@@ -6,6 +6,7 @@ import { Translate } from 'react-jhipster';
 import { Alert, Col, Row } from 'reactstrap';
 
 import { useAppSelector } from 'app/config/store';
+import BrandLogo from 'app/shared/components/brand-logo/brand-logo';
 
 export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
@@ -13,7 +14,7 @@ export const Home = () => {
   return (
     <Row>
       <Col md="3" className="pad">
-        <span className="hipster rounded" />
+        <BrandLogo />
       </Col>
       <Col md="9">
         <h1 className="display-4">

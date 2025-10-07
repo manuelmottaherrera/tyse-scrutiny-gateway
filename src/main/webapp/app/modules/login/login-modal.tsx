@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { type FieldError, useForm } from 'react-hook-form';
 
 import useRecaptcha from 'app/shared/custom-hooks/recaptcha/useRecaptcha';
+import BrandLogo from 'app/shared/components/brand-logo/brand-logo';
 
 export interface ILoginModalProps {
   showModal: boolean;
@@ -46,6 +47,9 @@ const LoginModal = (props: ILoginModalProps) => {
         </ModalHeader>
         <ModalBody>
           <Row>
+            <Col md="12">
+              <BrandLogo />
+            </Col>
             <Col md="12">
               {loginError ? (
                 <Alert color="danger" data-cy="loginError" fade={false}>

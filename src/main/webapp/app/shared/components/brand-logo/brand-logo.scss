@@ -1,0 +1,22 @@
+.brand-logo {
+  display: block;
+  align-content: center;
+  text-align: center;
+}
+
+.tyse-logo {
+  display: inline-block;
+  min-width: 100px;
+  min-height: 100px;
+  background: url('/content/images/TySE_LOGO_256x256.png') no-repeat center center;
+  background-size: contain;
+  margin-bottom: 0px;
+}
+
+.icons-array {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 10px;
+  margin-top: 0px;
+}

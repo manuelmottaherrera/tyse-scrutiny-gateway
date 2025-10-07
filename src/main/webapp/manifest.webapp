@@ -3,25 +3,35 @@
   "short_name": "TyseScrutinyGateway",
   "icons": [
     {
-      "src": "./content/images/jhipster_family_member_2_head-192.png",
-      "sizes": "192x192",
+      "src": "./content/images/TySE_LOGO_16x16.png",
+      "sizes": "16x16",
       "type": "image/png"
     },
     {
-      "src": "./content/images/jhipster_family_member_2_head-256.png",
+      "src": "./content/images/TySE_LOGO_32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "./content/images/TySE_LOGO_48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "./content/images/TySE_LOGO_100x100.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    },
+    {
+      "src": "./content/images/TySE_LOGO_113x113.png",
+      "sizes": "113x113",
+      "type": "image/png"
+    },
+    {
+      "src": "./content/images/TySE_LOGO_256x256.png",
       "sizes": "256x256",
       "type": "image/png"
     },
-    {
-      "src": "./content/images/jhipster_family_member_2_head-384.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "./content/images/jhipster_family_member_2_head-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
   ],
   "theme_color": "#000000",
   "background_color": "#e0e0e0",
