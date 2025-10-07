@@ -48,7 +48,7 @@ const LoginModal = (props: ILoginModalProps) => {
           <Row>
             <Col md="12">
               {loginError ? (
-                <Alert color="danger" data-cy="loginError">
+                <Alert color="danger" data-cy="loginError" fade={false}>
                   <Translate contentKey="login.messages.error.authentication">
                     <strong>Failed to sign in!</strong> Please check your credentials and try again.
                   </Translate>
@@ -101,12 +101,12 @@ const LoginModal = (props: ILoginModalProps) => {
             </Col>
           </Row>
           <div className="mt-1">&nbsp;</div>
-          <Alert color="warning">
+          <Alert color="warning" fade={false}>
             <Link to="/account/reset/request" data-cy="forgetYourPasswordSelector">
               <Translate contentKey="login.password.forgot">Did you forget your password?</Translate>
             </Link>
           </Alert>
-          <Alert color="warning">
+          <Alert color="warning" fade={false}>
             <span>
               <Translate contentKey="global.messages.info.register.noaccount">You don&apos;t have an account yet?</Translate>
             </span>{' '}
