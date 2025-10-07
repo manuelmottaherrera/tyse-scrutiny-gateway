@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
 import { Alert, Button, Col, Row } from 'reactstrap';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { handleRegister, reset } from './register.reducer';
+import useRecaptcha from 'app/shared/custom-hooks/recaptcha/useRecaptcha';
 
 export const RegisterPage = () => {
+  const { verifyRecaptcha, isLoadingRecaptcha, errorRecaptcha } = useRecaptcha('register');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
+  const [navigateToHome, setNavigateToHome] = useState(false);
 
   useEffect(
     () => () => {
@@ -21,8 +24,11 @@ export const RegisterPage = () => {
 
   const currentLocale = useAppSelector(state => state.locale.currentLocale);
 
-  const handleValidSubmit = ({ username, email, firstPassword }) => {
-    dispatch(handleRegister({ login: username, email, password: firstPassword, langKey: currentLocale }));
+  const handleValidSubmit = async ({ username, email, firstPassword }) => {
+    const validRecaptcha: boolean = await verifyRecaptcha();
+    if (validRecaptcha === true) {
+      dispatch(handleRegister({ login: username, email, password: firstPassword, langKey: currentLocale }));
+    }
   };
 
   const updatePassword = event => setPassword(event.target.value);
@@ -32,9 +38,17 @@ export const RegisterPage = () => {
   useEffect(() => {
     if (successMessage) {
       toast.success(translate(successMessage));
+      setNavigateToHome(true);
     }
-  }, [successMessage]);
+    if (errorRecaptcha) {
+      toast.error(errorRecaptcha);
+      setNavigateToHome(true);
+    }
+  }, [successMessage, errorRecaptcha]);
 
+  if (navigateToHome === true) {
+    return <Navigate to="/" />;
+  }
   return (
     <div>
       <Row className="justify-content-center">

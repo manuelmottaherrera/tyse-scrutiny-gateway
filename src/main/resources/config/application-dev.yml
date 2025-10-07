@@ -127,3 +127,6 @@ jhipster:
 # ===================================================================
 
 # application:
+google:
+  recaptcha:
+    site-key: 6LcTfbMrAAAAANzeOWR6c8lO1tn78Mehm_dVDDfN
