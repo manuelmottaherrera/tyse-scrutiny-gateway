@@ -33,7 +33,7 @@ export const App = () => {
   const ribbonEnv = useAppSelector(state => state.applicationProfile.ribbonEnv);
   const isInProduction = useAppSelector(state => state.applicationProfile.inProduction);
   const isOpenAPIEnabled = useAppSelector(state => state.applicationProfile.isOpenAPIEnabled);
-
+  const siteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY || 'no funcionó';
   const paddingTop = '60px';
   return (
     <BrowserRouter basename={baseHref}>

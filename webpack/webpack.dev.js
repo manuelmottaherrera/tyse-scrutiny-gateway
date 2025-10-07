@@ -10,6 +10,11 @@ const commonConfig = require('./webpack.common.js');
 
 const ENV = 'development';
 
+const dotenv = require('dotenv').config({ path: utils.root('.env') });
+if (dotenv.error) {
+  throw dotenv.error;
+}
+
 module.exports = async options =>
   webpackMerge(await commonConfig({ env: ENV }), {
     devtool: 'cheap-module-source-map', // https://reactjs.org/docs/cross-origin-errors.html
