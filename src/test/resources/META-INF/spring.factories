@@ -1,0 +1,4 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.tyse.scrutiny.gateway.config.\
+    SqlTestContainersSpringContextCustomizerFactory,com.tyse.scrutiny.gateway.\
+    config.KafkaTestContainersSpringContextCustomizerFactory
