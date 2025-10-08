@@ -31,7 +31,7 @@
       "src": "./content/images/TySE_LOGO_256x256.png",
       "sizes": "256x256",
       "type": "image/png"
-    },
+    }
   ],
   "theme_color": "#000000",
   "background_color": "#e0e0e0",
