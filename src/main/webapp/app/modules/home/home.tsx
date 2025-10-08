@@ -7,29 +7,17 @@ import { Alert, Col, Row } from 'reactstrap';
 
 import { useAppSelector } from 'app/config/store';
 import BrandLogo from 'app/shared/components/brand-logo/brand-logo';
+import { DashboardGrid } from 'app/shared/components/dashboard/dashboard-grid';
 
 export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
 
   return (
     <Row>
-      <Col md="3" className="pad">
-        <BrandLogo />
-      </Col>
-      <Col md="9">
-        <h1 className="display-4">
-          <Translate contentKey="home.title">Welcome!</Translate>
-        </h1>
-        <p className="lead">
-          <Translate contentKey="home.subtitle">This is your homepage</Translate>
-        </p>
+      <Col md="12">
         {account?.login ? (
           <div>
-            <Alert color="success" fade={false}>
-              <Translate contentKey="home.logged.message" interpolate={{ username: account.login }}>
-                You are logged in as user {account.login}.
-              </Translate>
-            </Alert>
+            <DashboardGrid />
           </div>
         ) : (
           <div>
