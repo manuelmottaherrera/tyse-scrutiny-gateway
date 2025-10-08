@@ -1,0 +1,348 @@
+@import 'bootswatch/dist/yeti/variables';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootswatch/dist/yeti/bootswatch';
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    // Variables para tema oscuro del sistema
+    --bs-body-bg: #{$gray-900};
+    --bs-body-color: #{$gray-100};
+    --bs-primary: #{darken($blue, 15%)};
+    --bs-secondary: #{$gray-700};
+    --bs-success: #{darken($green, 10%)};
+    --bs-info: #{darken($cyan, 10%)};
+    --bs-warning: #{darken($yellow, 10%)};
+    --bs-danger: #{darken($red, 10%)};
+    --bs-light: #{$gray-700};
+    --bs-dark: #{$gray-800};
+
+    --bs-card-bg: #{$gray-800};
+    --bs-card-color: #{$gray-100};
+    --bs-navbar-bg: #{darken($blue, 20%)};
+    --bs-navbar-color: #{rgba($white, 0.9)};
+    --bs-navbar-hover-color: #{$white};
+    --bs-table-bg: transparent;
+    --bs-table-color: #{$gray-100};
+    --bs-table-border-color: #{$gray-700};
+    --bs-dropdown-bg: #{$gray-800};
+    --bs-dropdown-color: #{$gray-100};
+    --bs-modal-bg: #{$gray-800};
+    --bs-modal-color: #{$gray-100};
+  }
+}
+
+.theme-dark {
+  // Colores base invertidos
+  --bs-body-bg: #{$gray-900};
+  --bs-body-color: #{$gray-100};
+  --bs-primary: #{darken($blue, 15%)};
+  --bs-secondary: #{$gray-700};
+  --bs-secondary-color: #{$gray-500};
+  --bs-success: #{darken($green, 10%)};
+  --bs-info: #{darken($cyan, 10%)};
+  --bs-warning: #{darken($yellow, 10%)};
+  --bs-danger: #{darken($red, 10%)};
+  --bs-light: #{$gray-700};
+  --bs-dark: #{$gray-800};
+
+  // Componentes específicos
+  --bs-card-bg: #{$gray-800};
+  --bs-card-color: #{$gray-100};
+  --bs-navbar-bg: #{darken($blue, 20%)};
+  --bs-navbar-color: #{rgba($white, 0.9)};
+  --bs-navbar-hover-color: #{$white};
+  --bs-table-bg: transparent;
+  --bs-table-color: #{$gray-100};
+  --bs-table-border-color: #{$gray-700};
+  --bs-dropdown-bg: #{$gray-800};
+  --bs-dropdown-color: #{$gray-100};
+  --bs-modal-bg: #{$gray-800};
+  --bs-modal-color: #{$gray-100};
+}
+
+.theme-light {
+  --bs-body-bg: #{$white};
+  --bs-body-color: #{$gray-900};
+  --bs-primary: #{$blue};
+  --bs-secondary: #{$gray-200};
+  --bs-success: #{$green};
+  --bs-info: #{$cyan};
+  --bs-warning: #{$yellow};
+  --bs-danger: #{$red};
+  --bs-light: #{$gray-200};
+  --bs-dark: #{$gray-800};
+
+  // Componentes específicos
+  --bs-card-bg: #{$white};
+  --bs-card-color: #{$gray-900};
+  --bs-navbar-bg: #{$primary};
+  --bs-navbar-color: #{rgba($white, 0.7)};
+  --bs-navbar-hover-color: #{$white};
+  --bs-table-bg: transparent;
+  --bs-table-color: #{$gray-900};
+  --bs-table-border-color: #{$gray-300};
+  --bs-dropdown-bg: #{$white};
+  --bs-dropdown-color: #{$gray-900};
+  --bs-modal-bg: #{$white};
+  --bs-modal-color: #{$gray-900};
+}
+
+// Variables CSS para temas
+:root {
+  // Tema Claro (Yeti por defecto)
+  --bs-body-bg: #{$white};
+  --bs-body-color: #{$gray-900};
+  --bs-primary: #{$blue};
+  --bs-secondary: #{$gray-200};
+  --bs-success: #{$green};
+  --bs-info: #{$cyan};
+  --bs-warning: #{$yellow};
+  --bs-danger: #{$red};
+  --bs-light: #{$gray-200};
+  --bs-dark: #{$gray-800};
+
+  // Componentes específicos
+  --bs-card-bg: #{$white};
+  --bs-card-color: #{$gray-900};
+  --bs-navbar-bg: #{$primary};
+  --bs-navbar-color: #{rgba($white, 0.7)};
+  --bs-navbar-hover-color: #{$white};
+  --bs-table-bg: transparent;
+  --bs-table-color: #{$gray-900};
+  --bs-table-border-color: #{$gray-300};
+  --bs-dropdown-bg: #{$white};
+  --bs-dropdown-color: #{$gray-900};
+  --bs-modal-bg: #{$white};
+  --bs-modal-color: #{$gray-900};
+}
+
+[data-theme='dark'] {
+  // Colores base invertidos
+  --bs-body-bg: #{$gray-900};
+  --bs-body-color: #{$gray-100};
+  --bs-primary: #{darken($blue, 15%)};
+  --bs-secondary: #{$gray-700};
+  --bs-success: #{darken($green, 10%)};
+  --bs-info: #{darken($cyan, 10%)};
+  --bs-warning: #{darken($yellow, 10%)};
+  --bs-danger: #{darken($red, 10%)};
+  --bs-light: #{$gray-700};
+  --bs-dark: #{$gray-800};
+
+  // Componentes específicos
+  --bs-card-bg: #{$gray-800};
+  --bs-card-color: #{$gray-100};
+  --bs-navbar-bg: #{darken($blue, 20%)};
+  --bs-navbar-color: #{rgba($white, 0.9)};
+  --bs-navbar-hover-color: #{$white};
+  --bs-table-bg: transparent;
+  --bs-table-color: #{$gray-100};
+  --bs-table-border-color: #{$gray-700};
+  --bs-dropdown-bg: #{$gray-800};
+  --bs-dropdown-color: #{$gray-100};
+  --bs-modal-bg: #{$gray-800};
+  --bs-modal-color: #{$gray-100};
+}
+
+// Aplicación de variables a elementos Bootstrap
+body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+// Navbar
+.navbar {
+  background-color: var(--bs-navbar-bg) !important;
+  transition: background-color 0.3s ease;
+
+  .navbar-brand,
+  .navbar-text {
+    color: var(--bs-navbar-color);
+  }
+
+  .navbar-nav {
+    .nav-link {
+      color: var(--bs-navbar-color);
+      transition: color 0.3s ease;
+
+      &:hover,
+      &:focus {
+        color: var(--bs-navbar-hover-color);
+      }
+    }
+
+    .show > .nav-link,
+    .active > .nav-link,
+    .nav-link.show,
+    .nav-link.active {
+      color: var(--bs-navbar-hover-color);
+    }
+  }
+}
+
+// Cards
+.card {
+  background-color: var(--bs-card-bg);
+  color: var(--bs-card-color);
+  border: 1px solid var(--bs-table-border-color);
+  transition: all 0.3s ease;
+}
+
+// Tables
+.table {
+  color: var(--bs-table-color);
+  --bs-table-border-color: var(--bs-table-border-color);
+
+  &.table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: rgba(var(--bs-body-color-rgb), 0.05);
+  }
+}
+
+// Buttons
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+
+  &:hover {
+    background-color: #{darken($blue, 10%)};
+    border-color: #{darken($blue, 10%)};
+  }
+}
+
+[data-theme='dark'] {
+  .btn-primary:hover {
+    background-color: #{lighten($blue, 10%)};
+    border-color: #{lighten($blue, 10%)};
+  }
+}
+
+// Dropdowns
+.dropdown-menu {
+  background-color: var(--bs-dropdown-bg);
+  color: var(--bs-dropdown-color);
+  border: 1px solid var(--bs-table-border-color);
+}
+
+.dropdown-item {
+  color: var(--bs-dropdown-color);
+
+  &:hover,
+  &:focus {
+    background-color: var(--bs-primary);
+    color: white;
+  }
+}
+
+// Forms
+.form-control {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-table-border-color);
+
+  &:focus {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border-color: var(--bs-primary);
+  }
+}
+
+.form-label {
+  color: var(--bs-body-color);
+}
+
+// Modals
+.modal-content {
+  background-color: var(--bs-modal-bg);
+  color: var(--bs-modal-color);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--bs-table-border-color);
+}
+
+// Alerts
+.alert {
+  background-color: var(--bs-card-bg);
+  color: var(--bs-card-color);
+  border-color: var(--bs-table-border-color);
+}
+
+// Badges
+.badge {
+  &.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+  }
+}
+
+// Pagination
+.page-link {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-table-border-color);
+
+  &:hover {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+  }
+}
+
+.page-item.active .page-link {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+// Breadcrumb
+.breadcrumb {
+  background-color: var(--bs-card-bg);
+  border: 1px solid var(--bs-table-border-color);
+
+  .breadcrumb-item {
+    &.active {
+      color: var(--bs-body-color);
+    }
+  }
+}
+
+// Progress bars
+.progress {
+  background-color: var(--bs-card-bg);
+}
+
+// List groups
+.list-group-item {
+  background-color: var(--bs-card-bg);
+  color: var(--bs-card-color);
+  border-color: var(--bs-table-border-color);
+}
+
+// Utility classes for manual overrides
+.bg-light {
+  background-color: var(--bs-light) !important;
+}
+
+.bg-dark {
+  background-color: var(--bs-dark) !important;
+}
+
+.text-muted {
+  color: #6c757d !important; // Mantener consistente en ambos temas
+}
+
+// Asegurar que los enlaces sean visibles
+a {
+  color: var(--bs-primary);
+
+  &:hover {
+    color: var(--bs-primary);
+    opacity: 0.8;
+  }
+}

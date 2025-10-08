@@ -1,9 +1,7 @@
 // Override Bootstrap variables
 @import 'bootstrap-variables';
-@import 'bootswatch/dist/sketchy/variables';
+@import 'themes';
 // Import Bootstrap source files from node_modules
-@import 'bootstrap/scss/bootstrap';
-@import 'bootswatch/dist/sketchy/bootswatch';
 body {
   margin: 0;
 }

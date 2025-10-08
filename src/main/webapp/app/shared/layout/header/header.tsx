@@ -9,6 +9,7 @@ import { useAppDispatch } from 'app/config/store';
 import { setLocale } from 'app/shared/reducers/locale';
 import { AccountMenu, AdminMenu, EntitiesMenu, LocaleMenu } from '../menus';
 import { Brand, Home } from './header-components';
+import ThemeToggle from 'app/shared/components/theme-toggle/theme-toggle';
 
 export interface IHeaderProps {
   isAuthenticated: boolean;
@@ -57,6 +58,7 @@ const Header = (props: IHeaderProps) => {
             {props.isAuthenticated && props.isAdmin && <AdminMenu showOpenAPI={props.isOpenAPIEnabled} />}
             <LocaleMenu currentLocale={props.currentLocale} onClick={handleLocaleChange} />
             <AccountMenu isAuthenticated={props.isAuthenticated} />
+            <ThemeToggle />
           </Nav>
         </Collapse>
       </Navbar>
