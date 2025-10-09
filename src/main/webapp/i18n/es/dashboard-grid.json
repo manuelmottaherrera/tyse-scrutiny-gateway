@@ -1,0 +1,47 @@
+{
+  "dashboardGrid": {
+    "title": "Panel Principal",
+    "description": "Selecciona un módulo para comenzar",
+    "items": {
+      "divipol": {
+        "title": "Divipol",
+        "description": "Gestión de división política y configuración territorial"
+      },
+      "statistics": {
+        "title": "Estadísticas",
+        "description": "Reportes y análisis estadísticos electorales"
+      },
+      "heatMap": {
+        "title": "Mapa de Calor",
+        "description": "Visualización geográfica de resultados electorales"
+      },
+      "voteCount": {
+        "title": "Conteo de Votos",
+        "description": "Sistema de escrutinio y conteo en tiempo real"
+      },
+      "fileUpload": {
+        "title": "Cargue de Archivos",
+        "description": "Gestión y procesamiento de archivos electorales"
+      },
+      "votingJuries": {
+        "title": "Jurados de Votación",
+        "description": "Administración del personal electoral"
+      },
+      "trainings": {
+        "title": "Capacitaciones",
+        "description": "Programas de formación para el personal electoral"
+      },
+      "witnesses": {
+        "title": "Testigos Electorales",
+        "description": "Gestión de observadores y testigos electorales"
+      },
+      "analytics": {
+        "title": "Analítica Electoral",
+        "description": "Análisis predictivo y tendencias electorales"
+      }
+    },
+    "general": {
+      "comingSoon": "Próximamente"
+    }
+  }
+}

@@ -28,6 +28,8 @@
     --bs-dropdown-color: #{$gray-100};
     --bs-modal-bg: #{$gray-800};
     --bs-modal-color: #{$gray-100};
+    --bs-color-orange: #{$orange};
+    --bs-color-yellow: #{$yellow};
   }
 }
 
@@ -58,6 +60,8 @@
   --bs-dropdown-color: #{$gray-100};
   --bs-modal-bg: #{$gray-800};
   --bs-modal-color: #{$gray-100};
+  --bs-color-orange: #{$orange};
+  --bs-color-yellow: #{$yellow};
 }
 
 .theme-light {
@@ -85,6 +89,8 @@
   --bs-dropdown-color: #{$gray-900};
   --bs-modal-bg: #{$white};
   --bs-modal-color: #{$gray-900};
+  --bs-color-orange: #{$orange};
+  --bs-color-yellow: #{$yellow};
 }
 
 // Variables CSS para temas
@@ -114,6 +120,8 @@
   --bs-dropdown-color: #{$gray-900};
   --bs-modal-bg: #{$white};
   --bs-modal-color: #{$gray-900};
+  --bs-color-orange: #{$orange};
+  --bs-color-yellow: #{$yellow};
 }
 
 [data-theme='dark'] {
@@ -142,6 +150,8 @@
   --bs-dropdown-color: #{$gray-100};
   --bs-modal-bg: #{$gray-800};
   --bs-modal-color: #{$gray-100};
+  --bs-color-orange: #{$orange};
+  --bs-color-yellow: #{$yellow};
 }
 
 // Aplicación de variables a elementos Bootstrap

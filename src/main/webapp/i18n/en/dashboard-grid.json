@@ -1,0 +1,47 @@
+{
+  "dashboardGrid": {
+    "title": "Main Panel",
+    "description": "Select a module to begin",
+    "items": {
+      "divipol": {
+        "title": "Divipol",
+        "description": "Management of political division and territorial configuration"
+      },
+      "statistics": {
+        "title": "Statistics",
+        "description": "Electoral statistical reports and analyses"
+      },
+      "heatMap": {
+        "title": "Heat Map",
+        "description": "Geographic visualization of election results"
+      },
+      "voteCount": {
+        "title": "Vote Count",
+        "description": "Real-time counting and scrutiny system"
+      },
+      "fileUpload": {
+        "title": "File Upload",
+        "description": "Management and processing of electoral files"
+      },
+      "votingJuries": {
+        "title": "Voting Juries",
+        "description": "Election Personnel Administration"
+      },
+      "trainings": {
+        "title": "Trainings",
+        "description": "Training programs for electoral staff"
+      },
+      "witnesses": {
+        "title": "Election Witnesses",
+        "description": "Management of electoral observers and witnesses"
+      },
+      "analytics": {
+        "title": "Electoral Analytics",
+        "description": "Predictive analysis and electoral trends"
+      }
+    },
+    "general": {
+      "comingSoon": "Coming Soon"
+    }
+  }
+}

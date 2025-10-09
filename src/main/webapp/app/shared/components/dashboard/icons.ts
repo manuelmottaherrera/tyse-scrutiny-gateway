@@ -12,12 +12,12 @@ import {
 
 export const moduleIcons = {
   divipol: faMapMarkedAlt,
-  estadisticas: faChartBar,
-  mapaCalor: faFire,
-  conteoVotos: faVoteYea,
-  cargueArchivos: faFileUpload,
-  jurados: faUsers,
-  capacitaciones: faChalkboardTeacher,
-  testigos: faUserShield,
-  analitica: faChartLine,
+  statistics: faChartBar,
+  heatMap: faFire,
+  voteCount: faVoteYea,
+  fileUpload: faFileUpload,
+  votingJuries: faUsers,
+  trainings: faChalkboardTeacher,
+  witnesses: faUserShield,
+  analytics: faChartLine,
 };

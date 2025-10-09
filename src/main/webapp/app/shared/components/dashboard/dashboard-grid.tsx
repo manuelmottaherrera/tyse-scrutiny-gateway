@@ -2,6 +2,7 @@ import React from 'react';
 import { ModuleCard } from './modules-card';
 import { moduleIcons } from './icons';
 import './dashboard-grid.scss';
+import { Translate } from 'react-jhipster';
 
 export interface Module {
   id: string;
@@ -11,6 +12,10 @@ export interface Module {
   path: string;
   role: string[];
   color?: string;
+  enabled: boolean;
+  disabledReason?: string;
+  comingSoon?: boolean;
+  hidden: boolean;
 }
 
 export const DashboardGrid: React.FC = () => {
@@ -18,83 +23,119 @@ export const DashboardGrid: React.FC = () => {
     {
       id: 'divipol',
       title: 'Divipol',
-      description: 'Gestión de división política y configuración territorial',
+      description: 'Management of political division and territorial configuration',
       icon: moduleIcons.divipol,
       path: '/divipol',
       role: ['ADMIN', 'COORDINATOR'],
       color: '#008cba',
+      enabled: true,
+      disabledReason: 'Módulo en desarrollo',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'estadisticas',
-      title: 'Estadísticas',
-      description: 'Reportes y análisis estadísticos electorales',
-      icon: moduleIcons.estadisticas,
+      id: 'statistics',
+      title: 'Statistics',
+      description: 'Electoral statistical reports and analyses',
+      icon: moduleIcons.statistics,
       path: '/estadistics',
       role: ['ADMIN', 'ANALYST', 'VIEWER'],
       color: '#43ac6a',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'mapa-calor',
-      title: 'Mapa de Calor',
-      description: 'Visualización geográfica de resultados electorales',
-      icon: moduleIcons.mapaCalor,
+      id: 'heatMap',
+      title: 'Heat Map',
+      description: 'Geographic visualization of election results',
+      icon: moduleIcons.heatMap,
       path: '/heat-map',
       role: ['ADMIN', 'ANALYST', 'VIEWER'],
       color: '#e99002',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'conteo-votos',
-      title: 'Conteo de Votos',
-      description: 'Sistema de escrutinio y conteo en tiempo real',
-      icon: moduleIcons.conteoVotos,
+      id: 'voteCount',
+      title: 'Vote Count',
+      description: 'Real-time counting and scrutiny system',
+      icon: moduleIcons.voteCount,
       path: '/vote-count',
       role: ['ADMIN', 'COORDINATOR', 'OPERATOR'],
       color: '#f04124',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'cargue-archivos',
-      title: 'Cargue de Archivos',
-      description: 'Gestión y procesamiento de archivos electorales',
-      icon: moduleIcons.cargueArchivos,
+      id: 'fileUpload',
+      title: 'File Upload',
+      description: 'Management and processing of electoral files',
+      icon: moduleIcons.fileUpload,
       path: '/file-upload',
       role: ['ADMIN', 'OPERATOR'],
       color: '#5bc0de',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'jurados',
-      title: 'Jurados de Votación',
-      description: 'Administración del personal electoral',
-      icon: moduleIcons.jurados,
-      path: '/jury-management',
+      id: 'votingJuries',
+      title: 'Voting Juries',
+      description: '',
+      icon: moduleIcons.votingJuries,
+      path: '/voting-juries',
       role: ['ADMIN', 'COORDINATOR'],
       color: '#6f42c1',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'capacitaciones',
-      title: 'Capacitaciones',
-      description: 'Programas de formación para el personal electoral',
-      icon: moduleIcons.capacitaciones,
+      id: 'trainings',
+      title: 'Trainings',
+      description: 'Training programs for electoral staff',
+      icon: moduleIcons.trainings,
       path: '/training',
       role: ['ADMIN', 'COORDINATOR', 'TRAINER'],
       color: '#20c997',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'testigos',
+      id: 'witnesses',
       title: 'Testigos Electorales',
-      description: 'Gestión de observadores y testigos electorales',
-      icon: moduleIcons.testigos,
+      description: '',
+      icon: moduleIcons.witnesses,
       path: '/witnesses',
       role: ['ADMIN', 'COORDINATOR'],
       color: '#e83e8c',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
     {
-      id: 'analitica',
+      id: 'analytics',
       title: 'Analítica Electoral',
-      description: 'Análisis predictivo y tendencias electorales',
-      icon: moduleIcons.analitica,
+      description: 'Predictive analysis and electoral trends',
+      icon: moduleIcons.analytics,
       path: '/analytics',
       role: ['ADMIN', 'ANALYST'],
       color: '#6610f2',
+      enabled: false,
+      disabledReason: 'Disponible próximamente',
+      comingSoon: true,
+      hidden: false,
     },
   ];
 
@@ -105,8 +146,12 @@ export const DashboardGrid: React.FC = () => {
   return (
     <div className="dashboard-grid">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Panel Principal</h1>
-        <p className="dashboard-subtitle">Selecciona un módulo para comenzar</p>
+        <h1 className="dashboard-title">
+          <Translate contentKey="dashboardGrid.title">Main Panel</Translate>
+        </h1>
+        <p className="dashboard-subtitle">
+          <Translate contentKey="dashboardGrid.description">Select a module to begin</Translate>
+        </p>
       </div>
 
       <div className="modules-grid">

@@ -125,6 +125,63 @@
     &:hover::before {
       opacity: 1;
     }
+
+    // Estado deshabilitado
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      position: relative;
+
+      // Eliminar efectos hover para deshabilitados
+      &:hover {
+        transform: none;
+        box-shadow: none;
+        border-color: var(--bs-border-color);
+
+        .card-arrow {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        .card-icon {
+          transform: none;
+        }
+      }
+
+      // Overlay semi-transparente
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        pointer-events: none;
+      }
+
+      .card-title {
+        .badge.coming-soon {
+          background: linear-gradient(45deg, var(--bs-color-orange), var(--bs-color-yellow));
+          color: var(--bs-body-bg);
+          font-size: 0.7rem;
+          margin-left: 0.5rem;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+
+      .disabled-reason {
+        font-size: 0.8rem;
+        color: var(--bs-danger);
+        margin: 0.5rem 0 0 0;
+        font-style: italic;
+      }
+
+      .card-arrow {
+        color: var(--bs-danger);
+      }
+    }
   }
 
   // Responsive
@@ -158,6 +215,15 @@
         svg {
           font-size: 1.5rem !important;
         }
+      }
+    }
+  }
+
+  // Mejoras para modo oscuro en elementos deshabilitados
+  [data-theme='dark'] {
+    .module-card.disabled {
+      &::after {
+        background: rgba(0, 0, 0, 0.3);
       }
     }
   }
