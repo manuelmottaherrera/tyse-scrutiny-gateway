@@ -8,16 +8,17 @@
     margin-bottom: 3rem;
 
     .dashboard-title {
-      font-size: 2.5rem;
-      font-weight: 300;
-      color: var(--bs-body-color);
+      font-size: calc(2.5rem * var(--bs-heading-font-size-factor));
+      font-weight: var(--bs-heading-font-weight);
+      color: var(--bs-heading-color);
       margin-bottom: 0.5rem;
     }
 
     .dashboard-subtitle {
       font-size: 1.1rem;
-      color: var(--bs-secondary-color);
-      opacity: 0.8;
+      font-weight: var(--bs-subtitle-font-weight);
+      color: var(--bs-subtitle-color);
+      opacity: 0.9;
     }
   }
 
@@ -80,19 +81,19 @@
       font-size: 1.25rem;
       font-weight: 600;
       margin: 0 0 0.5rem 0;
-      color: var(--bs-body-color);
+      color: var(--bs-heading-color);
     }
 
     .card-description {
       font-size: 0.9rem;
-      color: var(--bs-secondary-color);
+      color: var(--bs-subtitle-color);
       margin: 0;
       line-height: 1.4;
       opacity: 0.8;
     }
 
     .card-arrow {
-      color: var(--bs-secondary-color);
+      color: var(--bs-secondary);
       opacity: 0;
       transform: translateX(-5px);
       transition: all 0.3s ease;
