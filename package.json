@@ -83,6 +83,11 @@
     "webapp:test": "npm run test --",
     "webpack-dev-server": "webpack serve"
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "config": {
     "backend_port": 8080,
     "default_environment": "prod",
@@ -122,6 +127,8 @@
     "uuid": "11.1.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@testing-library/react": "16.3.0",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.16",
@@ -152,7 +159,7 @@
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "generator-jhipster": "^8.7.0",
     "html-webpack-plugin": "5.6.3",
-    "husky": "9.1.7",
+    "husky": "^9.1.7",
     "identity-obj-proxy": "3.0.0",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
