@@ -10,6 +10,14 @@ import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
 import com.tyse.scrutiny.gateway.web.rest.errors.BadRequestAlertException;
 import com.tyse.scrutiny.gateway.web.rest.errors.EmailAlreadyUsedException;
 import com.tyse.scrutiny.gateway.web.rest.errors.LoginAlreadyUsedException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import java.net.URI;
@@ -62,6 +70,7 @@ import tech.jhipster.web.util.PaginationUtil;
  */
 @RestController
 @RequestMapping("/api/admin")
+@Tag(name = "User Management", description = "API de administración de usuarios - Solo accesible para administradores")
 public class UserResource {
 
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
@@ -108,9 +117,27 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new user, or with status {@code 400 (Bad Request)} if the login or email is already in use.
      * @throws BadRequestAlertException {@code 400 (Bad Request)} if the login or email is already in use.
      */
+    @Operation(
+        summary = "Crear nuevo usuario",
+        description = "Crea un nuevo usuario en el sistema y envía un correo de activación. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "201",
+                description = "Usuario creado exitosamente",
+                content = @Content(schema = @Schema(implementation = User.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Login o email ya en uso", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+        }
+    )
     @PostMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<User>> createUser(@Valid @RequestBody AdminUserDTO userDTO) {
+    public Mono<ResponseEntity<User>> createUser(
+        @Parameter(description = "Información del usuario a crear", required = true) @Valid @RequestBody AdminUserDTO userDTO
+    ) {
         LOG.debug("REST request to save User : {}", userDTO);
 
         if (userDTO.getId() != null) {
@@ -153,11 +180,31 @@ public class UserResource {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
      */
+    @Operation(
+        summary = "Actualizar usuario existente",
+        description = "Actualiza la información de un usuario existente. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Usuario actualizado exitosamente",
+                content = @Content(schema = @Schema(implementation = AdminUserDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Email o login ya en uso", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content),
+        }
+    )
     @PutMapping({ "/users", "/users/{login}" })
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<AdminUserDTO>> updateUser(
-        @PathVariable(name = "login", required = false) @Pattern(regexp = Constants.LOGIN_REGEX) String login,
-        @Valid @RequestBody AdminUserDTO userDTO
+        @Parameter(description = "Login del usuario (opcional si está en el body)", required = false) @PathVariable(
+            name = "login",
+            required = false
+        ) @Pattern(regexp = Constants.LOGIN_REGEX) String login,
+        @Parameter(description = "Información actualizada del usuario", required = true) @Valid @RequestBody AdminUserDTO userDTO
     ) {
         LOG.debug("REST request to update User : {}", userDTO);
         return userRepository
@@ -193,10 +240,22 @@ public class UserResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body all users.
      */
+    @Operation(
+        summary = "Obtener todos los usuarios",
+        description = "Retorna una lista paginada de todos los usuarios con sus detalles completos. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetros de paginación inválidos", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+        }
+    )
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<Flux<AdminUserDTO>>> getAllUsers(
-        @org.springdoc.core.annotations.ParameterObject ServerHttpRequest request,
+        @Parameter(hidden = true) @org.springdoc.core.annotations.ParameterObject ServerHttpRequest request,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get all User for an admin");
@@ -226,9 +285,27 @@ public class UserResource {
      * @param login the login of the user to find.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the "login" user, or with status {@code 404 (Not Found)}.
      */
+    @Operation(
+        summary = "Obtener usuario por login",
+        description = "Retorna la información completa de un usuario específico. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Usuario encontrado",
+                content = @Content(schema = @Schema(implementation = AdminUserDTO.class))
+            ),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content),
+        }
+    )
     @GetMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<AdminUserDTO> getUser(@PathVariable("login") String login) {
+    public Mono<AdminUserDTO> getUser(
+        @Parameter(description = "Login del usuario a buscar", required = true) @PathVariable("login") String login
+    ) {
         LOG.debug("REST request to get User : {}", login);
         return userService
             .getUserWithAuthoritiesByLogin(login)
@@ -242,9 +319,25 @@ public class UserResource {
      * @param login the login of the user to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @Operation(
+        summary = "Eliminar usuario",
+        description = "Elimina un usuario del sistema. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "204", description = "Usuario eliminado exitosamente"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content),
+        }
+    )
     @DeleteMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+    public Mono<ResponseEntity<Void>> deleteUser(
+        @Parameter(description = "Login del usuario a eliminar", required = true) @PathVariable("login") @Pattern(
+            regexp = Constants.LOGIN_REGEX
+        ) String login
+    ) {
         LOG.debug("REST request to delete User: {}", login);
         return userService
             .deleteUser(login)

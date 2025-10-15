@@ -2,6 +2,14 @@ package com.tyse.scrutiny.gateway.web.rest;
 
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
 import com.tyse.scrutiny.gateway.web.rest.vm.RouteVM;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +26,7 @@ import reactor.core.publisher.Flux;
  */
 @RestController
 @RequestMapping("/api/gateway")
+@Tag(name = "Gateway", description = "API para gestionar la configuración del Gateway y rutas de microservicios")
 public class GatewayResource {
 
     private final RouteLocator routeLocator;
@@ -37,6 +46,21 @@ public class GatewayResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the list of routes.
      */
+    @Operation(
+        summary = "Obtener rutas activas del Gateway",
+        description = "Retorna todas las rutas activas configuradas en el Gateway con sus instancias de servicio descubiertas. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Lista de rutas obtenida exitosamente",
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = RouteVM.class)))
+            ),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+        }
+    )
     @GetMapping("/routes")
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<List<RouteVM>> activeRoutes() {

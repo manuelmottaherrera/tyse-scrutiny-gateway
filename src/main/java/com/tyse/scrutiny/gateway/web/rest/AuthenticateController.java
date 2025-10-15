@@ -7,6 +7,13 @@ import static com.tyse.scrutiny.gateway.security.SecurityUtils.USER_ID_CLAIM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tyse.scrutiny.gateway.security.DomainUserDetailsService.UserWithId;
 import com.tyse.scrutiny.gateway.web.rest.vm.LoginVM;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.Instant;
@@ -34,6 +41,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Authentication", description = "API para autenticación de usuarios con JWT")
 public class AuthenticateController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticateController.class);
@@ -53,8 +61,26 @@ public class AuthenticateController {
         this.authenticationManager = authenticationManager;
     }
 
+    @Operation(
+        summary = "Autenticar usuario",
+        description = "Autentica un usuario con sus credenciales y retorna un token JWT para acceder a los recursos protegidos"
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Autenticación exitosa - retorna token JWT",
+                content = @Content(schema = @Schema(implementation = JWTToken.class))
+            ),
+            @ApiResponse(responseCode = "401", description = "Credenciales inválidas", content = @Content),
+        }
+    )
     @PostMapping("/authenticate")
-    public Mono<ResponseEntity<JWTToken>> authorize(@Valid @RequestBody Mono<LoginVM> loginVM) {
+    public Mono<ResponseEntity<JWTToken>> authorize(
+        @Parameter(description = "Credenciales de inicio de sesión (usuario y contraseña)", required = true) @Valid @RequestBody Mono<
+            LoginVM
+        > loginVM
+    ) {
         return loginVM
             .flatMap(login ->
                 authenticationManager
@@ -74,8 +100,18 @@ public class AuthenticateController {
      * @return the {@link ResponseEntity} with status {@code 204 (No Content)},
      * or with status {@code 401 (Unauthorized)} if not authenticated.
      */
+    @Operation(
+        summary = "Verificar estado de autenticación",
+        description = "Verifica si el usuario actual está autenticado mediante el token JWT"
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "204", description = "Usuario autenticado correctamente"),
+            @ApiResponse(responseCode = "401", description = "Usuario no autenticado o token inválido"),
+        }
+    )
     @GetMapping("/authenticate")
-    public ResponseEntity<Void> isAuthenticated(Principal principal) {
+    public ResponseEntity<Void> isAuthenticated(@Parameter(hidden = true) Principal principal) {
         LOG.debug("REST request to check if the current user is authenticated");
         return ResponseEntity.status(principal == null ? HttpStatus.UNAUTHORIZED : HttpStatus.NO_CONTENT).build();
     }
