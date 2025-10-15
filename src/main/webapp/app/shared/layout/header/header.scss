@@ -66,6 +66,29 @@ Navbar styles
   }
 }
 
+// Añadir espacio entre iconos y texto en todos los menús
+.navbar-nav {
+  .nav-link,
+  .dropdown-toggle {
+    svg {
+      margin-right: 0.5rem;
+    }
+  }
+
+  // Añadir espacio entre las opciones del menú en vista desktop
+  @media (min-width: 768px) {
+    .nav-item,
+    .dropdown,
+    .theme-toggle {
+      margin-left: 1rem;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
 .brand-title {
   font-size: 1.25rem;
   margin-left: 0.25rem;
