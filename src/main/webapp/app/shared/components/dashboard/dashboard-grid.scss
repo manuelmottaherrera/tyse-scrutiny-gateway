@@ -1,3 +1,5 @@
+@import '../../../color-variables';
+
 .dashboard-grid {
   padding: 2rem;
   max-width: 1200px;
@@ -40,11 +42,11 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px $color-shadow-secondary;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 25px $color-shadow-medium;
       border-color: var(--bs-primary);
       text-decoration: none;
       color: inherit;
@@ -152,7 +154,7 @@
       // Eliminar efectos hover para deshabilitados
       &:hover {
         transform: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px $color-shadow-secondary;
         border-color: var(--bs-border-color-translucent);
 
         .card-arrow {
@@ -218,13 +220,13 @@
   // Mejoras para modo oscuro
   [data-theme='dark'] {
     .module-card {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      background: $color-dark-overlay-light;
+      border-color: $color-dark-overlay-strong;
+      box-shadow: 0 2px 8px $color-shadow-strong;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        background: $color-dark-overlay-medium;
+        box-shadow: 0 8px 25px $color-shadow-very-strong;
         border-color: var(--bs-primary);
       }
 
@@ -233,21 +235,21 @@
       }
 
       .card-title .badge {
-        background-color: #6c757d !important;
-        color: #ffffff;
+        background-color: $color-gray-darker !important;
+        color: $color-white-full;
       }
 
       &.disabled {
-        background: rgba(255, 255, 255, 0.02);
+        background: $color-dark-overlay-lightest;
         opacity: 0.6;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.02);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          background: $color-dark-overlay-lightest;
+          box-shadow: 0 2px 8px $color-shadow-strong;
         }
 
         .disabled-reason {
-          color: #ffc107;
+          color: $color-warning;
           font-weight: 600;
           opacity: 1;
         }

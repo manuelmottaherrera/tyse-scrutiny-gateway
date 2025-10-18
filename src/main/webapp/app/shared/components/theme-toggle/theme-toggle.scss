@@ -1,6 +1,8 @@
+@import '../../../color-variables';
+
 .theme-toggle {
   .theme-toggle-button {
-    color: #fff !important;
+    color: $color-white !important;
 
     svg {
       margin-right: 0.5rem;
@@ -10,11 +12,11 @@
   .theme-dropdown-menu {
     min-width: 10rem;
     border-radius: 0.5rem;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 16px $color-shadow-medium;
     padding: 0.5rem;
     margin-top: 0.25rem !important;
-    background-color: #212529;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: $color-dark-background;
+    border: 1px solid $color-dark-overlay-border;
   }
 
   .theme-dropdown-item {
@@ -25,14 +27,14 @@
     transition: all 0.2s ease;
     border-radius: 0.25rem;
     margin-bottom: 0.25rem;
-    color: #fff;
+    color: $color-white;
 
     &:last-child {
       margin-bottom: 0;
     }
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: $color-dark-overlay-strong;
       transform: translateX(2px);
     }
 

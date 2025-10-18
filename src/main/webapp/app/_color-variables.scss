@@ -1,0 +1,85 @@
+/**
+ * Variables de Colores Centralizadas
+ * ====================================
+ * Este archivo contiene todas las variables de colores utilizadas en la aplicación.
+ * Todos los colores hardcodeados deben ser reemplazados por estas variables.
+ */
+
+// ==========================================================================
+// Colores Base
+// ==========================================================================
+
+// Blancos y Negros
+$color-white: #fff;
+$color-white-full: #ffffff;
+$color-black: #000;
+$color-black-full: #000000;
+
+// Grises
+$color-gray-light: #eee;
+$color-gray-medium: #ccc;
+$color-gray-medium-dark: #bbb;
+$color-gray-dark: #ddd;
+$color-gray-darker: #6c757d;
+
+// ==========================================================================
+// Colores de Estado
+// ==========================================================================
+
+// Error y Peligro
+$color-danger: #ff0000;
+$color-danger-ribbon: rgba(170, 0, 0, 0.5);
+
+// Advertencia
+$color-warning: #ffc107;
+
+// Éxito
+$color-success: #009cd8;
+
+// ==========================================================================
+// Colores de Header/Navbar
+// ==========================================================================
+
+$color-header-primary: #fff;
+$color-header-secondary: #bbb;
+
+// ==========================================================================
+// Colores de Enlaces
+// ==========================================================================
+
+$color-link-primary: #533f03;
+
+// ==========================================================================
+// Colores de Sombras
+// ==========================================================================
+
+$color-shadow-primary: rgba(0, 0, 0, 0.12);
+$color-shadow-secondary: rgba(0, 0, 0, 0.08);
+$color-shadow-medium: rgba(0, 0, 0, 0.15);
+$color-shadow-strong: rgba(0, 0, 0, 0.3);
+$color-shadow-very-strong: rgba(0, 0, 0, 0.4);
+$color-shadow-text: rgba(0, 0, 0, 0.5);
+
+// ==========================================================================
+// Colores de Tema Oscuro
+// ==========================================================================
+
+// Overlays y fondos translúcidos para tema oscuro
+$color-dark-overlay-lightest: rgba(255, 255, 255, 0.02);
+$color-dark-overlay-light: rgba(255, 255, 255, 0.03);
+$color-dark-overlay-medium: rgba(255, 255, 255, 0.05);
+$color-dark-overlay-strong: rgba(255, 255, 255, 0.1);
+$color-dark-overlay-border: rgba(255, 255, 255, 0.15);
+
+// Colores específicos del tema oscuro
+$color-dark-background: #212529;
+
+// ==========================================================================
+// Colores de Componentes Específicos
+// ==========================================================================
+
+// Password Strength Bar
+$color-password-strength-empty: #ddd;
+
+// Docs (iFrame)
+$color-docs-background: #ffffff;

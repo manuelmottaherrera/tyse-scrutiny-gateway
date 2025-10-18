@@ -1,12 +1,14 @@
-$header-color: #fff;
-$header-color-secondary: #bbb;
+@import '../../../color-variables';
+
+$header-color: $color-header-primary;
+$header-color-secondary: $color-header-secondary;
 $header-color-hover: darken($header-color, 20%);
 
 /* ==========================================================================
 Development Ribbon
 ========================================================================== */
 .ribbon {
-  background-color: rgba(170, 0, 0, 0.5);
+  background-color: $color-danger-ribbon;
   left: -3.5em;
   -moz-transform: rotate(-45deg);
   -ms-transform: rotate(-45deg);
@@ -22,14 +24,14 @@ Development Ribbon
   pointer-events: none;
   opacity: 0.75;
   a {
-    color: #fff;
+    color: $color-white;
     display: block;
     font-weight: 400;
     margin: 1px 0;
     padding: 10px 50px;
     text-align: center;
     text-decoration: none;
-    text-shadow: 0 0 5px #444;
+    text-shadow: 0 0 5px $color-shadow-text;
     pointer-events: none;
   }
 }
@@ -101,7 +103,7 @@ Navbar styles
 
 .loading-bar {
   height: 3px;
-  background-color: #009cd8;
+  background-color: $color-success;
   position: absolute;
   top: 0;
   z-index: 1031;
