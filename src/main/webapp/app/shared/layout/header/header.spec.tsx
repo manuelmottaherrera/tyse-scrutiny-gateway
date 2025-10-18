@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 
 import initStore from 'app/config/store';
+import { ThemeProvider } from 'app/shared/context/theme-contex/theme-context';
 import Header from './header';
 
 describe('Header', () => {
@@ -37,9 +38,11 @@ describe('Header', () => {
       const store = initStore();
       const { container } = render(
         <Provider store={store}>
-          <MemoryRouter>
-            <Header {...props} />
-          </MemoryRouter>
+          <ThemeProvider>
+            <MemoryRouter>
+              <Header {...props} />
+            </MemoryRouter>
+          </ThemeProvider>
         </Provider>,
       );
       mountedWrapper = container.innerHTML;

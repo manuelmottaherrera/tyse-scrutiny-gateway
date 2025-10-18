@@ -3,6 +3,7 @@ package com.tyse.scrutiny.gateway.security.jwt;
 import static com.tyse.scrutiny.gateway.security.AuthoritiesConstants.ADMIN;
 import static com.tyse.scrutiny.gateway.security.SecurityUtils.AUTHORITIES_CLAIM;
 import static com.tyse.scrutiny.gateway.security.SecurityUtils.JWT_ALGORITHM;
+import static org.mockito.Mockito.mock;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.codec.Hex;
@@ -24,19 +25,23 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
+@TestConfiguration
 public class JwtAuthenticationTestUtils {
 
     @Bean
-    private MeterRegistry meterRegistry() {
+    public MeterRegistry meterRegistry() {
         return new SimpleMeterRegistry();
     }
 
-    // TODO switch to MockitoSpyBean https://github.com/spring-projects/spring-framework/issues/33941
-    @MockBean
-    private ReactiveUserDetailsService userDetailsService;
+    @Bean
+    public ReactiveUserDetailsService userDetailsService() {
+        return mock(ReactiveUserDetailsService.class);
+    }
 
-    @MockBean
-    private UserRepository userRepository;
+    @Bean
+    public UserRepository userRepository() {
+        return mock(UserRepository.class);
+    }
 
     public static String createValidToken(String jwtKey) {
         return createValidTokenForUser(jwtKey, "anonymous");

@@ -53,6 +53,7 @@ spring:
       write-durations-as-timestamps: false
   mail:
     host: localhost
+    port: 1025
   main:
     allow-bean-definition-overriding: true
   messages:
@@ -119,6 +120,14 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# ===================================================================
+# Google reCAPTCHA configuration for tests
+# ===================================================================
+google:
+  recaptcha:
+    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+
 management:
   health:
     mail:
