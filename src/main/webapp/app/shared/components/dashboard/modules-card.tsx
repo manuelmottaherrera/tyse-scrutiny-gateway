@@ -21,8 +21,8 @@ export const ModuleCardCore: React.FC<{
   title: string;
   description: string;
   comingSoon?: boolean;
-  disabledReason?: string;
-}> = ({ id, title, description, comingSoon, disabledReason }) => {
+  disabledReasonKey?: string;
+}> = ({ id, title, description, comingSoon, disabledReasonKey }) => {
   return (
     <div className="card-text">
       <h3 className="card-title">
@@ -36,12 +36,16 @@ export const ModuleCardCore: React.FC<{
       <p className="card-description">
         <Translate contentKey={`dashboardGrid.items.${id}.description`}>{description}</Translate>
       </p>
-      {disabledReason && <p className="disabled-reason">{disabledReason}</p>}
+      {disabledReasonKey && (
+        <p className="disabled-reason">
+          <Translate contentKey={`dashboardGrid.general.disabledReasons.${disabledReasonKey}`}>{disabledReasonKey}</Translate>
+        </p>
+      )}
     </div>
   );
 };
 
-export const ModuleCardSubIcon: React.FC<{ enabled: boolean }> = enabled => {
+export const ModuleCardSubIcon: React.FC<{ enabled: boolean }> = ({ enabled }) => {
   return (
     <div className="card-arrow">
       <FontAwesomeIcon icon={enabled ? 'arrow-right' : 'lock'} />
@@ -52,16 +56,18 @@ export const ModuleCardSubIcon: React.FC<{ enabled: boolean }> = enabled => {
 export const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
   if (!module.enabled) {
     return (
-      <div className="module-card disabled" title={module.disabledReason}>
-        <ModuleCardIcon icon={module.icon} color={module.color} opacity={0.5} />
-        <ModuleCardCore
-          id={module.id}
-          title={module.title}
-          description={module.description}
-          comingSoon={module.comingSoon}
-          disabledReason={module.disabledReason}
-        />
-        <ModuleCardSubIcon enabled={module.enabled} />
+      <div className="module-card disabled">
+        <div className="card-content">
+          <ModuleCardIcon icon={module.icon} color={module.color} opacity={0.5} />
+          <ModuleCardCore
+            id={module.id}
+            title={module.title}
+            description={module.description}
+            comingSoon={module.comingSoon}
+            disabledReasonKey={module.disabledReasonKey}
+          />
+          <ModuleCardSubIcon enabled={module.enabled} />
+        </div>
       </div>
     );
   }

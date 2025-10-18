@@ -40,6 +40,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
     &:hover {
       transform: translateY(-4px);
@@ -82,21 +83,34 @@
       font-weight: 600;
       margin: 0 0 0.5rem 0;
       color: var(--bs-heading-color);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.35rem 0.65rem;
+      }
     }
 
     .card-description {
       font-size: 0.9rem;
       color: var(--bs-subtitle-color);
       margin: 0;
-      line-height: 1.4;
-      opacity: 0.8;
+      line-height: 1.5;
+      opacity: 0.85;
     }
 
     .card-arrow {
-      color: var(--bs-secondary);
+      flex-shrink: 0;
+      color: var(--bs-primary);
       opacity: 0;
       transform: translateX(-5px);
       transition: all 0.3s ease;
+      font-size: 1.2rem;
+      margin-left: auto;
     }
 
     &:hover {
@@ -129,15 +143,17 @@
 
     // Estado deshabilitado
     &.disabled {
-      opacity: 0.6;
+      opacity: 0.7;
       cursor: not-allowed;
       position: relative;
+      background: var(--bs-card-bg);
+      border: 1px solid var(--bs-border-color-translucent);
 
       // Eliminar efectos hover para deshabilitados
       &:hover {
         transform: none;
-        box-shadow: none;
-        border-color: var(--bs-border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-color: var(--bs-border-color-translucent);
 
         .card-arrow {
           opacity: 1;
@@ -149,38 +165,17 @@
         }
       }
 
-      // Overlay semi-transparente
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        pointer-events: none;
-      }
-
-      .card-title {
-        .badge.coming-soon {
-          background: linear-gradient(45deg, var(--bs-color-orange), var(--bs-color-yellow));
-          color: var(--bs-body-bg);
-          font-size: 0.7rem;
-          margin-left: 0.5rem;
-          padding: 0.25rem 0.5rem;
-        }
+      .card-arrow {
+        color: var(--bs-secondary);
+        opacity: 1;
       }
 
       .disabled-reason {
         font-size: 0.8rem;
-        color: var(--bs-danger);
+        color: var(--bs-warning);
         margin: 0.5rem 0 0 0;
         font-style: italic;
-      }
-
-      .card-arrow {
-        color: var(--bs-danger);
+        font-weight: 500;
       }
     }
   }
@@ -220,11 +215,42 @@
     }
   }
 
-  // Mejoras para modo oscuro en elementos deshabilitados
+  // Mejoras para modo oscuro
   [data-theme='dark'] {
-    .module-card.disabled {
-      &::after {
-        background: rgba(0, 0, 0, 0.3);
+    .module-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-color: var(--bs-primary);
+      }
+
+      .card-description {
+        opacity: 0.75;
+      }
+
+      .card-title .badge {
+        background-color: #6c757d !important;
+        color: #ffffff;
+      }
+
+      &.disabled {
+        background: rgba(255, 255, 255, 0.02);
+        opacity: 0.6;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.02);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .disabled-reason {
+          color: #ffc107;
+          font-weight: 600;
+          opacity: 1;
+        }
       }
     }
   }

@@ -41,7 +41,14 @@
       }
     },
     "general": {
-      "comingSoon": "Próximamente"
+      "comingSoon": "Próximamente",
+      "disabledReasons": {
+        "inDevelopment": "Módulo en desarrollo",
+        "comingSoon": "Disponible próximamente",
+        "noPermissions": "Permisos insuficientes",
+        "maintenanceMode": "En mantenimiento",
+        "requiresConfiguration": "Requiere configuración"
+      }
     }
   }
 }

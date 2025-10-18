@@ -13,7 +13,7 @@ export interface Module {
   role: string[];
   color?: string;
   enabled: boolean;
-  disabledReason?: string;
+  disabledReasonKey?: string; // Clave i18n para la razón de deshabilitación
   comingSoon?: boolean;
   hidden: boolean;
 }
@@ -29,7 +29,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'COORDINATOR'],
       color: '#008cba',
       enabled: true,
-      disabledReason: 'Módulo en desarrollo',
+      disabledReasonKey: 'inDevelopment',
       comingSoon: true,
       hidden: false,
     },
@@ -42,7 +42,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'ANALYST', 'VIEWER'],
       color: '#43ac6a',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -55,7 +55,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'ANALYST', 'VIEWER'],
       color: '#e99002',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -68,7 +68,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'COORDINATOR', 'OPERATOR'],
       color: '#f04124',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -81,7 +81,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'OPERATOR'],
       color: '#5bc0de',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -94,7 +94,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'COORDINATOR'],
       color: '#6f42c1',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -107,7 +107,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'COORDINATOR', 'TRAINER'],
       color: '#20c997',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -120,7 +120,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'COORDINATOR'],
       color: '#e83e8c',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
@@ -133,7 +133,7 @@ export const DashboardGrid: React.FC = () => {
       role: ['ADMIN', 'ANALYST'],
       color: '#6610f2',
       enabled: false,
-      disabledReason: 'Disponible próximamente',
+      disabledReasonKey: 'comingSoon',
       comingSoon: true,
       hidden: false,
     },
