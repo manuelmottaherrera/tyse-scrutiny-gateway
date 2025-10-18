@@ -15,9 +15,13 @@ public class RecaptchaService {
 
     private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
-    public boolean verifyRecaptcha(String token, String action) {
-        RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
 
+    public RecaptchaService() {
+        this.restTemplate = new RestTemplate();
+    }
+
+    public boolean verifyRecaptcha(String token, String action) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("secret", secretKey);
         params.add("response", token);
