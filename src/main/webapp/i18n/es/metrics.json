@@ -75,7 +75,15 @@
       "cachename": "Nombre cache",
       "hits": "Accesos",
       "misses": "Fallos",
-      "evictions": "Contador desalojo"
+      "evictions": "Contador desalojo",
+      "gets": "Lecturas",
+      "puts": "Escrituras",
+      "removals": "Eliminaciones",
+      "hitPercent": "% Aciertos",
+      "missPercent": "% Fallos",
+      "averageGetTime": "Tiempo promedio de lectura",
+      "averagePutTime": "Tiempo promedio de escritura",
+      "averageRemoveTime": "Tiempo promedio de eliminación"
     },
     "datasource": {
       "usage": "Uso",

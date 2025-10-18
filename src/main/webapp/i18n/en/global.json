@@ -1,7 +1,6 @@
 {
   "global": {
     "title": "TyseScrutinyGateway",
-    "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "theme": {
       "title": "Theme",
       "light": "Light",
@@ -53,6 +52,9 @@
     },
     "messages": {
       "info": {
+        "authenticated": {
+          "link": "sign in"
+        },
         "register": {
           "noaccount": "You don't have an account yet?",
           "link": "Register a new account"
@@ -83,28 +85,15 @@
     },
     "field": {
       "id": "ID"
-    },
-    "ribbon": {
-      "dev": "Development"
-    },
-    "item-count": "Showing {{first}} - {{second}} of {{total}} items."
+    }
   },
   "entity": {
     "action": {
-      "addblob": "Add blob",
-      "addimage": "Add image",
       "back": "Back",
       "cancel": "Cancel",
       "delete": "Delete",
       "edit": "Edit",
-      "open": "Open",
-      "save": "Save",
-      "view": "View",
-      "show": "Show {{otherEntity}}"
-    },
-    "detail": {
-      "field": "Field",
-      "value": "Value"
+      "save": "Save"
     },
     "delete": {
       "title": "Confirm delete operation"
@@ -114,13 +103,7 @@
       "minlength": "This field is required to be at least {{ min }} characters.",
       "maxlength": "This field cannot be longer than {{ max }} characters.",
       "min": "This field should be at least {{ min }}.",
-      "max": "This field cannot be more than {{ max }}.",
-      "minbytes": "This field should be at least {{ min }} bytes.",
-      "maxbytes": "This field cannot be more than {{ max }} bytes.",
-      "pattern": "This field should follow pattern for {{ pattern }}.",
-      "number": "This field should be a number.",
-      "datetimelocal": "This field should be a date and time.",
-      "patternLogin": "This field can only contain letters, digits and e-mail addresses."
+      "max": "This field cannot be more than {{ max }}."
     },
     "filters": {
       "set": "Following filters are set",
@@ -139,11 +122,7 @@
     "idexists": "A new {{ entityName }} cannot already have an ID",
     "idnull": "Invalid ID",
     "idinvalid": "Invalid ID",
-    "idnotfound": "ID cannot be found",
-    "file": {
-      "could.not.extract": "Could not extract file",
-      "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
-    }
+    "idnotfound": "ID cannot be found"
   },
   "footer": "This is your footer"
 }
