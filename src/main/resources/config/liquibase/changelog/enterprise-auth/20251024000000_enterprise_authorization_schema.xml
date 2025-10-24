@@ -136,7 +136,74 @@
             This enables fine-grained access control beyond simple role checks.
         </comment>
 
-        <!-- TODO: Implement table creation in next step -->
+        <createTable tableName="scr_permission">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_permission"/>
+            </column>
+
+            <!-- Core Fields -->
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_scr_permission_name"/>
+            </column>
+
+            <column name="resource" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="action" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(500)"/>
+
+            <!-- Flags -->
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Audit Fields -->
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_modified_by" type="varchar(50)"/>
+
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+
+        <!-- Unique constraint on resource + action combination -->
+        <addUniqueConstraint
+            tableName="scr_permission"
+            columnNames="resource, action"
+            constraintName="ux_scr_permission_resource_action"/>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_scr_permission_name" tableName="scr_permission">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_permission_resource" tableName="scr_permission">
+            <column name="resource"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_permission_action" tableName="scr_permission">
+            <column name="action"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_permission_is_active" tableName="scr_permission">
+            <column name="is_active"/>
+        </createIndex>
+
+        <!-- Composite index for filtering active permissions by resource -->
+        <createIndex indexName="idx_scr_permission_resource_active" tableName="scr_permission">
+            <column name="resource"/>
+            <column name="is_active"/>
+        </createIndex>
 
     </changeSet>
 
