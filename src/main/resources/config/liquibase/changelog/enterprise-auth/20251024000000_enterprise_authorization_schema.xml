@@ -372,7 +372,76 @@
             without making them a full MANAGER.
         </comment>
 
-        <!-- TODO: Implement table creation in next step -->
+        <createTable tableName="scr_user_permission">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_user_permission"/>
+            </column>
+
+            <!-- Foreign Keys -->
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="permission_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Temporal Permission Support -->
+            <column name="expires_at" type="timestamp"/>
+
+            <!-- Status -->
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Grant Audit -->
+            <column name="granted_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="granted_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="reason" type="varchar(500)"/>
+
+            <!-- Revocation Audit -->
+            <column name="revoked_by" type="varchar(50)"/>
+
+            <column name="revoked_date" type="timestamp"/>
+
+            <column name="revoked_reason" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Unique constraint: each permission can only be granted once directly to the same user -->
+        <addUniqueConstraint
+            tableName="scr_user_permission"
+            columnNames="user_id, permission_id"
+            constraintName="ux_scr_user_permission"/>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_scr_user_permission_user" tableName="scr_user_permission">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_permission_permission" tableName="scr_user_permission">
+            <column name="permission_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_permission_is_active" tableName="scr_user_permission">
+            <column name="is_active"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_permission_expires_at" tableName="scr_user_permission">
+            <column name="expires_at"/>
+        </createIndex>
+
+        <!-- Composite index for active permissions of a user -->
+        <createIndex indexName="idx_scr_user_permission_user_active" tableName="scr_user_permission">
+            <column name="user_id"/>
+            <column name="is_active"/>
+        </createIndex>
 
     </changeSet>
 
