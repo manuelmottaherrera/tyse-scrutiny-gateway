@@ -221,7 +221,45 @@
             Includes audit fields to track who granted the permission and when.
         </comment>
 
-        <!-- TODO: Implement table creation in next step -->
+        <createTable tableName="scr_authority_permission">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_authority_permission"/>
+            </column>
+
+            <!-- Foreign Keys -->
+            <column name="authority_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="permission_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Audit Fields -->
+            <column name="granted_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="granted_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Unique constraint: each permission can only be assigned once to a role -->
+        <addUniqueConstraint
+            tableName="scr_authority_permission"
+            columnNames="authority_id, permission_id"
+            constraintName="ux_scr_authority_permission"/>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_scr_authority_permission_authority" tableName="scr_authority_permission">
+            <column name="authority_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_permission_permission" tableName="scr_authority_permission">
+            <column name="permission_id"/>
+        </createIndex>
 
     </changeSet>
 
