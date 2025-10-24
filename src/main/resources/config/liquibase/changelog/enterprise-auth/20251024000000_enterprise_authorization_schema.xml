@@ -284,7 +284,74 @@
             - "See who assigned which roles to whom and when"
         </comment>
 
-        <!-- TODO: Implement table creation in next step -->
+        <createTable tableName="scr_user_authority">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_user_authority"/>
+            </column>
+
+            <!-- Foreign Keys -->
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="authority_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Temporal Role Support -->
+            <column name="expires_at" type="timestamp"/>
+
+            <!-- Status -->
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Assignment Audit -->
+            <column name="assigned_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="assigned_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Revocation Audit -->
+            <column name="revoked_by" type="varchar(50)"/>
+
+            <column name="revoked_date" type="timestamp"/>
+
+            <column name="revoked_reason" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Unique constraint: each authority can only be assigned once to the same user (active assignments) -->
+        <addUniqueConstraint
+            tableName="scr_user_authority"
+            columnNames="user_id, authority_id"
+            constraintName="ux_scr_user_authority"/>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_scr_user_authority_user" tableName="scr_user_authority">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_authority_authority" tableName="scr_user_authority">
+            <column name="authority_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_authority_is_active" tableName="scr_user_authority">
+            <column name="is_active"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_user_authority_expires_at" tableName="scr_user_authority">
+            <column name="expires_at"/>
+        </createIndex>
+
+        <!-- Composite index for active authorities of a user -->
+        <createIndex indexName="idx_scr_user_authority_user_active" tableName="scr_user_authority">
+            <column name="user_id"/>
+            <column name="is_active"/>
+        </createIndex>
 
     </changeSet>
 
