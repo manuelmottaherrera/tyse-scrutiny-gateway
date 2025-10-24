@@ -2,7 +2,7 @@
   "activate": {
     "title": "Activación",
     "messages": {
-      "success": "<strong>Su cuenta ha sido activada.</strong> Por favor, ",
+      "success": "<strong>Su cuenta ha sido activada.</strong> Por favor, inicie sesión.",
       "error": "<strong>Su cuenta no pudo ser activada.</strong> Por favor, utilice el formulario de inscripción para registrarse."
     }
   }
