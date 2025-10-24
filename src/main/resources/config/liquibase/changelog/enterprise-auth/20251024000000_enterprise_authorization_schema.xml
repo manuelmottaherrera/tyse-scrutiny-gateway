@@ -463,7 +463,64 @@
             Includes IP address and user agent for security auditing.
         </comment>
 
-        <!-- TODO: Implement table creation in next step -->
+        <createTable tableName="scr_authority_audit">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_authority_audit"/>
+            </column>
+
+            <!-- Foreign Key -->
+            <column name="authority_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Audit Action: CREATED, UPDATED, DELETED, ACTIVATED, DEACTIVATED -->
+            <column name="action" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Changed Values (JSON) -->
+            <column name="old_values" type="text"/>
+
+            <column name="new_values" type="text"/>
+
+            <!-- Audit Metadata -->
+            <column name="changed_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Security Context -->
+            <column name="ip_address" type="varchar(45)"/>
+
+            <column name="user_agent" type="varchar(255)"/>
+        </createTable>
+
+        <!-- Indexes for audit queries -->
+        <createIndex indexName="idx_scr_authority_audit_authority" tableName="scr_authority_audit">
+            <column name="authority_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_audit_action" tableName="scr_authority_audit">
+            <column name="action"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_audit_changed_by" tableName="scr_authority_audit">
+            <column name="changed_by"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_audit_changed_date" tableName="scr_authority_audit">
+            <column name="changed_date"/>
+        </createIndex>
+
+        <!-- Composite index for common audit queries -->
+        <createIndex indexName="idx_scr_authority_audit_authority_date" tableName="scr_authority_audit">
+            <column name="authority_id"/>
+            <column name="changed_date" order="DESC"/>
+        </createIndex>
 
     </changeSet>
 
