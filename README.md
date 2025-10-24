@@ -24,6 +24,57 @@ In the project root, JHipster generates configuration files for tools like git, 
   JHipster installs Node and npm locally using the build tool by default. This wrapper makes sure npm is installed locally and uses it avoiding some differences different versions can cause. By using `./npmw` instead of the traditional `npm` you can configure a Node-less environment to develop or test your application.
 - `/src/main/docker` - Docker configurations for the application and services that the application depends on
 
+## Database Naming Conventions
+
+This project uses the `scr_` prefix for all database tables to ensure portability across different database management systems and avoid conflicts with reserved keywords.
+
+### Prefix: `scr_`
+
+**Meaning:** **Scr**utiny (short for Tyse Scrutiny Gateway)
+
+**Rationale:**
+
+- **Portability:** The word `user` is a reserved keyword in PostgreSQL, MySQL, Oracle, SQL Server, and H2. Using the `scr_` prefix ensures our schema works seamlessly across all major database systems without requiring quotes, backticks, or brackets.
+- **Namespace Clarity:** All application tables are clearly identified with the `scr_` prefix, making it easy for DBAs to distinguish them from system tables or tables from other applications.
+- **Future-Proof:** If the database is shared with other applications in the future, the prefix prevents table name collisions.
+- **Liquibase Compatibility:** Adheres to Liquibase's philosophy of database-agnostic migrations.
+
+### Naming Standard
+
+All table names follow this pattern:
+
+```
+scr_[descriptive_name]
+```
+
+**Examples:**
+
+- `scr_user` - User accounts
+- `scr_authority` - Roles/authorities
+- `scr_permission` - Granular permissions
+- `scr_user_authority` - User-role assignments
+- `scr_authority_permission` - Role-permission mappings
+- `scr_authority_audit` - Audit log for authority changes
+
+**Rules:**
+
+- Use **singular** nouns for table names (e.g., `scr_user`, not `scr_users`)
+- Use **snake_case** for multi-word names (e.g., `scr_user_authority`)
+- Always use lowercase
+- Keep names descriptive but concise
+
+### Entity Mapping
+
+In Java entity classes, the `@Table` annotation maps to these prefixed table names:
+
+```java
+@Table("scr_user")
+public class User extends AbstractAuditingEntity<Long> { ... }
+
+@Table("scr_authority")
+public class Authority extends AbstractAuditingEntity<Long> { ... }
+```
+
 ## Development
 
 ### Doing API-First development using openapi-generator-cli
