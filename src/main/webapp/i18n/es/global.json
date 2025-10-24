@@ -1,6 +1,7 @@
 {
   "global": {
     "title": "TyseScrutinyGateway",
+    "browsehappy": "Está usando un navegador <strong>no actualizado</strong>. Por favor, <a href=\"http://browsehappy.com/?locale=es\">actualice su navegador</a> para mejorar su experiencia.",
     "theme": {
       "title": "Tema",
       "light": "Claro",
@@ -85,15 +86,28 @@
     },
     "field": {
       "id": "ID"
-    }
+    },
+    "ribbon": {
+      "dev": "Desarrollo"
+    },
+    "item-count": "Mostrando {{first}} - {{second}} de {{total}} elementos."
   },
   "entity": {
     "action": {
+      "addblob": "Añadir fichero",
+      "addimage": "Añadir imagen",
       "back": "Volver",
       "cancel": "Cancelar",
       "delete": "Eliminar",
       "edit": "Editar",
-      "save": "Guardar"
+      "open": "Abrir",
+      "save": "Guardar",
+      "view": "Vista",
+      "show": "Show {{otherEntity}}"
+    },
+    "detail": {
+      "field": "Campo",
+      "value": "Valor"
     },
     "delete": {
       "title": "Confirmar operación de borrado"
@@ -103,12 +117,17 @@
       "minlength": "Este campo requiere al menos {{min}} caracteres.",
       "maxlength": "Este campo no puede superar más de {{max}} caracteres.",
       "min": "Este campo debe ser mayor que {{min}}.",
-      "max": "Este campo no puede ser mayor que {{max}}."
+      "max": "Este campo no puede ser mayor que {{max}}.",
+      "minbytes": "Este campo debe tener como mínimo {{min}} bytes.",
+      "maxbytes": "Este campo no puede tener más de {{max}} bytes.",
+      "pattern": "Este campo debe seguir el patrón {{pattern}}.",
+      "number": "Este campo debe ser un número.",
+      "datetimelocal": "Este campo debe ser una fecha y hora."
     },
     "filters": {
-      "set": "Los siguientes filtros están activos",
-      "clear": "Limpiar filtro",
-      "clearAll": "Limpiar todos los filtros"
+      "set": "Following filters are set",
+      "clear": "Clear filter",
+      "clearAll": "Clear all filters"
     }
   },
   "error": {
@@ -122,7 +141,11 @@
     "idexists": "Un/a nuevo/a {{entityName}} no puede tener ID",
     "idnull": "ID inválido",
     "idinvalid": "ID inválido",
-    "idnotfound": "ID no encontrado"
+    "idnotfound": "ID no encontrado",
+    "file": {
+      "could.not.extract": "No se pudo extraer el fichero",
+      "not.image": "Se esperaba que el fichero fuera una imagen pero se encontro \"{{ fileType }}\""
+    }
   },
   "footer": "Pie de página"
 }
