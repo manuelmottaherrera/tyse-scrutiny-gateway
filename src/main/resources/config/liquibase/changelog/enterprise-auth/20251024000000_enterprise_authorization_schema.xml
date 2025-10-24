@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Enterprise Authorization System - Database Schema
+
+        This changelog creates a complete enterprise-grade authorization system with:
+        - Role-Based Access Control (RBAC) with numeric IDs
+        - Granular permissions system
+        - Full audit trail for all authorization changes
+        - Temporal roles (with expiration)
+        - Direct user permissions (bypass roles)
+        - Multi-tenancy ready structure
+
+        All tables use 'scr_' prefix for database portability.
+
+        Author: Tyse Scrutiny Team
+        Date: 2025-10-24
+        Related Issue: #5 (blocked pending validations)
+    -->
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 1: Create scr_authority table (Roles)                          -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000001-create-authority" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_authority table to replace jhi_authority.
+
+            Changes from legacy design:
+            - Uses BIGINT ID instead of VARCHAR(50) name as PK (better performance)
+            - Adds 'code' field for URL-friendly identifiers
+            - Adds 'description' for UI display
+            - Adds 'category' to distinguish system vs custom roles
+            - Adds 'is_system' flag to prevent deletion of core roles
+            - Adds 'is_active' for soft deletion
+            - Adds 'hierarchy_level' for future role hierarchy
+            - Includes full audit fields (created_by, created_date, etc.)
+        </comment>
+
+        <createTable tableName="scr_authority">
+            <!-- Primary Key -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_scr_authority"/>
+            </column>
+
+            <!-- Core Fields -->
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_scr_authority_name"/>
+            </column>
+
+            <column name="code" type="varchar(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_scr_authority_code"/>
+            </column>
+
+            <column name="description" type="varchar(500)"/>
+
+            <!-- Category: SYSTEM, CUSTOM, TENANT_SPECIFIC -->
+            <column name="category" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Flags -->
+            <column name="is_system" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Hierarchy Level (0 = highest, 999 = lowest) -->
+            <column name="hierarchy_level" type="integer" defaultValueNumeric="500">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Audit Fields -->
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_modified_by" type="varchar(50)"/>
+
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_scr_authority_name" tableName="scr_authority">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_code" tableName="scr_authority">
+            <column name="code"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_category" tableName="scr_authority">
+            <column name="category"/>
+        </createIndex>
+
+        <createIndex indexName="idx_scr_authority_is_active" tableName="scr_authority">
+            <column name="is_active"/>
+        </createIndex>
+
+        <!-- Composite index for filtering active authorities by category -->
+        <createIndex indexName="idx_scr_authority_category_active" tableName="scr_authority">
+            <column name="category"/>
+            <column name="is_active"/>
+        </createIndex>
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 2: Create scr_permission table (Granular Permissions)          -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000002-create-permission" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_permission table for granular permissions.
+
+            Permissions follow the pattern: resource.action
+            Examples:
+            - user.create
+            - user.read
+            - user.update
+            - user.delete
+            - report.export
+            - invoice.approve
+
+            This enables fine-grained access control beyond simple role checks.
+        </comment>
+
+        <!-- TODO: Implement table creation in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 3: Create scr_authority_permission (N:N Roles-Permissions)     -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000003-create-authority-permission" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_authority_permission junction table.
+
+            Links authorities (roles) to permissions in a many-to-many relationship.
+            Each role can have multiple permissions, and each permission can be
+            assigned to multiple roles.
+
+            Includes audit fields to track who granted the permission and when.
+        </comment>
+
+        <!-- TODO: Implement table creation in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 4: Create scr_user_authority (User-Role Assignments)           -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000004-create-user-authority" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_user_authority table to replace jhi_user_authority.
+
+            Major improvements over legacy design:
+            - Has its own BIGINT ID (not just composite PK)
+            - References authority by ID instead of name (better performance)
+            - Full audit trail: assigned_by, assigned_date
+            - Supports temporal roles: expires_at field
+            - Supports role revocation: revoked_by, revoked_date, revoked_reason
+            - is_active flag for soft deletion
+
+            This enables:
+            - "Grant ADMIN role to user X for 7 days"
+            - "Revoke role with reason for audit"
+            - "See who assigned which roles to whom and when"
+        </comment>
+
+        <!-- TODO: Implement table creation in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 5: Create scr_user_permission (Direct User Permissions)        -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000005-create-user-permission" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_user_permission table for direct permission grants.
+
+            Allows granting specific permissions to users without assigning a full role.
+            Use cases:
+            - Temporary elevated permissions
+            - Exception permissions for specific users
+            - Fine-grained access without creating custom roles
+
+            Example: Grant "invoice.approve" permission to user X for 30 days
+            without making them a full MANAGER.
+        </comment>
+
+        <!-- TODO: Implement table creation in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 6: Create scr_authority_audit (Audit Log)                      -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000006-create-authority-audit" author="Manuel A. Motta H.">
+        <comment>
+            Create scr_authority_audit table for tracking all changes to authorities.
+
+            Records all modifications to roles:
+            - CREATED: When a new role is created
+            - UPDATED: When role properties change
+            - DELETED: When a role is deleted
+            - ACTIVATED: When a role is activated
+            - DEACTIVATED: When a role is deactivated
+
+            Stores old and new values as JSON for complete audit trail.
+            Includes IP address and user agent for security auditing.
+        </comment>
+
+        <!-- TODO: Implement table creation in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 7: Create Indexes for Performance                              -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000007-create-indexes" author="Manuel A. Motta H.">
+        <comment>
+            Create indexes for optimal query performance.
+
+            Critical indexes for common queries:
+            - User's authorities lookup
+            - Authority by name/code lookup
+            - Active authorities/permissions
+            - Expired role detection
+            - Audit log queries
+        </comment>
+
+        <!-- TODO: Implement indexes in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 8: Load Initial Data (Seed Data)                               -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000008-load-initial-data" author="Manuel A. Motta H.">
+        <comment>
+            Load initial seed data for the authorization system.
+
+            Creates:
+            - System authorities: ROLE_ADMIN, ROLE_USER
+            - Base permissions for each resource
+            - Authority-permission mappings
+            - Initial user-authority assignments (admin, user)
+
+            All data loaded from CSV files for maintainability.
+        </comment>
+
+        <!-- TODO: Implement data loading in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 9: Add Foreign Key Constraints                                 -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000009-add-foreign-keys" author="Manuel A. Motta H.">
+        <comment>
+            Add foreign key constraints for referential integrity.
+
+            Ensures:
+            - Users cannot be assigned non-existent roles
+            - Roles cannot have non-existent permissions
+            - Cascade deletes are handled appropriately
+            - Orphaned records are prevented
+
+            Note: Added after data loading to avoid constraint violations
+            during initial data setup.
+        </comment>
+
+        <!-- TODO: Implement foreign keys in next step -->
+
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 10: Validation and Verification                                -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000010-validation" author="Manuel A. Motta H.">
+        <comment>
+            Validate that the schema was created correctly.
+
+            Checks:
+            - All tables exist with correct structure
+            - Required indexes are present
+            - Foreign keys are properly configured
+            - Initial data was loaded successfully
+            - At least 2 authorities exist (ROLE_ADMIN, ROLE_USER)
+            - At least 5 base permissions exist
+
+            If validation fails, the entire changeset will rollback.
+        </comment>
+
+        <!-- TODO: Implement validations in next step -->
+
+        <!-- Preconditions for safety -->
+        <preConditions onFail="HALT">
+            <and>
+                <!-- Ensure we're running on a supported database -->
+                <or>
+                    <dbms type="postgresql"/>
+                    <dbms type="mysql"/>
+                    <dbms type="oracle"/>
+                    <dbms type="mssql"/>
+                    <dbms type="h2"/>
+                </or>
+            </and>
+        </preConditions>
+
+    </changeSet>
+
+</databaseChangeLog>
