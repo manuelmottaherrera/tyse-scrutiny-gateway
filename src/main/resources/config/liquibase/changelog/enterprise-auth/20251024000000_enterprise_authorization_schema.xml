@@ -531,15 +531,22 @@
         <comment>
             Create indexes for optimal query performance.
 
-            Critical indexes for common queries:
-            - User's authorities lookup
-            - Authority by name/code lookup
-            - Active authorities/permissions
-            - Expired role detection
-            - Audit log queries
+            NOTE: All indexes have been created in their respective table changesets.
+            This changeset is kept for reference and future additional indexes if needed.
+
+            Summary of indexes created (27 total):
+            - scr_authority: 5 indexes (name, code, category, is_active, category+active)
+            - scr_permission: 5 indexes (name, resource, action, is_active, resource+active)
+            - scr_authority_permission: 2 indexes (authority_id, permission_id)
+            - scr_user_authority: 5 indexes (user_id, authority_id, is_active, expires_at, user+active)
+            - scr_user_permission: 5 indexes (user_id, permission_id, is_active, expires_at, user+active)
+            - scr_authority_audit: 5 indexes (authority_id, action, changed_by, changed_date, authority+date)
+
+            All critical queries are covered by existing indexes.
         </comment>
 
-        <!-- TODO: Implement indexes in next step -->
+        <!-- No additional indexes needed at this time -->
+        <!-- All indexes were created in changesets 1-6 alongside their tables -->
 
     </changeSet>
 
@@ -559,7 +566,50 @@
             All data loaded from CSV files for maintainability.
         </comment>
 
-        <!-- TODO: Implement data loading in next step -->
+        <!-- Load authorities (2 system roles) -->
+        <loadData file="config/liquibase/data/authority.csv"
+                  separator=";"
+                  tableName="scr_authority"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_system" type="boolean"/>
+            <column name="is_active" type="boolean"/>
+            <column name="hierarchy_level" type="numeric"/>
+            <column name="created_date" type="timestamp"/>
+        </loadData>
+
+        <!-- Load permissions (13 base permissions) -->
+        <loadData file="config/liquibase/data/permission.csv"
+                  separator=";"
+                  tableName="scr_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_active" type="boolean"/>
+            <column name="created_date" type="timestamp"/>
+        </loadData>
+
+        <!-- Load authority-permission mappings -->
+        <loadData file="config/liquibase/data/authority_permission.csv"
+                  separator=";"
+                  tableName="scr_authority_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="authority_id" type="numeric"/>
+            <column name="permission_id" type="numeric"/>
+            <column name="granted_date" type="timestamp"/>
+        </loadData>
+
+        <!-- Load user-authority assignments -->
+        <loadData file="config/liquibase/data/user_authority.csv"
+                  separator=";"
+                  tableName="scr_user_authority"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="user_id" type="numeric"/>
+            <column name="authority_id" type="numeric"/>
+            <column name="is_active" type="boolean"/>
+            <column name="assigned_date" type="timestamp"/>
+        </loadData>
 
     </changeSet>
 

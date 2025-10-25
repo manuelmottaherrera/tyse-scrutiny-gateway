@@ -1,0 +1,14 @@
+id;name;resource;action;description;is_active;created_by;created_date
+1;user.create;user;create;Create new users in the system;true;system;2025-01-01T00:00:00
+2;user.read;user;read;View user information;true;system;2025-01-01T00:00:00
+3;user.update;user;update;Modify user details;true;system;2025-01-01T00:00:00
+4;user.delete;user;delete;Delete users from the system;true;system;2025-01-01T00:00:00
+5;authority.create;authority;create;Create new roles;true;system;2025-01-01T00:00:00
+6;authority.read;authority;read;View role information;true;system;2025-01-01T00:00:00
+7;authority.update;authority;update;Modify role details;true;system;2025-01-01T00:00:00
+8;authority.delete;authority;delete;Delete roles;true;system;2025-01-01T00:00:00
+9;authority.assign;authority;assign;Assign roles to users;true;system;2025-01-01T00:00:00
+10;permission.create;permission;create;Create new permissions;true;system;2025-01-01T00:00:00
+11;permission.read;permission;read;View permission information;true;system;2025-01-01T00:00:00
+12;permission.update;permission;update;Modify permission details;true;system;2025-01-01T00:00:00
+13;permission.delete;permission;delete;Delete permissions;true;system;2025-01-01T00:00:00

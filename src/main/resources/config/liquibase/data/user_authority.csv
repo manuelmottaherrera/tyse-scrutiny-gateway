@@ -1,4 +1,4 @@
-user_id;authority_name
-1;ROLE_ADMIN
-1;ROLE_USER
-2;ROLE_USER
+id;user_id;authority_id;is_active;assigned_by;assigned_date
+1;1;1;true;system;2025-01-01T00:00:00
+2;1;2;true;system;2025-01-01T00:00:00
+3;2;2;true;system;2025-01-01T00:00:00
