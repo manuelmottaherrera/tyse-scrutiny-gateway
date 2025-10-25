@@ -519,7 +519,7 @@
         <!-- Composite index for common audit queries -->
         <createIndex indexName="idx_scr_authority_audit_authority_date" tableName="scr_authority_audit">
             <column name="authority_id"/>
-            <column name="changed_date" order="DESC"/>
+            <column name="changed_date" descending="true"/>
         </createIndex>
 
     </changeSet>
@@ -575,7 +575,6 @@
             <column name="is_system" type="boolean"/>
             <column name="is_active" type="boolean"/>
             <column name="hierarchy_level" type="numeric"/>
-            <column name="created_date" type="timestamp"/>
         </loadData>
 
         <!-- Load permissions (13 base permissions) -->
@@ -585,7 +584,6 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="is_active" type="boolean"/>
-            <column name="created_date" type="timestamp"/>
         </loadData>
 
         <!-- Load authority-permission mappings -->
@@ -596,7 +594,6 @@
             <column name="id" type="numeric"/>
             <column name="authority_id" type="numeric"/>
             <column name="permission_id" type="numeric"/>
-            <column name="granted_date" type="timestamp"/>
         </loadData>
 
         <!-- Load user-authority assignments -->
@@ -608,8 +605,23 @@
             <column name="user_id" type="numeric"/>
             <column name="authority_id" type="numeric"/>
             <column name="is_active" type="boolean"/>
-            <column name="assigned_date" type="timestamp"/>
         </loadData>
+
+        <rollback>
+            <!-- Delete in reverse order to respect foreign key constraints -->
+            <delete tableName="scr_user_authority">
+                <where>id IN (1, 2)</where>
+            </delete>
+            <delete tableName="scr_authority_permission">
+                <where>id BETWEEN 1 AND 16</where>
+            </delete>
+            <delete tableName="scr_permission">
+                <where>id BETWEEN 1 AND 13</where>
+            </delete>
+            <delete tableName="scr_authority">
+                <where>id IN (1, 2)</where>
+            </delete>
+        </rollback>
 
     </changeSet>
 
@@ -682,79 +694,6 @@
             constraintName="fk_authority_audit_authority"
             referencedTableName="scr_authority"
             referencedColumnNames="id"/>
-
-    </changeSet>
-
-    <!-- ========================================================================= -->
-    <!-- CHANGESET 10: Validation and Verification                                -->
-    <!-- ========================================================================= -->
-    <changeSet id="20251024000010-validation" author="Manuel A. Motta H.">
-        <comment>
-            Validate that the schema was created correctly.
-
-            Checks:
-            - All tables exist with correct structure
-            - Required indexes are present
-            - Foreign keys are properly configured
-            - Initial data was loaded successfully
-            - At least 2 authorities exist (ROLE_ADMIN, ROLE_USER)
-            - At least 5 base permissions exist
-
-            If validation fails, the entire changeset will rollback.
-        </comment>
-
-        <!-- Preconditions for safety -->
-        <preConditions onFail="HALT">
-            <and>
-                <!-- Ensure we're running on a supported database -->
-                <or>
-                    <dbms type="postgresql"/>
-                    <dbms type="mysql"/>
-                    <dbms type="oracle"/>
-                    <dbms type="mssql"/>
-                    <dbms type="h2"/>
-                </or>
-            </and>
-        </preConditions>
-
-        <!-- Validate all tables exist -->
-        <preConditions onFail="HALT">
-            <tableExists tableName="scr_authority"/>
-            <tableExists tableName="scr_permission"/>
-            <tableExists tableName="scr_authority_permission"/>
-            <tableExists tableName="scr_user_authority"/>
-            <tableExists tableName="scr_user_permission"/>
-            <tableExists tableName="scr_authority_audit"/>
-        </preConditions>
-
-        <!-- Validate critical columns exist -->
-        <preConditions onFail="HALT">
-            <columnExists tableName="scr_authority" columnName="id"/>
-            <columnExists tableName="scr_authority" columnName="code"/>
-            <columnExists tableName="scr_permission" columnName="name"/>
-            <columnExists tableName="scr_permission" columnName="resource"/>
-            <columnExists tableName="scr_permission" columnName="action"/>
-        </preConditions>
-
-        <!-- Validate foreign keys exist -->
-        <preConditions onFail="HALT">
-            <foreignKeyConstraintExists foreignKeyName="fk_authority_permission_authority"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_authority_permission_permission"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_user_authority_user"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_user_authority_authority"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_user_permission_user"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_user_permission_permission"/>
-            <foreignKeyConstraintExists foreignKeyName="fk_authority_audit_authority"/>
-        </preConditions>
-
-        <!-- Validate data was loaded -->
-        <sql>
-            SELECT COUNT(*) FROM scr_authority WHERE id IN (1, 2);
-        </sql>
-
-        <sql>
-            SELECT COUNT(*) FROM scr_permission WHERE id BETWEEN 1 AND 13;
-        </sql>
 
     </changeSet>
 
