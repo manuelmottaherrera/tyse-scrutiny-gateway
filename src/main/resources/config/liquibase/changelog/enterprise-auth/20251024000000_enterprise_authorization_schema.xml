@@ -630,7 +630,58 @@
             during initial data setup.
         </comment>
 
-        <!-- TODO: Implement foreign keys in next step -->
+        <!-- scr_authority_permission FKs -->
+        <addForeignKeyConstraint
+            baseTableName="scr_authority_permission"
+            baseColumnNames="authority_id"
+            constraintName="fk_authority_permission_authority"
+            referencedTableName="scr_authority"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="scr_authority_permission"
+            baseColumnNames="permission_id"
+            constraintName="fk_authority_permission_permission"
+            referencedTableName="scr_permission"
+            referencedColumnNames="id"/>
+
+        <!-- scr_user_authority FKs -->
+        <addForeignKeyConstraint
+            baseTableName="scr_user_authority"
+            baseColumnNames="user_id"
+            constraintName="fk_user_authority_user"
+            referencedTableName="scr_user"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="scr_user_authority"
+            baseColumnNames="authority_id"
+            constraintName="fk_user_authority_authority"
+            referencedTableName="scr_authority"
+            referencedColumnNames="id"/>
+
+        <!-- scr_user_permission FKs -->
+        <addForeignKeyConstraint
+            baseTableName="scr_user_permission"
+            baseColumnNames="user_id"
+            constraintName="fk_user_permission_user"
+            referencedTableName="scr_user"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="scr_user_permission"
+            baseColumnNames="permission_id"
+            constraintName="fk_user_permission_permission"
+            referencedTableName="scr_permission"
+            referencedColumnNames="id"/>
+
+        <!-- scr_authority_audit FK -->
+        <addForeignKeyConstraint
+            baseTableName="scr_authority_audit"
+            baseColumnNames="authority_id"
+            constraintName="fk_authority_audit_authority"
+            referencedTableName="scr_authority"
+            referencedColumnNames="id"/>
 
     </changeSet>
 
