@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ========================================================================= -->
+    <!-- TAG 0: Estado Vacío (antes de crear cualquier tabla)                     -->
+    <!-- Tag: estado-vacio
+
+         Marca el estado inicial antes de crear cualquier tabla en la base de datos.
+         Este tag permite hacer rollback completo a base de datos vacía.
+
+         Estado en este punto:
+         - 0 tablas de aplicación
+         - Solo tablas de control de Liquibase (databasechangelog, databasechangeloglock)
+
+         Rollback a este punto:
+         ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio
+
+         Esto ejecutará el rollback de TODOS los changesets aplicados después de este tag,
+         eliminando todas las tablas del schema de forma ordenada y controlada.
+
+         Ventaja vs dropAll:
+         - Usa los bloques de rollback definidos en cada changeset
+         - Respeta el orden de dependencias (foreign keys, etc.)
+         - Más seguro y controlado
+    -->
+    <!-- ========================================================================= -->
+    <changeSet id="00000000000000-tag-estado-vacio" author="Manuel A. Motta H.">
+        <tagDatabase tag="estado-vacio"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -28,7 +28,9 @@
             <column name="login" type="varchar(50)">
                 <constraints unique="true" nullable="false" uniqueConstraintName="ux_user_login"/>
             </column>
-            <column name="password_hash" type="varchar(60)"/>
+            <column name="password_hash" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
             <column name="first_name" type="varchar(50)"/>
             <column name="last_name" type="varchar(50)"/>
             <column name="email" type="varchar(191)">
@@ -44,33 +46,32 @@
             <column name="created_by" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_date" type="timestamp"/>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
             <column name="reset_date" type="timestamp">
                 <constraints nullable="true"/>
             </column>
             <column name="last_modified_by" type="varchar(50)"/>
             <column name="last_modified_date" type="timestamp"/>
         </createTable>
-
-        <addNotNullConstraint columnName="password_hash"
-                              columnDataType="varchar(60)"
-                              tableName="scr_user"/>
-
-        <!-- Load initial user data -->
-        <loadData
-                  file="config/liquibase/data/user.csv"
-                  separator=";"
-                  tableName="scr_user"
-                  usePreparedStatements="true">
-            <column name="id" type="numeric"/>
-            <column name="activated" type="boolean"/>
-            <column name="created_date" type="timestamp"/>
-        </loadData>
-
-        <dropDefaultValue tableName="scr_user" columnName="created_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    <changeSet author="jhipster" id="00000000000002">
+      <!-- Load initial user data -->
+      <loadData
+                file="config/liquibase/data/user.csv"
+                separator=";"
+                tableName="scr_user"
+                usePreparedStatements="true">
+          <column name="id" type="numeric"/>
+          <column name="activated" type="boolean"/>
+      </loadData>
+      <rollback>
+        <delete tableName="scr_user"></delete>
+      </rollback>
     </changeSet>
 
-    <changeSet author="jhipster" id="00000000000002" context="test">
+    <changeSet author="jhipster" id="00000000000003" context="test">
         <createTable tableName="jhi_date_time_wrapper">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="jhi_date_time_wrapperPK"/>

@@ -75,6 +75,78 @@ public class User extends AbstractAuditingEntity<Long> { ... }
 public class Authority extends AbstractAuditingEntity<Long> { ... }
 ```
 
+## Liquibase Database Management
+
+This project uses Liquibase for database version control and migration management. Tags enable controlled rollback to specific database states.
+
+### Apply Database Changes
+
+**Apply all pending changesets:**
+
+```bash
+./mvnw liquibase:update
+```
+
+This command:
+
+- ✅ Applies all unapplied changesets from `master.xml`
+- ✅ Creates database tags automatically
+- ✅ Updates the `databasechangelog` tracking table
+- ✅ Safe to run multiple times (idempotent)
+
+### Available Database Tags
+
+Tags are snapshots of the database state at specific points in the migration history:
+
+- **`estado-vacio`** - Empty database (no application tables, only Liquibase control tables)
+- **`sistema-autorizacion`** - Complete enterprise authorization system with:
+  - 6 authorization tables (scr_authority, scr_permission, scr_authority_permission, scr_user_authority, scr_user_permission, scr_authority_audit)
+  - Seed data loaded (2 roles, 13 permissions, 16 mappings)
+  - Foreign keys and indexes configured
+
+### Rollback Commands
+
+**Return to authorization system snapshot:**
+
+```bash
+./mvnw liquibase:rollback -Dliquibase.rollbackTag=sistema-autorizacion
+```
+
+**Return to empty database (controlled rollback):**
+
+```bash
+./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio
+```
+
+Rollback will:
+
+- ✅ Execute rollback changesets in reverse order
+- ✅ Respect foreign key dependencies
+- ✅ Leave Liquibase control tables intact
+- ✅ Maintain migration history for future re-application
+
+**Complete database wipe (destructive):**
+
+```bash
+./mvnw liquibase:dropAll
+```
+
+⚠️ **Warning:** This will:
+
+- ❌ Drop ALL database objects directly (no changeset execution)
+- ❌ Remove even Liquibase control tables
+- ❌ Destroy all migration history
+- Use only for complete reset scenarios
+
+### Rollback vs DropAll Comparison
+
+| Command                                  | Method                       | Reversible | Keeps History | Recommended         |
+| ---------------------------------------- | ---------------------------- | ---------- | ------------- | ------------------- |
+| `rollback -Dliquibase.rollbackTag=<tag>` | Executes `<rollback>` blocks | ✅ Yes     | ✅ Yes        | ✅ **Preferred**    |
+| `dropAll`                                | Direct DROP statements       | ❌ No      | ❌ No         | ⚠️ Use with caution |
+
+**Recommendation:** Always use `rollback` to maintain control and history. Use `dropAll` only when you need a complete reset.
+
 ## Development
 
 ### Doing API-First development using openapi-generator-cli
