@@ -26,6 +26,11 @@ In the project root, JHipster generates configuration files for tools like git, 
 
 ## Development
 
+### Ports
+
+This aplication: 8080
+Micro divipol: 8081
+
 ### Doing API-First development using openapi-generator-cli
 
 [OpenAPI-Generator]() is configured for this application. You can generate API code from the `src/main/resources/swagger/api.yml` definition file by running:
