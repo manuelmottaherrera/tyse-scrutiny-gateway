@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Rules
+
+- Hablame en español
+- **Obtener fecha/hora actual**: SIEMPRE usa el comando `date` antes de crear reportes:
+  - **Para nombres de archivo**: `date +"%Y%m%d_%H%M"` → `20251024_1430`
+  - **Para contenido legible**: `date +"%Y-%m-%d %H:%M"` → `2025-10-24 14:30`
+  - **Ejemplo de uso**: `echo "$(date +"%Y%m%d_%H%M")_miReporte.md"`
+- **Documentación de sesiones**: Cuando generes respuestas finales importantes (reportes, análisis, decisiones de arquitectura), guárdalas en archivos markdown siguiendo estas convenciones:
+  - **Ubicación**: `claude/reports/` para reportes finales
+  - **Formato de nombre**: `YYYYMMDD_HHMM_nombreEnCamelCase.md`
+  - **Ejemplo**: `20251024_1430_estadoInicialBaseDatos.md`
+- **Contexto de sesiones**: Almacena contextos importantes de conversaciones en:
+  - **Ubicación**: `claude/context/`
+  - **Formato de nombre**: `YYYYMMDD_HHMM_contexto_nombreDescriptivo.md`
+  - **Ejemplo**: `20251024_1400_contexto_migracionAutorizacion.md`
+- **Contenido de reportes**: Incluye fecha, fase/paso del proyecto, propósito, análisis detallado, conclusiones y siguiente paso
+- **Trazabilidad**: Estos archivos permiten mantener historial de decisiones y análisis para futuras sesiones
+
 ## Project Overview
 
 **Tyse Scrutiny Gateway** is a JHipster 8.11.0 microservice gateway application using:
