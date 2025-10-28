@@ -106,6 +106,82 @@ Note: There are still a few other things remaining to do for Leaflet that we won
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
+### Code Linting and Formatting
+
+This project uses ESLint and Prettier to maintain code quality and consistent formatting.
+
+#### Check for linting issues
+
+```bash
+npm run lint
+```
+
+#### Automatically fix linting issues
+
+```bash
+npm run lint:fix
+```
+
+This command will automatically fix most ESLint and Prettier formatting issues. It's particularly useful when you encounter compilation errors related to code formatting.
+
+#### Check code formatting with Prettier
+
+```bash
+npm run prettier:check
+```
+
+#### Format code with Prettier
+
+```bash
+npm run prettier:format
+```
+
+**Note**: If you encounter compilation errors mentioning `prettier/prettier` or `object-shorthand`, running `npm run lint:fix` will typically resolve them automatically.
+
+### Styling Guidelines
+
+#### Color Variables
+
+**IMPORTANT**: All SCSS files must use color variables defined in `src/main/webapp/app/_color-variables.scss` instead of hardcoded color values.
+
+❌ **Incorrect** (hardcoded colors):
+
+```scss
+.my-component {
+  color: #333;
+  background: #fff;
+  border: 1px solid #eee;
+}
+```
+
+✅ **Correct** (using variables):
+
+```scss
+@import '../../color-variables';
+
+.my-component {
+  color: $color-text-primary;
+  background: $color-white;
+  border: 1px solid $color-gray-light;
+}
+```
+
+**Benefits**:
+
+- Ensures consistent theming across light and dark modes
+- Makes color changes centralized and easier to maintain
+- Improves accessibility and visual consistency
+
+**Available color categories**:
+
+- Base colors: `$color-white`, `$color-black`, grays
+- Text colors: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
+- State colors: `$color-danger`, `$color-warning`, `$color-success`
+- Shadow colors: `$color-shadow-*` variants
+- Dark theme colors: `$color-dark-overlay-*` variants
+
+See `src/main/webapp/app/_color-variables.scss` for the complete list of available variables.
+
 ## Building for production
 
 ### Packaging as jar
