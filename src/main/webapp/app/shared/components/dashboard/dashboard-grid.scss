@@ -182,9 +182,9 @@
     }
   }
 
-  // Responsive
+  // Responsive - Diseño estilo iOS para móviles
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
 
     .dashboard-header {
       margin-bottom: 2rem;
@@ -192,26 +192,169 @@
       .dashboard-title {
         font-size: 2rem;
       }
+
+      .dashboard-subtitle {
+        font-size: 1rem;
+      }
     }
 
     .modules-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+      // Grid de 4 columnas para móviles estándar
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem 0.5rem; // gap vertical mayor, horizontal menor
+      row-gap: 1.5rem;
+      column-gap: 0.5rem;
     }
 
     .module-card {
-      padding: 1.25rem;
+      // Layout vertical centrado (estilo iOS)
+      padding: 0.75rem 0.25rem;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      border-radius: 0;
 
       .card-content {
-        gap: 0.75rem;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        text-align: center;
       }
 
       .card-icon {
-        width: 50px;
-        height: 50px;
+        // Ícono más grande y redondeado (iOS-style)
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        position: relative;
+        flex-shrink: 0;
 
         svg {
-          font-size: 1.5rem !important;
+          font-size: 2rem !important;
+        }
+      }
+
+      .card-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .card-title {
+        font-size: 0.65rem;
+        font-weight: 500;
+        margin: 0;
+        line-height: 1.2;
+        word-break: break-word;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+
+        // Badge como overlay en el ícono
+        .badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          font-size: 0.55rem;
+          padding: 0.2rem 0.4rem;
+          z-index: 10;
+          line-height: 1;
+          border-radius: 8px;
+          min-width: auto;
+        }
+      }
+
+      // Ocultar descripción en móvil
+      .card-description {
+        display: none;
+      }
+
+      // Ocultar flecha en móvil
+      .card-arrow {
+        display: none;
+      }
+
+      // Eliminar efectos hover en móvil
+      &:hover {
+        transform: none;
+        box-shadow: none;
+        border-color: transparent;
+
+        .card-icon {
+          transform: none;
+        }
+
+        &::before {
+          opacity: 0;
+        }
+      }
+
+      // Feedback táctil en active (al presionar)
+      &:active:not(.disabled) {
+        transform: scale(0.92);
+        opacity: 0.75;
+        transition: all 0.15s ease;
+      }
+
+      // Estado deshabilitado (estilo iOS - opacidad reducida)
+      &.disabled {
+        opacity: 0.55;
+        cursor: default;
+
+        &:hover {
+          transform: none;
+          box-shadow: none;
+        }
+
+        &:active {
+          transform: scale(0.92);
+          opacity: 0.4;
+        }
+
+        .disabled-reason {
+          display: none; // Ocultar texto en móvil
+        }
+
+        .card-arrow {
+          display: none;
+        }
+      }
+
+      // Eliminar el pseudo-elemento ::before en móvil
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  // Móviles pequeños - 3 columnas
+  @media (max-width: 374px) {
+    .modules-grid {
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 0.25rem;
+    }
+
+    .module-card {
+      padding: 0.5rem 0.15rem;
+
+      .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+
+        svg {
+          font-size: 1.75rem !important;
+        }
+      }
+
+      .card-title {
+        font-size: 0.6rem;
+
+        .badge {
+          font-size: 0.45rem;
+          padding: 0.15rem 0.35rem;
         }
       }
     }
@@ -252,6 +395,48 @@
           color: $color-warning;
           font-weight: 600;
           opacity: 1;
+        }
+      }
+    }
+
+    // Estilos específicos para móvil en dark mode
+    @media (max-width: 768px) {
+      .module-card {
+        // En móvil, mantener fondo transparente en dark mode
+        background: transparent;
+        border: none;
+        box-shadow: none;
+
+        &:hover {
+          background: transparent;
+          box-shadow: none;
+        }
+
+        // Asegurar que los iconos mantengan colores vibrantes en dark mode
+        .card-icon {
+          // El fondo del icono ya tiene el color del módulo con opacidad
+          // No necesitamos override adicional
+        }
+
+        // Badge en dark mode móvil
+        .card-title .badge {
+          background-color: $color-gray-darker !important;
+          color: $color-white-full;
+          border: 1px solid $color-dark-overlay-strong;
+        }
+
+        // Deshabilitados en dark mode móvil
+        &.disabled {
+          opacity: 0.45; // Más transparente en dark mode móvil
+          background: transparent;
+
+          &:hover {
+            background: transparent;
+          }
+
+          &:active {
+            opacity: 0.3;
+          }
         }
       }
     }
