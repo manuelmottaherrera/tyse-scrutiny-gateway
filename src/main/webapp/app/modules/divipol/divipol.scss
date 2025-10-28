@@ -1,0 +1,19 @@
+@import '../../color-variables';
+
+.divipol-page {
+  .page-header {
+    border-bottom: 2px solid $color-border;
+    padding-bottom: 1rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: $color-text-primary;
+      margin-bottom: 0.5rem;
+    }
+
+    p.text-muted {
+      margin-bottom: 0;
+    }
+  }
+}

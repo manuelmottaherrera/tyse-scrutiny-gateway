@@ -27,6 +27,12 @@ const Admin = Loadable({
   loader: () => import(/* webpackChunkName: "administration" */ 'app/modules/administration'),
   loading: () => loading,
 });
+
+const Divipol = Loadable({
+  loader: () => import(/* webpackChunkName: "divipol" */ 'app/modules/divipol'),
+  loading: () => loading,
+});
+
 const AppRoutes = () => {
   return (
     <div className="view-routes">
@@ -55,6 +61,14 @@ const AppRoutes = () => {
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
               <Admin />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="divipol/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+              <Divipol />
             </PrivateRoute>
           }
         />

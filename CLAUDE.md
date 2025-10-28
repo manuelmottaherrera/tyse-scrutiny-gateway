@@ -146,6 +146,48 @@ Redux Toolkit with injectable reducers for code splitting:
 
 Use `useAppSelector` and `useAppDispatch` hooks for type-safe Redux access.
 
+### Frontend Styling
+
+#### Color Variables (IMPORTANT)
+
+All SCSS files MUST use color variables defined in `src/main/webapp/app/_color-variables.scss` instead of hardcoded color values.
+
+**Why?**
+
+- Ensures consistent theming across light and dark modes
+- Centralizes color management for easier maintenance
+- Improves accessibility and visual consistency
+
+**How to use:**
+
+```scss
+// Import variables at the top of your SCSS file
+@import '../../color-variables';
+
+// Use variables instead of hardcoded colors
+.my-component {
+  color: $color-text-primary; // NOT #333
+  background: $color-white; // NOT #fff
+  border: 1px solid $color-gray-light; // NOT #eee
+  box-shadow: 0 2px 4px $color-shadow-medium; // NOT rgba(0,0,0,0.15)
+}
+```
+
+**Available variable categories:**
+
+- **Base colors**: `$color-white`, `$color-black`, `$color-gray-*`
+- **Text colors**: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
+- **State colors**: `$color-danger`, `$color-warning`, `$color-success`
+- **Shadows**: `$color-shadow-primary`, `$color-shadow-medium`, `$color-shadow-strong`, etc.
+- **Dark theme**: `$color-dark-overlay-*`, `$color-dark-background`
+- **Component-specific**: See `_color-variables.scss` for the complete list
+
+**Before adding new colors:**
+
+1. Check if a suitable variable already exists in `_color-variables.scss`
+2. If not, add the new color variable to `_color-variables.scss` following the existing pattern
+3. Use the new variable in your component
+
 ### Key Technologies
 
 - **Reactive Programming**: All backend operations use Reactor (`Mono`, `Flux`)

@@ -16,7 +16,7 @@ $color-black: #000;
 $color-black-full: #000000;
 
 // Grises
-$color-gray-light: #eee;
+$color-border: var(--color-border); // Dinámico según tema
 $color-gray-medium: #ccc;
 $color-gray-medium-dark: #bbb;
 $color-gray-dark: #ddd;
@@ -48,6 +48,20 @@ $color-header-secondary: #bbb;
 // ==========================================================================
 
 $color-link-primary: #533f03;
+
+// ==========================================================================
+// Colores de Texto (Dinámicos según tema)
+// ==========================================================================
+
+$color-text-primary: var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+$color-text-tertiary: var(--color-text-tertiary);
+
+// ==========================================================================
+// Colores de Fondo (Dinámicos según tema)
+// ==========================================================================
+
+$color-bg-form: var(--color-bg-form);
 
 // ==========================================================================
 // Colores de Sombras
