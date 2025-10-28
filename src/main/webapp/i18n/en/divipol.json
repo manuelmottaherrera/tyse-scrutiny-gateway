@@ -1,0 +1,39 @@
+{
+  "divipol": {
+    "title": "DIVIPOL - Political Division",
+    "subtitle": "Management and query of Colombia's electoral political division",
+    "error": "Error loading data",
+    "filters": {
+      "departamento": "Department",
+      "municipio": "Municipality",
+      "zona": "Zone",
+      "puesto": "Voting Station",
+      "selectDepartamento": "Select department",
+      "selectMunicipio": "Select municipality",
+      "selectZona": "Select zone",
+      "reset": "Clear Filters"
+    },
+    "stats": {
+      "departamentos": "Departments",
+      "municipios": "Municipalities",
+      "zonas": "Zones",
+      "mesas": "Tables",
+      "potencialElectoral": "Electoral Potential",
+      "total": "Total",
+      "women": "Women",
+      "men": "Men"
+    },
+    "table": {
+      "code": "Divipol Code",
+      "name": "Name",
+      "women": "Women",
+      "men": "Men",
+      "total": "Total Potential",
+      "mesas": "Tables",
+      "noData": "No data to display. Select filters to view information."
+    },
+    "export": {
+      "download": "Download Report"
+    }
+  }
+}

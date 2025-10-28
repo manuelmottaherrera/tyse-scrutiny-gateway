@@ -41,6 +41,16 @@
   --bs-heading-font-size-factor: 1.2;
   --bs-subtitle-color: #{$gray-400}; // Subtítulos
   --bs-subtitle-font-weight: 400;
+
+  // Variables de texto personalizadas para dark mode
+  --color-text-primary: #{$gray-100};
+  --color-text-secondary: #{$gray-400};
+  --color-text-tertiary: #{$gray-500};
+  --color-border: #{$gray-700};
+  --color-bg-form: #{$gray-800};
+  --color-input-disabled-bg: #{darken($gray-800, 3%)};
+  --color-input-disabled-text: #{$gray-600};
+  --color-table-striped-bg: #{lighten($gray-900, 3%)};
 }
 
 // Mixin para tema claro
@@ -78,6 +88,16 @@
   --bs-heading-font-size-factor: 1.2;
   --bs-subtitle-color: #{$gray-700}; // Subtítulos
   --bs-subtitle-font-weight: 400;
+
+  // Variables de texto personalizadas para light mode
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-text-tertiary: #999;
+  --color-border: #eee;
+  --color-bg-form: #f8f9fa;
+  --color-input-disabled-bg: #e9ecef;
+  --color-input-disabled-text: #6c757d;
+  --color-table-striped-bg: rgba(0, 0, 0, 0.05);
 }
 
 // Variables CSS para temas - Tema Claro por defecto (Yeti)
@@ -155,7 +175,8 @@ body {
   --bs-table-border-color: var(--bs-table-border-color);
 
   &.table-striped > tbody > tr:nth-of-type(odd) > * {
-    --bs-table-accent-bg: rgba(var(--bs-body-color-rgb), 0.05);
+    --bs-table-accent-bg: var(--color-table-striped-bg);
+    background-color: var(--color-table-striped-bg);
   }
 }
 
@@ -201,7 +222,10 @@ body {
 }
 
 // Forms
-.form-control {
+.form-control,
+.form-select,
+select.form-control,
+input.form-control {
   background-color: var(--bs-body-bg);
   color: var(--bs-body-color);
   border-color: var(--bs-table-border-color);
@@ -211,6 +235,26 @@ body {
     color: var(--bs-body-color);
     border-color: var(--bs-primary);
   }
+
+  &:disabled,
+  &[disabled] {
+    background-color: var(--color-input-disabled-bg) !important;
+    color: var(--color-input-disabled-text) !important;
+    border-color: var(--bs-table-border-color) !important;
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+// Asegurar que los selects deshabilitados usen los colores correctos
+select:disabled,
+select[disabled],
+Input:disabled[type='select'] {
+  background-color: var(--color-input-disabled-bg) !important;
+  color: var(--color-input-disabled-text) !important;
+  border-color: var(--bs-table-border-color) !important;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
 }
 
 .form-label {
