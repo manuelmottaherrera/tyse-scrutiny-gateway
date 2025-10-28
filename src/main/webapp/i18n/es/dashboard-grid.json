@@ -8,7 +8,7 @@
         "description": "Gestión de división política y configuración territorial"
       },
       "statistics": {
-        "title": "Estadísticas",
+        "title": "Datos",
         "description": "Reportes y análisis estadísticos electorales"
       },
       "heatMap": {
@@ -28,7 +28,7 @@
         "description": "Administración del personal electoral"
       },
       "trainings": {
-        "title": "Capacitaciones",
+        "title": "Formación",
         "description": "Programas de formación para el personal electoral"
       },
       "witnesses": {
