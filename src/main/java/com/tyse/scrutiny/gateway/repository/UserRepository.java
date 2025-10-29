@@ -44,13 +44,32 @@ public interface UserRepository extends R2dbcRepository<User, Long>, UserReposit
 
     Mono<Long> count();
 
-    @Query("INSERT INTO jhi_user_authority VALUES(:userId, :authority)")
-    Mono<Void> saveUserAuthority(Long userId, String authority);
+    /**
+     * Save user-authority assignment to the new scr_user_authority table.
+     * Note: This is a legacy compatibility method. Use UserAuthorityRepository for new code.
+     * @deprecated Use {@link com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository} instead
+     */
+    @Deprecated
+    @Query(
+        "INSERT INTO scr_user_authority (user_id, authority_id, is_active, assigned_by, assigned_date) " +
+        "SELECT :userId, a.id, true, :assignedBy, CURRENT_TIMESTAMP FROM scr_authority a WHERE a.code = :authorityCode"
+    )
+    Mono<Void> saveUserAuthority(Long userId, String authorityCode, String assignedBy);
 
-    @Query("DELETE FROM jhi_user_authority")
+    /**
+     * Delete all user-authority assignments (cleanup utility).
+     * @deprecated Use {@link com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository#deleteAll()} instead
+     */
+    @Deprecated
+    @Query("DELETE FROM scr_user_authority")
     Mono<Void> deleteAllUserAuthorities();
 
-    @Query("DELETE FROM jhi_user_authority WHERE user_id = :userId")
+    /**
+     * Delete all authority assignments for a specific user.
+     * @deprecated Use {@link com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository#deleteByUserId(Long)} instead
+     */
+    @Deprecated
+    @Query("DELETE FROM scr_user_authority WHERE user_id = :userId")
     Mono<Void> deleteUserAuthorities(Long userId);
 }
 
@@ -98,9 +117,21 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
         long size = pageable.getPageSize();
 
         return db
-            .sql("SELECT * FROM jhi_user u LEFT JOIN jhi_user_authority ua ON u.id=ua.user_id")
+            .sql(
+                """
+                SELECT u.*, a.id as authority_id, a.code as authority_code, a.name as authority_name
+                FROM jhi_user u
+                LEFT JOIN scr_user_authority ua ON u.id = ua.user_id AND ua.is_active = true
+                  AND (ua.expires_at IS NULL OR ua.expires_at > CURRENT_TIMESTAMP)
+                LEFT JOIN scr_authority a ON ua.authority_id = a.id
+                """
+            )
             .map((row, metadata) ->
-                Tuples.of(r2dbcConverter.read(User.class, row, metadata), Optional.ofNullable(row.get("authority_name", String.class)))
+                Tuples.of(
+                    r2dbcConverter.read(User.class, row, metadata),
+                    Optional.ofNullable(row.get("authority_id", Long.class)),
+                    Optional.ofNullable(row.get("authority_code", String.class))
+                )
             )
             .all()
             .groupBy(t -> t.getT1().getLogin())
@@ -117,18 +148,33 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
     @Override
     public Mono<Void> delete(User user) {
         return db
-            .sql("DELETE FROM jhi_user_authority WHERE user_id = :userId")
+            .sql("DELETE FROM scr_user_authority WHERE user_id = :userId")
             .bind("userId", user.getId())
             .then()
+            .then(db.sql("DELETE FROM scr_user_permission WHERE user_id = :userId").bind("userId", user.getId()).then())
             .then(r2dbcEntityTemplate.delete(User.class).matching(query(where("id").is(user.getId()))).all().then());
     }
 
     private Mono<User> findOneWithAuthoritiesBy(String fieldName, Object fieldValue) {
+        String sql =
+            """
+            SELECT u.*, a.id as authority_id, a.code as authority_code, a.name as authority_name
+            FROM jhi_user u
+            LEFT JOIN scr_user_authority ua ON u.id = ua.user_id AND ua.is_active = true
+              AND (ua.expires_at IS NULL OR ua.expires_at > CURRENT_TIMESTAMP)
+            LEFT JOIN scr_authority a ON ua.authority_id = a.id
+            WHERE u.%s = :%s
+            """.formatted(fieldName, fieldName);
+
         return db
-            .sql("SELECT * FROM jhi_user u LEFT JOIN jhi_user_authority ua ON u.id=ua.user_id WHERE u." + fieldName + " = :" + fieldName)
+            .sql(sql)
             .bind(fieldName, fieldValue)
             .map((row, metadata) ->
-                Tuples.of(r2dbcConverter.read(User.class, row, metadata), Optional.ofNullable(row.get("authority_name", String.class)))
+                Tuples.of(
+                    r2dbcConverter.read(User.class, row, metadata),
+                    Optional.ofNullable(row.get("authority_id", Long.class)),
+                    Optional.ofNullable(row.get("authority_code", String.class))
+                )
             )
             .all()
             .collectList()
@@ -136,14 +182,18 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
             .map(l -> updateUserWithAuthorities(l.get(0).getT1(), l));
     }
 
-    private User updateUserWithAuthorities(User user, List<Tuple2<User, Optional<String>>> tuples) {
+    private User updateUserWithAuthorities(User user, List<reactor.util.function.Tuple3<User, Optional<Long>, Optional<String>>> tuples) {
         user.setAuthorities(
             tuples
                 .stream()
-                .filter(t -> t.getT2().isPresent())
+                .filter(t -> t.getT2().isPresent() && t.getT3().isPresent())
                 .map(t -> {
                     Authority authority = new Authority();
-                    authority.setName(t.getT2().orElseThrow());
+                    authority.setId(t.getT2().orElseThrow());
+                    authority.setCode(t.getT3().orElseThrow());
+                    // For backward compatibility, set name to code
+                    // TODO: In Phase 5, load full authority details or use proper DTO
+                    authority.setName(t.getT3().orElseThrow());
                     return authority;
                 })
                 .collect(Collectors.toSet())
