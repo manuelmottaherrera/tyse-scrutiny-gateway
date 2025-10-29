@@ -80,7 +80,7 @@ public class AuthorityResource {
     ) throws URISyntaxException {
         LOG.debug("REST request to save Authority : {}", authority);
         return authorityRepository
-            .existsById(authority.getName())
+            .existsByCode(authority.getCode())
             .flatMap(exists -> {
                 if (exists) {
                     return Mono.error(new BadRequestAlertException("authority already exists", ENTITY_NAME, "idexists"));
@@ -169,7 +169,7 @@ public class AuthorityResource {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public Mono<ResponseEntity<Authority>> getAuthority(
-        @Parameter(description = "ID de la autoridad", required = true) @PathVariable("id") String id
+        @Parameter(description = "ID de la autoridad", required = true) @PathVariable("id") Long id
     ) {
         LOG.debug("REST request to get Authority : {}", id);
         Mono<Authority> authority = authorityRepository.findById(id);
@@ -197,14 +197,16 @@ public class AuthorityResource {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public Mono<ResponseEntity<Void>> deleteAuthority(
-        @Parameter(description = "ID de la autoridad a eliminar", required = true) @PathVariable("id") String id
+        @Parameter(description = "ID de la autoridad a eliminar", required = true) @PathVariable("id") Long id
     ) {
         LOG.debug("REST request to delete Authority : {}", id);
         return authorityRepository
             .deleteById(id)
             .then(
                 Mono.just(
-                    ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build()
+                    ResponseEntity.noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
                 )
             );
     }

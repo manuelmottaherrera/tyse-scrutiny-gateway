@@ -414,7 +414,7 @@ class AccountResourceIT {
         assertThat(userDup).isPresent();
         assertThat(userDup.orElseThrow().getAuthorities())
             .hasSize(1)
-            .containsExactly(authorityRepository.findById(AuthoritiesConstants.USER).block());
+            .containsExactly(authorityRepository.findByCode(AuthoritiesConstants.USER).block());
 
         userService.deleteUser("badguy").block();
     }

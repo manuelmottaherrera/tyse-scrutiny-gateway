@@ -68,7 +68,7 @@ public class AdminUserDTO implements Serializable {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
-        this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        this.authorities = user.getAuthorities().stream().map(Authority::getCode).collect(Collectors.toSet());
     }
 
     public Long getId() {

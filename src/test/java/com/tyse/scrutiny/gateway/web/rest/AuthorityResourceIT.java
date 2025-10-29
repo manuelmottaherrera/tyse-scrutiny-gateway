@@ -257,7 +257,7 @@ class AuthorityResourceIT {
     }
 
     protected Authority getPersistedAuthority(Authority authority) {
-        return authorityRepository.findById(authority.getName()).block();
+        return authorityRepository.findById(authority.getId()).block();
     }
 
     protected void assertPersistedAuthorityToMatchAllProperties(Authority expectedAuthority) {

@@ -134,7 +134,7 @@ public class UserService {
             .flatMap(newUser -> {
                 Set<Authority> authorities = new HashSet<>();
                 return authorityRepository
-                    .findById(AuthoritiesConstants.USER)
+                    .findByCode(AuthoritiesConstants.USER)
                     .map(authorities::add)
                     .thenReturn(newUser)
                     .doOnNext(user -> user.setAuthorities(authorities))
@@ -159,7 +159,7 @@ public class UserService {
             user.setLangKey(userDTO.getLangKey());
         }
         return Flux.fromIterable(userDTO.getAuthorities() != null ? userDTO.getAuthorities() : new HashSet<>())
-            .flatMap(authorityRepository::findById)
+            .flatMap(authorityRepository::findByCode)
             .doOnNext(authority -> user.getAuthorities().add(authority))
             .then(Mono.just(user))
             .publishOn(Schedulers.boundedElastic())
@@ -200,7 +200,7 @@ public class UserService {
                 return userRepository
                     .deleteUserAuthorities(user.getId())
                     .thenMany(Flux.fromIterable(userDTO.getAuthorities()))
-                    .flatMap(authorityRepository::findById)
+                    .flatMap(authorityRepository::findByCode)
                     .map(managedAuthorities::add)
                     .then(Mono.just(user));
             })
@@ -250,18 +250,18 @@ public class UserService {
     public Mono<User> saveUser(User user) {
         return SecurityUtils.getCurrentUserLogin()
             .switchIfEmpty(Mono.just(Constants.SYSTEM))
-            .flatMap(login -> {
+            .flatMap(assignedBy -> {
                 if (user.getCreatedBy() == null) {
-                    user.setCreatedBy(login);
+                    user.setCreatedBy(assignedBy);
                 }
-                user.setLastModifiedBy(login);
+                user.setLastModifiedBy(assignedBy);
                 // Saving the relationship can be done in an entity callback
                 // once https://github.com/spring-projects/spring-data-r2dbc/issues/215 is done
                 return userRepository
                     .save(user)
                     .flatMap(savedUser ->
                         Flux.fromIterable(user.getAuthorities())
-                            .flatMap(authority -> userRepository.saveUserAuthority(savedUser.getId(), authority.getName()))
+                            .flatMap(authority -> userRepository.saveUserAuthority(savedUser.getId(), authority.getCode(), assignedBy))
                             .then(Mono.just(savedUser))
                     );
             });
