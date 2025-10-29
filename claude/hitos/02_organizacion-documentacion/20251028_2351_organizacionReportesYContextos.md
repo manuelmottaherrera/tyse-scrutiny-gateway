@@ -272,7 +272,7 @@ claude
 
 Cada hito debe contener:
 
-1. **Subcarpetas temáticas** (00*\*, 01*_, 02\__)
+1. **Subcarpetas temáticas** (00*\*, 01*\_, 02\_\_)
 2. **Contexto** del hito (archivo .md)
 3. **README.md** con resumen completo
 4. **Reportes organizados** por fase
