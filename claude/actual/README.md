@@ -1,144 +1,149 @@
 # Carpeta de Trabajo Actual
 
 **Fecha de creación:** 2025-10-28 23:44
-**Propósito:** Almacenar reportes y contextos del trabajo en curso
+**Propósito:** Almacenar planes y contextos temporales durante el trabajo en un hito
 
 ---
 
 ## 📋 Descripción
 
-Esta carpeta contiene los reportes y contextos de las sesiones de trabajo actuales. Una vez que se complete un hito o se alcance un objetivo importante, los documentos deben ser archivados en la carpeta `hitos/` con un nombre descriptivo.
+Esta carpeta contiene **planes y contextos temporales** mientras se trabaja en un hito. Los **reportes finales se crean directamente** en la carpeta del hito correspondiente (`claude/hitos/XX_nombre-hito/`).
+
+**⚠️ IMPORTANTE:** Esta carpeta es solo para trabajo en progreso. Los reportes de sesión y documentación final van directo al hito.
 
 ---
 
-## 🗂️ Estructura de Documentos
+## 🗂️ Qué va en esta carpeta
 
-### Reportes
+### Planes de Trabajo
 
-Los reportes finales de sesiones importantes deben seguir este formato:
+Mientras trabajas en un hito, guarda aquí los planes:
 
-**Formato de nombre:** `YYYYMMDD_HHMM_nombreEnCamelCase.md`
+**Formato:** `YYYYMMDD_HHMM_plan[Nombre].md`
+**Ejemplo:** `20251029_1051_planFase5Servicios.md`
 
-**Ejemplo:** `20251028_2344_analisisPerformance.md`
+**Contenido:**
 
-**Contenido mínimo:**
+- Objetivo del trabajo
+- Tareas a realizar
+- Decisiones pendientes
+- Referencias necesarias
 
-- Fecha y hora
-- Fase/paso del proyecto
-- Propósito
-- Análisis detallado
-- Conclusiones
-- Siguiente paso
+### Contextos Temporales
 
-### Contextos
+Contextos de conversaciones que aún están en progreso:
 
-Los contextos de conversaciones importantes deben seguir este formato:
-
-**Formato de nombre:** `YYYYMMDD_HHMM_contexto_nombreDescriptivo.md`
-
-**Ejemplo:** `20251028_2300_contexto_refactorAutenticacion.md`
-
-**Contenido mínimo:**
-
-- Objetivo de la sesión
-- Estado del proyecto
-- Plan de trabajo
-- Decisiones tomadas
-- Referencias importantes
+**Formato:** `YYYYMMDD_HHMM_contexto_[nombre].md`
+**Ejemplo:** `20251029_1000_contexto_migracion.md`
 
 ---
 
-## 🔄 Flujo de Trabajo
+## 🔄 Nuevo Flujo de Trabajo
 
-### 1. Durante el Trabajo
+### 1. Al Iniciar un Hito
 
-Guarda reportes y contextos en esta carpeta (`claude/actual/`) a medida que avanzas en las tareas.
+```bash
+# Crea la carpeta del hito
+mkdir -p claude/hitos/XX_nombre-del-hito
 
-### 2. Al Completar un Hito
+# Trabaja con planes en claude/actual/
+```
 
-Cuando completes un hito importante:
+### 2. Durante el Trabajo
 
-1. **Crear carpeta de hito:**
+- **Planes**: Guarda en `claude/actual/`
+- **Reportes**: Crea directamente en `claude/hitos/XX_nombre-hito/YYYYMMDD_HHMM_reporte.md`
 
-   ```bash
-   mkdir -p claude/hitos/XX_nombre-del-hito/{subcarpetas}
-   ```
+### 3. Al Completar una Sesión
 
-2. **Mover documentos:**
+```bash
+# Crea reporte DIRECTAMENTE en el hito
+vim claude/hitos/05_sistema-autorizacion-fase5/20251029_1615_completacionFase5.md
+```
 
-   ```bash
-   mv claude/actual/*.md claude/hitos/XX_nombre-del-hito/categoria/
-   ```
+### 4. Al Completar el Hito
 
-3. **Crear README del hito:**
-   Documenta el hito completado con resumen, métricas y logros.
+```bash
+# 1. Mueve el plan de actual/ al hito
+mv claude/actual/20251029_1051_planFase5.md claude/hitos/05_sistema-autorizacion-fase5/
 
-4. **Limpiar carpeta actual:**
-   Asegúrate de que `claude/actual/` quede lista para nuevos trabajos.
+# 2. Crea README.md del hito
+vim claude/hitos/05_sistema-autorizacion-fase5/README.md
+
+# 3. Limpia actual/
+rm claude/actual/*.md  # Solo si ya están archivados
+```
 
 ---
 
-## 📂 Ejemplos de Organización por Hito
+## 📂 Nueva Estructura de Hitos
 
 ```
 claude/hitos/
-├── 01_sistema-autorizacion-fase1/
-│   ├── 00_preparacion/
-│   ├── 01_diseno-base-datos/
-│   ├── 02_validacion-testing/
-│   ├── contexto_migracionSistemaAutorizacion.md
-│   └── README.md
-├── 02_frontend-dashboard/
-│   ├── 00_analisis/
-│   ├── 01_componentes/
-│   └── README.md
-└── 03_integracion-api-externa/
-    ├── 00_investigacion/
-    ├── 01_implementacion/
-    └── README.md
+└── 05_sistema-autorizacion-fase5/
+    ├── README.md                              # Resumen ejecutivo
+    ├── 20251029_1051_planFase5Servicios.md   # Plan (movido de actual/)
+    ├── 20251029_1615_completacionFase5.md    # Reporte (creado directo)
+    └── 00_preparacion/                        # Subcarpetas opcionales
+        └── analisisServicios.md
 ```
 
 ---
 
 ## ✅ Checklist de Archivo
 
-Antes de archivar un hito, asegúrate de:
+Al completar un hito:
 
-- [ ] Todos los reportes tienen fecha y hora
-- [ ] Los nombres de archivos son descriptivos
-- [ ] Se creó un README del hito con resumen
-- [ ] Los documentos están organizados en subcarpetas lógicas
-- [ ] El contexto del hito está incluido
-- [ ] La carpeta `actual/` quedó limpia
+- [ ] Plan movido de `actual/` al hito
+- [ ] Reportes creados directamente en el hito (NO en actual/)
+- [ ] README.md del hito creado con resumen ejecutivo
+- [ ] Documentos organizados (con subcarpetas si es necesario)
+- [ ] Carpeta `actual/` limpia de archivos archivados
+- [ ] Actualizado `claude/actual/README.md` con estado actual
 
 ---
 
-## 🎯 Convención de Nombres de Hitos
+## 🎯 Convención de Nombres
+
+### Hitos
 
 **Formato:** `XX_nombre-descriptivo-del-hito`
 
 **Ejemplos:**
 
-- `01_sistema-autorizacion-fase1`
-- `02_dashboard-modular`
-- `03_integracion-kafka`
-- `04_refactor-servicios-core`
+- `05_sistema-autorizacion-fase5`
+- `06_sistema-autorizacion-fase6`
+- `07_frontend-autorizacion`
 
-**Numeración:**
+### Reportes (directo en hito)
 
-- Usa números secuenciales (01, 02, 03, ...)
-- El número indica el orden cronológico de completado
-- No reutilices números de hitos anteriores
+**Formato:** `YYYYMMDD_HHMM_nombreDescriptivo.md`
+
+**Ejemplos:**
+
+- `20251029_1615_completacionFase5.md`
+- `20251029_1700_pruebasIntegracion.md`
 
 ---
 
 ## 📊 Estado Actual
 
-**Hitos completados:** 1
+**Última actualización:** 2025-10-29 11:00
 
-- `01_sistema-autorizacion-fase1` ✅
+**Hitos completados:** 4
 
-**Trabajo en curso:** Pendiente de iniciar nuevo hito
+- `01_sistema-autorizacion-fase1` ✅ - Base de datos y entidades del sistema de autorización
+- `02_organizacion-documentacion` ✅ - Reorganización de documentación del proyecto
+- `03_sistema-autorizacion-fase2` ✅ - Entidades enterprise completas (Permission, UserAuthority, UserPermission, AuthorityAudit)
+- `04_sistema-autorizacion-fase3` ✅ - Repositorios R2DBC, Row Mappers y SQL Helpers
+
+**Trabajo en curso:** Fase 5 - Servicios de Negocio
+
+- Corrección de errores de compilación
+- Implementación de servicios enterprise
+- DTOs de autorización
+- Scheduled jobs para cleanup y notificaciones
+- Tests críticos
 
 ---
 

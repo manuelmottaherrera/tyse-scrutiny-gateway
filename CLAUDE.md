@@ -5,20 +5,57 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Rules
 
 - Hablame en español
+- Una tarea compleja debe planearse correctamente. El plan debe almacenarse en `claude/actual/` mientras se trabaja en él. Cuando el plan se complete, se debe crear un reporte y archivar todo en el hito correspondiente.
 - **Obtener fecha/hora actual**: SIEMPRE usa el comando `date` antes de crear reportes:
   - **Para nombres de archivo**: `date +"%Y%m%d_%H%M"` → `20251024_1430`
   - **Para contenido legible**: `date +"%Y-%m-%d %H:%M"` → `2025-10-24 14:30`
   - **Ejemplo de uso**: `echo "$(date +"%Y%m%d_%H%M")_miReporte.md"`
-- **Documentación de sesiones**: Cuando generes respuestas finales importantes (reportes, análisis, decisiones de arquitectura), guárdalas en archivos markdown siguiendo estas convenciones:
-  - **Ubicación**: `claude/reports/` para reportes finales
-  - **Formato de nombre**: `YYYYMMDD_HHMM_nombreEnCamelCase.md`
-  - **Ejemplo**: `20251024_1430_estadoInicialBaseDatos.md`
-- **Contexto de sesiones**: Almacena contextos importantes de conversaciones en:
-  - **Ubicación**: `claude/context/`
-  - **Formato de nombre**: `YYYYMMDD_HHMM_contexto_nombreDescriptivo.md`
-  - **Ejemplo**: `20251024_1400_contexto_migracionAutorizacion.md`
-- **Contenido de reportes**: Incluye fecha, fase/paso del proyecto, propósito, análisis detallado, conclusiones y siguiente paso
-- **Trazabilidad**: Estos archivos permiten mantener historial de decisiones y análisis para futuras sesiones
+
+## Organización de Documentación por Hitos
+
+### Estructura de Hitos
+
+Cada hito debe organizarse en `claude/hitos/XX_nombre-hito/` con:
+
+- **README.md**: Resumen ejecutivo del hito con métricas y logros
+- **Reportes de sesión**: Directamente en la carpeta del hito (formato: `YYYYMMDD_HHMM_nombreDescriptivo.md`)
+- **Subcarpetas opcionales**: Para organizar por subtareas (ej: `00_preparacion/`, `01_implementacion/`)
+
+**Ejemplo de estructura:**
+
+```
+claude/hitos/
+└── 05_sistema-autorizacion-fase5/
+    ├── README.md                              # Resumen del hito
+    ├── 20251029_1051_planFase5Servicios.md   # Plan inicial
+    ├── 20251029_1615_completacionFase5.md    # Reporte de completación
+    └── 00_preparacion/                        # Subcarpeta opcional
+        └── analisisServicios.md
+```
+
+### Flujo de Trabajo
+
+1. **Durante el trabajo**: Guarda planes y contextos en `claude/actual/`
+2. **Al completar sesión**: Crea reporte directamente en `claude/hitos/XX_nombre-hito/`
+3. **Al completar hito**:
+   - Crea `README.md` del hito con resumen ejecutivo
+   - Verifica que todos los reportes estén en la carpeta del hito
+   - Limpia `claude/actual/` de archivos archivados
+
+### Formato de Reportes
+
+**Nombre:** `YYYYMMDD_HHMM_nombreDescriptivo.md`
+
+**Contenido mínimo:**
+
+- Fecha y hora
+- Fase/hito del proyecto
+- Propósito y objetivo
+- Análisis detallado o implementación
+- Conclusiones y resultados
+- Próximos pasos
+
+**Trazabilidad**: Los reportes en hitos permiten mantener historial completo de decisiones y progreso del proyecto
 
 ## Project Overview
 
