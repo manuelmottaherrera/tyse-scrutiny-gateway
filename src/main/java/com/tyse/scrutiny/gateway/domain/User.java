@@ -74,6 +74,18 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column("reset_date")
     private Instant resetDate = null;
 
+    /**
+     * Legacy authority collection.
+     * Loaded manually in UserRepository from jhi_user_authority join table.
+     *
+     * @deprecated This field is part of the legacy authorization system.
+     * The new enterprise system uses:
+     * - {@link com.tyse.scrutiny.gateway.domain.authorization.UserAuthority} for role assignments
+     * - {@link com.tyse.scrutiny.gateway.domain.authorization.UserPermission} for direct permissions
+     *
+     * This field will be migrated in Fase 3 (Repositories) to load from scr_user_authority
+     * instead of jhi_user_authority.
+     */
     @JsonIgnore
     @org.springframework.data.annotation.Transient
     private Set<Authority> authorities = new HashSet<>();
