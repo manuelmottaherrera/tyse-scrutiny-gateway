@@ -160,6 +160,35 @@ public class UserAuthorityService {
     }
 
     /**
+     * Revoke an authority assignment by its ID.
+     *
+     * @param id the assignment id
+     * @param reason the reason for revocation
+     * @return the updated assignment
+     */
+    public Mono<UserAuthority> revokeById(Long id, String reason) {
+        LOG.debug("Request to revoke authority assignment with id: {}", id);
+
+        return SecurityUtils.getCurrentUserLogin()
+            .switchIfEmpty(Mono.just(Constants.SYSTEM))
+            .flatMap(revokedBy ->
+                userAuthorityRepository
+                    .findById(id)
+                    .switchIfEmpty(Mono.error(new IllegalArgumentException("No authority assignment found with id " + id)))
+                    .flatMap(assignment -> {
+                        assignment.setIsActive(false);
+                        assignment.setRevokedBy(revokedBy);
+                        assignment.setRevokedDate(Instant.now());
+                        assignment.setRevokedReason(reason);
+
+                        return userAuthorityRepository
+                            .save(assignment)
+                            .doOnNext(saved -> LOG.debug("Revoked authority assignment {} by {}: {}", id, revokedBy, reason));
+                    })
+            );
+    }
+
+    /**
      * Delete an authority assignment permanently.
      *
      * @param id the assignment id

@@ -145,6 +145,18 @@ public class PermissionService {
     }
 
     /**
+     * Find a permission by ID.
+     *
+     * @param id the permission id
+     * @return the permission if found
+     */
+    @Transactional(readOnly = true)
+    public Mono<Permission> findById(Long id) {
+        LOG.debug("Request to get Permission by id: {}", id);
+        return permissionRepository.findById(id);
+    }
+
+    /**
      * Validate permission pattern.
      *
      * @param resource the resource name

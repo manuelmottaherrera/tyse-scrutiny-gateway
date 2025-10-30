@@ -182,6 +182,35 @@ public class UserPermissionService {
     }
 
     /**
+     * Revoke a permission grant by its ID.
+     *
+     * @param id the grant id
+     * @param reason the reason for revocation
+     * @return the updated grant
+     */
+    public Mono<UserPermission> revokeById(Long id, String reason) {
+        LOG.debug("Request to revoke permission grant with id: {}", id);
+
+        return SecurityUtils.getCurrentUserLogin()
+            .switchIfEmpty(Mono.just(Constants.SYSTEM))
+            .flatMap(revokedBy ->
+                userPermissionRepository
+                    .findById(id)
+                    .switchIfEmpty(Mono.error(new IllegalArgumentException("No permission grant found with id " + id)))
+                    .flatMap(grant -> {
+                        grant.setIsActive(false);
+                        grant.setRevokedBy(revokedBy);
+                        grant.setRevokedDate(Instant.now());
+                        grant.setRevokedReason(reason);
+
+                        return userPermissionRepository
+                            .save(grant)
+                            .doOnNext(saved -> LOG.debug("Revoked permission grant {} by {}: {}", id, revokedBy, reason));
+                    })
+            );
+    }
+
+    /**
      * Delete a permission grant permanently.
      *
      * @param id the grant id
