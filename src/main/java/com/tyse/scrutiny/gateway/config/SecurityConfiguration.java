@@ -4,9 +4,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
+import com.tyse.scrutiny.gateway.security.EnterprisePermissionEvaluator;
 import com.tyse.scrutiny.gateway.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -44,6 +47,28 @@ public class SecurityConfiguration {
         );
         authenticationManager.setPasswordEncoder(passwordEncoder());
         return authenticationManager;
+    }
+
+    /**
+     * Configures the MethodSecurityExpressionHandler with a custom PermissionEvaluator.
+     *
+     * <p>This enables the use of hasPermission() expressions in @PreAuthorize annotations
+     * for granular permission checking. For example:
+     * <pre>
+     * {@code
+     * @PreAuthorize("hasPermission(null, 'user.create')")
+     * public Mono<User> createUser(User user) { ... }
+     * }
+     * </pre>
+     *
+     * @param permissionEvaluator the custom permission evaluator for enterprise authorization
+     * @return configured expression handler
+     */
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(EnterprisePermissionEvaluator permissionEvaluator) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(permissionEvaluator);
+        return handler;
     }
 
     @Bean

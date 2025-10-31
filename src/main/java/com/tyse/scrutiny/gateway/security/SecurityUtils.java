@@ -1,6 +1,8 @@
 package com.tyse.scrutiny.gateway.security;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -121,5 +123,70 @@ public final class SecurityUtils {
      */
     public static Mono<Boolean> hasCurrentUserThisAuthority(String authority) {
         return hasCurrentUserAnyOfAuthorities(authority);
+    }
+
+    /**
+     * Check if current user has specific permission.
+     *
+     * <p>Permissions are in the format "resource.action" (e.g., "user.create", "invoice.approve").
+     * This method checks if the permission exists in the user's granted authorities.
+     *
+     * @param permission format "resource.action" (e.g., "user.create")
+     * @return true if user has the permission, false otherwise
+     */
+    public static Mono<Boolean> hasPermission(String permission) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .flatMapIterable(Authentication::getAuthorities)
+            .map(GrantedAuthority::getAuthority)
+            .any(auth -> auth.equals(permission))
+            .defaultIfEmpty(false);
+    }
+
+    /**
+     * Check if current user has specific authority/role.
+     *
+     * <p>This is an alias for {@link #hasPermission(String)} to provide
+     * consistent API for checking both roles and permissions.
+     *
+     * @param authority format "ROLE_XXX"
+     * @return true if user has the authority, false otherwise
+     */
+    public static Mono<Boolean> hasAuthority(String authority) {
+        return hasPermission(authority);
+    }
+
+    /**
+     * Get all permissions of current user (only permissions, not roles).
+     *
+     * <p>Permissions are identified by containing a dot (.) in the authority string,
+     * following the format "resource.action" (e.g., "user.create", "invoice.approve").
+     *
+     * @return set of permissions in format "resource.action"
+     */
+    public static Mono<Set<String>> getCurrentUserPermissions() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .flatMapIterable(Authentication::getAuthorities)
+            .map(GrantedAuthority::getAuthority)
+            .filter(auth -> auth.contains(".")) // Solo permisos (formato "resource.action")
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * Get all authorities of current user (only roles, not permissions).
+     *
+     * <p>Authorities are identified by starting with "ROLE_" prefix,
+     * following Spring Security conventions (e.g., "ROLE_ADMIN", "ROLE_USER").
+     *
+     * @return set of authorities in format "ROLE_XXX"
+     */
+    public static Mono<Set<String>> getCurrentUserAuthorities() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .flatMapIterable(Authentication::getAuthorities)
+            .map(GrantedAuthority::getAuthority)
+            .filter(auth -> auth.startsWith("ROLE_")) // Solo roles
+            .collect(Collectors.toSet());
     }
 }
