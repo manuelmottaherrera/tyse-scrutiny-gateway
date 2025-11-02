@@ -1,0 +1,218 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { IAuthority } from '../../model/authorization/authority.model';
+import * as authorityService from '../../services/authority.service';
+import { serializeAxiosError } from '../reducer.utils';
+
+interface AuthorityState {
+  loading: boolean;
+  errorMessage: string | null;
+  entities: IAuthority[];
+  entity: IAuthority | null;
+  updating: boolean;
+  updateSuccess: boolean;
+}
+
+const initialState: AuthorityState = {
+  loading: false,
+  errorMessage: null,
+  entities: [],
+  entity: null,
+  updating: false,
+  updateSuccess: false,
+};
+
+// Async thunks
+export const getAuthorities = createAsyncThunk(
+  'authority/fetch_entity_list',
+  async () => {
+    const response = await authorityService.getAuthorities();
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const getAuthority = createAsyncThunk(
+  'authority/fetch_entity',
+  async (id: number) => {
+    const response = await authorityService.getAuthority(id);
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const createAuthority = createAsyncThunk(
+  'authority/create_entity',
+  async (authority: IAuthority) => {
+    const response = await authorityService.createAuthority(authority);
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const updateAuthority = createAsyncThunk(
+  'authority/update_entity',
+  async (authority: IAuthority) => {
+    const response = await authorityService.updateAuthority(authority);
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const deleteAuthority = createAsyncThunk(
+  'authority/delete_entity',
+  async (id: number) => {
+    await authorityService.deleteAuthority(id);
+    return id;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const getAuthorityPermissions = createAsyncThunk(
+  'authority/fetch_permissions',
+  async (id: number) => {
+    const response = await authorityService.getAuthorityPermissions(id);
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const assignPermissionToAuthority = createAsyncThunk(
+  'authority/assign_permission',
+  async ({ authorityId, permissionId }: { authorityId: number; permissionId: number }) => {
+    const response = await authorityService.assignPermissionToAuthority(authorityId, permissionId);
+    return response.data;
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const revokePermissionFromAuthority = createAsyncThunk(
+  'authority/revoke_permission',
+  async ({ authorityId, permissionId }: { authorityId: number; permissionId: number }) => {
+    await authorityService.revokePermissionFromAuthority(authorityId, permissionId);
+    return { authorityId, permissionId };
+  },
+  { serializeError: serializeAxiosError },
+);
+
+// Slice
+export const AuthoritySlice = createSlice({
+  name: 'authority',
+  initialState,
+  reducers: {
+    reset() {
+      return initialState;
+    },
+  },
+  extraReducers(builder) {
+    builder
+      // Get all authorities
+      .addCase(getAuthorities.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(getAuthorities.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entities = action.payload;
+      })
+      .addCase(getAuthorities.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Error loading authorities';
+      })
+      // Get single authority
+      .addCase(getAuthority.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(getAuthority.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload;
+      })
+      .addCase(getAuthority.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Error loading authority';
+      })
+      // Create authority
+      .addCase(createAuthority.pending, state => {
+        state.updating = true;
+        state.updateSuccess = false;
+        state.errorMessage = null;
+      })
+      .addCase(createAuthority.fulfilled, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = action.payload;
+        state.entities.push(action.payload);
+      })
+      .addCase(createAuthority.rejected, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = false;
+        state.errorMessage = action.error.message || 'Error creating authority';
+      })
+      // Update authority
+      .addCase(updateAuthority.pending, state => {
+        state.updating = true;
+        state.updateSuccess = false;
+        state.errorMessage = null;
+      })
+      .addCase(updateAuthority.fulfilled, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = action.payload;
+        const index = state.entities.findIndex(e => e.id === action.payload.id);
+        if (index !== -1) {
+          state.entities[index] = action.payload;
+        }
+      })
+      .addCase(updateAuthority.rejected, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = false;
+        state.errorMessage = action.error.message || 'Error updating authority';
+      })
+      // Delete authority
+      .addCase(deleteAuthority.pending, state => {
+        state.updating = true;
+        state.updateSuccess = false;
+        state.errorMessage = null;
+      })
+      .addCase(deleteAuthority.fulfilled, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entities = state.entities.filter(e => e.id !== action.payload);
+      })
+      .addCase(deleteAuthority.rejected, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = false;
+        state.errorMessage = action.error.message || 'Error deleting authority';
+      })
+      // Assign permission
+      .addCase(assignPermissionToAuthority.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(assignPermissionToAuthority.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+      })
+      .addCase(assignPermissionToAuthority.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Error assigning permission';
+      })
+      // Revoke permission
+      .addCase(revokePermissionFromAuthority.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(revokePermissionFromAuthority.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+      })
+      .addCase(revokePermissionFromAuthority.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Error revoking permission';
+      });
+  },
+});
+
+export const { reset } = AuthoritySlice.actions;
+
+export default AuthoritySlice.reducer;

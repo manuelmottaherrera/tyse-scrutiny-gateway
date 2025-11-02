@@ -11,6 +11,9 @@ import passwordReset from 'app/modules/account/password-reset/password-reset.red
 import applicationProfile from './application-profile';
 import authentication from './authentication';
 import locale from './locale';
+import authority from './authorization/authority.reducer';
+import permission from './authorization/permission.reducer';
+import userAuthority from './authorization/user-authority.reducer';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const rootReducer: ReducersMapObject = {
@@ -24,6 +27,9 @@ const rootReducer: ReducersMapObject = {
   passwordReset,
   password,
   settings,
+  authority,
+  permission,
+  userAuthority,
   loadingBar,
   /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
 };
