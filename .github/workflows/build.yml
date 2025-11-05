@@ -1,14 +1,11 @@
 name: Gateway - Build Docker Image
 
 on:
-  push:
-    branches: [main, develop]
-    tags:
-      - 'v*.*.*'
   workflow_run:
     workflows: ['Gateway - CI Pipeline']
     types: [completed]
     branches: [main, develop]
+  workflow_dispatch: # Permite ejecución manual si es necesario
 
 env:
   REGISTRY: ghcr.io
@@ -32,7 +29,7 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     if: |
-      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     permissions:
       contents: read
