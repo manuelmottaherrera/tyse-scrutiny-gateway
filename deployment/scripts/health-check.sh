@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOYMENT_DIR="/opt/tyse-scrutiny"
+DEPLOYMENT_DIR="/home/tyse/tyse-scrutiny"
 ENV_FILE="${DEPLOYMENT_DIR}/.env.staging"
 MAX_RETRIES=30
 RETRY_INTERVAL=10

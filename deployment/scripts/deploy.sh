@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOYMENT_DIR="/opt/tyse-scrutiny"
+DEPLOYMENT_DIR="/home/tyse/tyse-scrutiny"
 DOCKER_COMPOSE_FILE="${DEPLOYMENT_DIR}/docker-compose.staging.yml"
 ENV_FILE="${DEPLOYMENT_DIR}/.env.staging"
 BACKUP_DIR="${DEPLOYMENT_DIR}/backups"
