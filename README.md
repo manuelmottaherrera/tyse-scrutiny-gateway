@@ -350,7 +350,7 @@ Access the MailHog web interface at [http://localhost:8025](http://localhost:802
 
 For **staging environment**, MailHog is already configured in the Docker Compose setup. Users with VPN access can view emails at:
 
-- **Staging URL**: [http://192.168.0.58:8035](http://192.168.0.58:8035)
+- **Staging URL**: `192.168.0.58:8035` (via browser with VPN)
 
 All emails sent by the application (user activation, password reset, etc.) are automatically captured and can be viewed through this interface. No real email server or credentials are required.
 

@@ -64,14 +64,14 @@ STAGING_RECAPTCHA_SECRET_KEY=<tu_recaptcha_secret_key>
 **NO se requieren secrets adicionales para MailHog.** El servicio se configura automáticamente con los puertos por defecto:
 
 - Puerto SMTP: `1035` (usado internamente por la aplicación)
-- Puerto Web UI: `8035` (accesible via VPN en http://192.168.0.58:8035)
+- Puerto Web UI: `8035` (accesible via VPN)
 
 **Uso:**
 
-Los testers con VPN activa pueden acceder a la interfaz web de MailHog para ver todos los correos enviados por la aplicación:
+Los testers con VPN activa pueden acceder a la interfaz web de MailHog para ver todos los correos enviados por la aplicación ingresando en el navegador:
 
 ```
-http://192.168.0.58:8035
+192.168.0.58:8035
 ```
 
 Todos los correos enviados por la aplicación (activación de cuentas, reset de contraseñas, etc.) serán capturados automáticamente por MailHog y visibles en esta interfaz.
