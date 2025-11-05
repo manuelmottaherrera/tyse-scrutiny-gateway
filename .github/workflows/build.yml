@@ -63,40 +63,45 @@ jobs:
           chmod +x mvnw
           ./mvnw -Pprod clean verify -DskipTests
 
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
+      - name: Extract image tags
         id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+        run: |
+          # Extract branch or tag name
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+            BRANCH=${GITHUB_REF#refs/heads/}
+            echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
+            echo "IMAGE_TAG=$BRANCH" >> $GITHUB_OUTPUT
+          elif [[ $GITHUB_REF == refs/tags/* ]]; then
+            TAG=${GITHUB_REF#refs/tags/}
+            echo "TAG=$TAG" >> $GITHUB_OUTPUT
+            echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./src/main/docker/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          # Extract short SHA
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image with Jib
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          IMAGE_TAG=${{ steps.meta.outputs.IMAGE_TAG }}
+          SHORT_SHA=${{ steps.meta.outputs.SHORT_SHA }}
+
+          # Build and push with Jib
+          ./mvnw -Pprod verify jib:build \
+            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG} \
+            -Djib.to.tags=${IMAGE_TAG}-${SHORT_SHA},latest \
+            -Djib.to.auth.username=${{ github.actor }} \
+            -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }} \
+            -DskipTests
 
       - name: Image digest
         run: |
           echo "✅ Gateway Docker image built successfully"
           echo "📦 Registry: ${{ env.REGISTRY }}"
-          echo "🏷️  Tags: ${{ steps.meta.outputs.tags }}"
+          echo "🏷️  Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.IMAGE_TAG }}"
+          echo "🏷️  Tags: ${{ steps.meta.outputs.IMAGE_TAG }}, ${{ steps.meta.outputs.IMAGE_TAG }}-${{ steps.meta.outputs.SHORT_SHA }}, latest"
 
       - name: Trigger deployment (if develop branch)
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
