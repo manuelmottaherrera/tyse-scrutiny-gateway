@@ -151,5 +151,4 @@ Desktop.ini
 ######################
 coverage/
 .nyc_output/
-package-lock.json
 .env
