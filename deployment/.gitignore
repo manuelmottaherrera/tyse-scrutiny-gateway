@@ -1,0 +1,23 @@
+# Environment files with secrets (NEVER commit these)
+.env.staging
+.env.production
+.env.*.local
+
+# Backup files (contain sensitive data)
+backups/
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+
+# Temporary files
+*.tmp
+*.log
+
+# Docker volumes data
+volumes/
+
+# Keep example files
+!.env.staging.example
+!.env.production.example

@@ -1,0 +1,133 @@
+name: Deploy to Staging
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      gateway_tag:
+        description: 'Gateway image tag (default: develop)'
+        required: false
+        default: 'develop'
+      divipol_tag:
+        description: 'Divipol image tag (default: develop)'
+        required: false
+        default: 'develop'
+
+  # Auto-deploy when both images are ready (develop only)
+  repository_dispatch:
+    types: [deploy-staging]
+
+env:
+  REGISTRY: ghcr.io
+  GATEWAY_IMAGE: ${{ github.repository }}
+  DIVIPOL_IMAGE: manuelmottaherrera/tyse-scrutiny-micro-divipol
+
+jobs:
+  deploy:
+    name: Deploy to Staging Server
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: http://${{ secrets.STAGING_HOST }}:8090
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tags
+        id: set-tags
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            GATEWAY_TAG="${{ github.event.inputs.gateway_tag }}"
+            DIVIPOL_TAG="${{ github.event.inputs.divipol_tag }}"
+          else
+            # Auto-deploy uses develop tags
+            GATEWAY_TAG="develop"
+            DIVIPOL_TAG="develop"
+          fi
+
+          echo "gateway_tag=${GATEWAY_TAG}" >> $GITHUB_OUTPUT
+          echo "divipol_tag=${DIVIPOL_TAG}" >> $GITHUB_OUTPUT
+
+          echo "📦 Gateway tag: ${GATEWAY_TAG}"
+          echo "📦 Divipol tag: ${DIVIPOL_TAG}"
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy deployment files to server
+        run: |
+          # Create deployment directory on server
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.STAGING_HOST }} \
+            "mkdir -p /opt/tyse-scrutiny/{scripts,backups}"
+
+          # Copy files
+          scp -r deployment/* ${{ secrets.SSH_USER }}@${{ secrets.STAGING_HOST }}:/opt/tyse-scrutiny/
+
+      - name: Deploy on server
+        env:
+          GATEWAY_TAG: ${{ steps.set-tags.outputs.gateway_tag }}
+          DIVIPOL_TAG: ${{ steps.set-tags.outputs.divipol_tag }}
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.STAGING_HOST }} << 'ENDSSH'
+            set -e
+
+            cd /opt/tyse-scrutiny
+
+            # Export environment variables
+            export REGISTRY="${{ env.REGISTRY }}"
+            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
+            export DIVIPOL_IMAGE="${{ env.DIVIPOL_IMAGE }}"
+            export IMAGE_TAG_GATEWAY="${{ env.GATEWAY_TAG }}"
+            export IMAGE_TAG_DIVIPOL="${{ env.DIVIPOL_TAG }}"
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Run deployment script
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh
+          ENDSSH
+
+      - name: Wait for services to be healthy
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.STAGING_HOST }} << 'ENDSSH'
+            cd /opt/tyse-scrutiny
+            chmod +x scripts/health-check.sh
+            ./scripts/health-check.sh
+          ENDSSH
+
+      - name: Verify deployment
+        run: |
+          echo "🔍 Checking Gateway health..."
+          GATEWAY_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.STAGING_HOST }}:8090/management/health || echo "000")
+
+          echo "🔍 Checking Divipol health..."
+          DIVIPOL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.STAGING_HOST }}:8091/management/health || echo "000")
+
+          echo "Gateway response: $GATEWAY_RESPONSE"
+          echo "Divipol response: $DIVIPOL_RESPONSE"
+
+          if [ "$GATEWAY_RESPONSE" != "200" ] && [ "$GATEWAY_RESPONSE" != "503" ]; then
+            echo "❌ Gateway health check failed"
+            exit 1
+          fi
+
+          if [ "$DIVIPOL_RESPONSE" != "200" ] && [ "$DIVIPOL_RESPONSE" != "503" ]; then
+            echo "❌ Divipol health check failed"
+            exit 1
+          fi
+
+          echo "✅ Deployment verified successfully"
+          echo ""
+          echo "🌐 Gateway: http://${{ secrets.STAGING_HOST }}:8090"
+          echo "🌐 Divipol API: http://${{ secrets.STAGING_HOST }}:8091"
+          echo "🌐 Consul UI: http://${{ secrets.STAGING_HOST }}:8510"
+
+      - name: Cleanup SSH
+        if: always()
+        run: rm -rf ~/.ssh/id_rsa
