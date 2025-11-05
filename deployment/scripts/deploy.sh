@@ -134,7 +134,7 @@ start_services() {
 wait_for_services() {
     log_info "Waiting for services to be ready..."
 
-    local max_attempts=60  # 10 minutes total (60 * 10s)
+    local max_attempts=120  # 20 minutes total (120 * 10s)
     local attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
