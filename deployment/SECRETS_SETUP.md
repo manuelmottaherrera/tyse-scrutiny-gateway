@@ -51,6 +51,8 @@ Obtén tus claves de: https://www.google.com/recaptcha/admin
 
 ```bash
 # Clave pública (usada en el frontend)
+# IMPORTANTE: Este secret también se usa durante el build del Docker image
+# para embeber la clave en el JavaScript compilado del frontend
 STAGING_RECAPTCHA_SITE_KEY=<tu_recaptcha_site_key>
 
 # Clave privada (usada en el backend para verificación)
