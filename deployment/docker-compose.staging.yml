@@ -1,7 +1,7 @@
 services:
   # Consul - Service Discovery
   consul:
-    image: consul:1.17.0
+    image: hashicorp/consul:1.21.0
     container_name: tyse-consul-staging
     ports:
       - '${CONSUL_PORT:-8510}:8500'
@@ -17,7 +17,7 @@ services:
 
   # Kafka - Message Broker
   kafka:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:7.9.4
     container_name: tyse-kafka-staging
     ports:
       - '${KAFKA_PORT:-9102}:9092'
@@ -43,7 +43,7 @@ services:
 
   # Zookeeper (required by Kafka)
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.1
+    image: confluentinc/cp-zookeeper:7.9.4
     container_name: tyse-zookeeper-staging
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
