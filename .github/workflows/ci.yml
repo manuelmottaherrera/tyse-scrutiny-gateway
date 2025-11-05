@@ -126,6 +126,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build E2E package
+        run: npm run ci:e2e:package
+
       - name: Prepare E2E environment
         run: npm run ci:e2e:prepare:docker
 
