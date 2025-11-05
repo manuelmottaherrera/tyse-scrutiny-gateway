@@ -62,7 +62,7 @@ check_requirements() {
         exit 1
     fi
 
-    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+    if ! command -v docker-compose &> /dev/null; then
         log_error "Docker Compose is not installed"
         exit 1
     fi
@@ -105,7 +105,7 @@ pull_images() {
     log_info "Pulling latest Docker images..."
 
     cd "$DEPLOYMENT_DIR"
-    docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" pull
+    docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" pull
 
     log_info "Images pulled successfully"
 }
@@ -115,7 +115,7 @@ stop_services() {
     log_info "Stopping current services..."
 
     cd "$DEPLOYMENT_DIR"
-    docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans
+    docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans
 
     log_info "Services stopped"
 }
@@ -125,7 +125,7 @@ start_services() {
     log_info "Starting services..."
 
     cd "$DEPLOYMENT_DIR"
-    docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" up -d
+    docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" up -d
 
     log_info "Services started"
 }
@@ -142,7 +142,7 @@ wait_for_services() {
 
         log_info "Health check attempt $attempt/$max_attempts..."
 
-        if docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" ps | grep -q "healthy"; then
+        if docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" ps | grep -q "healthy"; then
             log_info "Services are healthy"
             return 0
         fi
@@ -198,7 +198,7 @@ show_summary() {
     log_info "=== Deployment Summary ==="
 
     cd "$DEPLOYMENT_DIR"
-    docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" ps
+    docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" ps
 
     echo ""
     log_info "Gateway URL: http://localhost:$(grep GATEWAY_PORT $ENV_FILE | cut -d'=' -f2)"
