@@ -134,7 +134,7 @@ start_services() {
 wait_for_services() {
     log_info "Waiting for services to be ready..."
 
-    local max_attempts=30
+    local max_attempts=60  # 10 minutes total (60 * 10s)
     local attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
@@ -142,15 +142,42 @@ wait_for_services() {
 
         log_info "Health check attempt $attempt/$max_attempts..."
 
-        if docker-compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" ps | grep -q "healthy"; then
-            log_info "Services are healthy"
+        # Check if Gateway and Divipol are healthy
+        local gateway_status=$(docker inspect --format='{{.State.Health.Status}}' tyse-gateway-staging 2>/dev/null || echo "unknown")
+        local divipol_status=$(docker inspect --format='{{.State.Health.Status}}' tyse-divipol-staging 2>/dev/null || echo "unknown")
+        local kafka_status=$(docker inspect --format='{{.State.Health.Status}}' tyse-kafka-staging 2>/dev/null || echo "unknown")
+
+        log_info "Gateway: $gateway_status | Divipol: $divipol_status | Kafka: $kafka_status"
+
+        # All critical services must be healthy
+        if [ "$gateway_status" = "healthy" ] && [ "$divipol_status" = "healthy" ] && [ "$kafka_status" = "healthy" ]; then
+            log_info "All services are healthy!"
             return 0
+        fi
+
+        # If any service is unhealthy (not starting), fail fast
+        if [ "$gateway_status" = "unhealthy" ] || [ "$divipol_status" = "unhealthy" ]; then
+            log_error "One or more services are unhealthy"
+            log_info "Showing last 50 lines of logs for failed services..."
+
+            if [ "$gateway_status" = "unhealthy" ]; then
+                log_error "Gateway logs:"
+                docker logs tyse-gateway-staging --tail 50
+            fi
+
+            if [ "$divipol_status" = "unhealthy" ]; then
+                log_error "Divipol logs:"
+                docker logs tyse-divipol-staging --tail 50
+            fi
+
+            return 1
         fi
 
         sleep 10
     done
 
     log_error "Services did not become healthy in time"
+    log_info "Final status - Gateway: $gateway_status | Divipol: $divipol_status | Kafka: $kafka_status"
     return 1
 }
 

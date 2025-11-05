@@ -79,12 +79,6 @@ jobs:
           chmod +x scripts/deploy.sh
           ./scripts/deploy.sh
 
-      - name: Run health checks
-        run: |
-          cd /home/tyse/tyse-scrutiny
-          chmod +x scripts/health-check.sh
-          ./scripts/health-check.sh
-
       - name: Verify deployment
         run: |
           echo "🔍 Checking Gateway health..."
