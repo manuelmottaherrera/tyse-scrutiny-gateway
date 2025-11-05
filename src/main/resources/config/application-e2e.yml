@@ -1,0 +1,10 @@
+# ===================================================================
+# Spring Boot configuration for the "e2e" profile.
+#
+# This configuration is for end-to-end testing environment.
+# ===================================================================
+
+google:
+  recaptcha:
+    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI # Google's test key
+    secret-key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe # Google's test key
