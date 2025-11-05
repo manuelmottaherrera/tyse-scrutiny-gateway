@@ -88,6 +88,10 @@ services:
       # CORS Configuration
       - JHIPSTER_CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:8090}
 
+      # Google reCAPTCHA Configuration
+      - GOOGLE_RECAPTCHA_SITE_KEY=${GOOGLE_RECAPTCHA_SITE_KEY}
+      - GOOGLE_RECAPTCHA_SECRET_KEY=${GOOGLE_RECAPTCHA_SECRET_KEY}
+
     depends_on:
       consul:
         condition: service_healthy
