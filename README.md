@@ -338,6 +338,22 @@ docker compose -f src/main/docker/app.yml up -d
 
 For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
 
+#### Email Testing with MailHog
+
+For **local development**, the application uses MailHog (or MailDev) running on `localhost:1025` to capture emails. To start MailHog locally:
+
+```bash
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog:v1.0.1
+```
+
+Access the MailHog web interface at [http://localhost:8025](http://localhost:8025) to view captured emails.
+
+For **staging environment**, MailHog is already configured in the Docker Compose setup. Users with VPN access can view emails at:
+
+- **Staging URL**: [http://192.168.0.58:8035](http://192.168.0.58:8035)
+
+All emails sent by the application (user activation, password reset, etc.) are automatically captured and can be viewed through this interface. No real email server or credentials are required.
+
 ## Continuous Integration (optional)
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.

@@ -54,6 +54,22 @@ services:
       - tyse-network
     restart: unless-stopped
 
+  # MailHog - Email Testing Tool
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: tyse-mailhog-staging
+    ports:
+      - '${MAILHOG_SMTP_PORT:-1035}:1025' # SMTP server
+      - '${MAILHOG_UI_PORT:-8035}:8025' # Web UI
+    networks:
+      - tyse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:8025']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   # Gateway Application
   gateway:
     image: ${REGISTRY}/${GATEWAY_IMAGE}:${IMAGE_TAG_GATEWAY:-develop}
@@ -62,7 +78,7 @@ services:
       - '${GATEWAY_PORT:-8090}:8080'
     environment:
       # Spring Profiles
-      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - SPRING_PROFILES_ACTIVE=staging,api-docs
       - JHIPSTER_SLEEP=30
 
       # Database Configuration (External PostgreSQL)
@@ -92,10 +108,22 @@ services:
       - GOOGLE_RECAPTCHA_SITE_KEY=${GOOGLE_RECAPTCHA_SITE_KEY}
       - GOOGLE_RECAPTCHA_SECRET_KEY=${GOOGLE_RECAPTCHA_SECRET_KEY}
 
+      # Mail Configuration (MailHog)
+      - SPRING_MAIL_HOST=mailhog
+      - SPRING_MAIL_PORT=1025
+      - SPRING_MAIL_USERNAME=
+      - SPRING_MAIL_PASSWORD=
+      - SPRING_MAIL_PROTOCOL=smtp
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=false
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=false
+      - MANAGEMENT_HEALTH_MAIL_ENABLED=true
+
     depends_on:
       consul:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      mailhog:
         condition: service_healthy
     networks:
       - tyse-network

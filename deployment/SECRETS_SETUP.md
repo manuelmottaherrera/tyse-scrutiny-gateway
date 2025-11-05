@@ -59,6 +59,23 @@ STAGING_RECAPTCHA_SITE_KEY=<tu_recaptcha_site_key>
 STAGING_RECAPTCHA_SECRET_KEY=<tu_recaptcha_secret_key>
 ```
 
+### MailHog (Email Testing)
+
+**NO se requieren secrets adicionales para MailHog.** El servicio se configura automáticamente con los puertos por defecto:
+
+- Puerto SMTP: `1035` (usado internamente por la aplicación)
+- Puerto Web UI: `8035` (accesible via VPN en http://192.168.0.58:8035)
+
+**Uso:**
+
+Los testers con VPN activa pueden acceder a la interfaz web de MailHog para ver todos los correos enviados por la aplicación:
+
+```
+http://192.168.0.58:8035
+```
+
+Todos los correos enviados por la aplicación (activación de cuentas, reset de contraseñas, etc.) serán capturados automáticamente por MailHog y visibles en esta interfaz.
+
 ## Verificación
 
 Una vez configurados todos los secrets, el workflow generará automáticamente el archivo `.env.staging` en el servidor durante cada deployment con todos estos valores.

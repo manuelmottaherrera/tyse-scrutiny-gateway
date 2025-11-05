@@ -79,6 +79,10 @@ jobs:
           CONSUL_PORT=8510
           KAFKA_PORT=9102
 
+          # MailHog Configuration (Email Testing)
+          MAILHOG_SMTP_PORT=1035
+          MAILHOG_UI_PORT=8035
+
           # Database Configuration
           DB_HOST=${{ secrets.STAGING_DB_HOST }}
           DB_PORT=${{ secrets.STAGING_DB_PORT }}
@@ -156,3 +160,4 @@ jobs:
           echo "🌐 Gateway: http://192.168.0.58:8090"
           echo "🌐 Divipol API: http://192.168.0.58:8091"
           echo "🌐 Consul UI: http://192.168.0.58:8510"
+          echo "📧 MailHog UI: http://192.168.0.58:8035"
