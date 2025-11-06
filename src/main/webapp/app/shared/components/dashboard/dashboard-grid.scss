@@ -44,18 +44,6 @@
     overflow: hidden;
     box-shadow: 0 2px 8px $color-shadow-secondary;
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 25px $color-shadow-medium;
-      border-color: var(--bs-primary);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    &:active {
-      transform: translateY(-2px);
-    }
-
     .card-content {
       display: flex;
       align-items: flex-start;
@@ -115,7 +103,14 @@
       margin-left: auto;
     }
 
+    // Efectos hover consolidados
     &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px $color-shadow-medium;
+      border-color: var(--bs-primary);
+      text-decoration: none;
+      color: inherit;
+
       .card-icon {
         transform: scale(1.1);
       }
@@ -124,6 +119,10 @@
         opacity: 1;
         transform: translateX(0);
       }
+    }
+
+    &:active {
+      transform: translateY(-2px);
     }
 
     // Efecto de fondo sutil al hover
@@ -302,10 +301,13 @@
       &.disabled {
         opacity: 0.55;
         cursor: default;
+        border: none;
+        background: transparent;
 
         &:hover {
           transform: none;
           box-shadow: none;
+          border: none;
         }
 
         &:active {
@@ -377,9 +379,10 @@
         opacity: 0.75;
       }
 
-      .card-title .badge {
+      .card-title .badge.bg-secondary {
         background-color: $color-gray-darker !important;
-        color: $color-white-full;
+        color: $color-white-full !important;
+        font-weight: 700;
       }
 
       &.disabled {
@@ -419,10 +422,11 @@
         }
 
         // Badge en dark mode móvil
-        .card-title .badge {
+        .card-title .badge.bg-secondary {
           background-color: $color-gray-darker !important;
-          color: $color-white-full;
-          border: 1px solid $color-dark-overlay-strong;
+          color: $color-white-full !important;
+          font-weight: 700;
+          border: none;
         }
 
         // Deshabilitados en dark mode móvil

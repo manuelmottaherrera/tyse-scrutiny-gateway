@@ -124,6 +124,13 @@
 // Atributo data-theme para control específico
 [data-theme='dark'] {
   @include dark-theme-variables;
+
+  // Badge "Próximamente" / "Coming Soon" en modo oscuro
+  .badge.bg-secondary {
+    background-color: $color-gray-darker !important;
+    color: $color-white-full !important;
+    font-weight: 700;
+  }
 }
 
 // Aplicación de variables a elementos Bootstrap
