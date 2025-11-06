@@ -124,13 +124,6 @@
 // Atributo data-theme para control específico
 [data-theme='dark'] {
   @include dark-theme-variables;
-
-  // Badge "Próximamente" / "Coming Soon" en modo oscuro
-  .badge.bg-secondary {
-    background-color: $color-gray-darker !important;
-    color: $color-white-full !important;
-    font-weight: 700;
-  }
 }
 
 // Aplicación de variables a elementos Bootstrap
@@ -286,8 +279,18 @@ Input:disabled[type='select'] {
   border-color: var(--bs-table-border-color);
 }
 
-.badge.bg-secondary {
-  background-color: var(--bs-secondary) !important;
+// Custom badge for "Coming Soon" / "Próximamente"
+.badge-coming-soon {
+  background-color: var(--bs-secondary);
+  color: var(--bs-body-color);
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 0.35rem 0.65rem;
+}
+
+[data-theme='dark'] .badge-coming-soon {
+  background-color: $color-gray-darker;
+  color: $color-white-full;
 }
 
 .page-link {

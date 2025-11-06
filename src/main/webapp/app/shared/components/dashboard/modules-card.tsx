@@ -28,7 +28,7 @@ export const ModuleCardCore: React.FC<{
       <h3 className="card-title">
         <Translate contentKey={`dashboardGrid.items.${id}.title`}>{title}</Translate>
         {comingSoon && (
-          <span className="badge bg-secondary ms-2">
+          <span className="badge badge-coming-soon ms-2">
             <Translate contentKey="dashboardGrid.general.comingSoon">Coming Soon</Translate>
           </span>
         )}
