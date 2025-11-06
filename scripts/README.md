@@ -2,6 +2,11 @@
 
 Este directorio contiene scripts útiles para el desarrollo y CI/CD del proyecto.
 
+## Tabla de Contenidos
+
+- [ci-local.sh](#ci-localsh) - Ejecuta CI localmente
+- [setup-branch-protection.sh](#setup-branch-protectionsh) - Configura protección de ramas en GitHub
+
 ## ci-local.sh
 
 Script que replica localmente el workflow **"Gateway - CI Pipeline"** de GitHub Actions.
@@ -138,3 +143,152 @@ git push --no-verify
 - Los reportes de cobertura y tests se guardan en `target/`
 - El script usa los mismos flags y configuraciones que GitHub Actions
 - Con el pre-push hook activo, no necesitas ejecutar manualmente antes de push a main/develop
+
+---
+
+## setup-branch-protection.sh
+
+Script para configurar automáticamente las reglas de protección de ramas en GitHub.
+
+### Uso
+
+```bash
+./scripts/setup-branch-protection.sh
+```
+
+### Qué hace el script
+
+Configura las siguientes reglas de protección:
+
+#### Para la rama `main`:
+
+- ✅ Requiere Pull Request con 1 aprobación
+- ✅ Requiere que pasen status checks: backend-tests, frontend-tests, e2e-tests, quality-gate
+- ✅ Requiere resolución de conversaciones
+- ✅ Aplica reglas incluso para administradores
+- ✅ No permite force pushes ni eliminación de la rama
+
+#### Para la rama `develop`:
+
+- ✅ Requiere Pull Request con 1 aprobación
+- ✅ Requiere que pasen status checks: backend-tests, frontend-tests, quality-gate
+- ✅ Requiere resolución de conversaciones
+- ✅ Permite bypass para administradores (en caso de emergencia)
+- ✅ No permite force pushes ni eliminación de la rama
+
+### Prerequisitos
+
+1. **GitHub CLI instalado:**
+
+   ```bash
+   # Ubuntu/Debian
+   sudo apt install gh
+
+   # O descargar desde
+   # https://cli.github.com/
+   ```
+
+2. **Autenticado con GitHub:**
+
+   ```bash
+   gh auth login
+   ```
+
+3. **Permisos de administrador** en el repositorio
+
+### Ejemplo de salida
+
+```
+================================
+Branch Protection Setup
+================================
+
+Repositorio: usuario/tyse-scrutiny-gateway
+
+⚠️  Esto configurará reglas de protección para las ramas main y develop
+
+Configuración para main:
+  - Require PR with 1 approval
+  - Require status checks: backend-tests, frontend-tests, e2e-tests, quality-gate
+  - Require conversation resolution
+  - Enforce for admins
+
+Configuración para develop:
+  - Require PR with 1 approval
+  - Require status checks: backend-tests, frontend-tests, quality-gate
+  - Require conversation resolution
+
+¿Continuar? (y/N): y
+
+Configurando protección para rama 'main'...
+✓ Protección configurada para 'main'
+
+Configurando protección para rama 'develop'...
+✓ Protección configurada para 'develop'
+
+================================
+✅ Branch Protection Configurada
+================================
+```
+
+### Verificar configuración
+
+**Via interfaz web:**
+
+- GitHub → Settings → Branches
+
+**Via CLI:**
+
+```bash
+gh api repos/OWNER/REPO/branches/main/protection | jq
+gh api repos/OWNER/REPO/branches/develop/protection | jq
+```
+
+### Configuración manual
+
+Si prefieres configurar manualmente o necesitas personalizar las reglas, consulta la documentación detallada en:
+
+📄 [`.github/BRANCH_PROTECTION.md`](../.github/BRANCH_PROTECTION.md)
+
+### Troubleshooting
+
+**Error: "Required status checks not found"**
+
+Los status checks deben ejecutarse al menos una vez antes de configurar la protección:
+
+1. Crea un PR de prueba
+2. Espera a que GitHub Actions ejecute el workflow `ci.yml`
+3. Una vez que los checks aparezcan, ejecuta el script nuevamente
+
+**Error: "Not authorized"**
+
+Asegúrate de tener permisos de administrador en el repositorio.
+
+### Beneficios de Branch Protection
+
+✅ **No se puede hacer merge si el CI falla**
+✅ **Garantiza revisión de código**
+✅ **Previene cambios accidentales en main/develop**
+✅ **Mantiene historial limpio**
+✅ **Detecta problemas antes del merge**
+
+### Workflow con Branch Protection
+
+```bash
+# 1. Crear feature branch
+git checkout -b feature/nueva-funcionalidad
+
+# 2. Hacer cambios y push
+git push -u origin feature/nueva-funcionalidad
+
+# 3. Crear PR en GitHub
+gh pr create --base develop --title "feat: nueva funcionalidad"
+
+# 4. GitHub Actions ejecuta automáticamente el CI
+#    - Si falla: Fix y push, se re-ejecuta automáticamente
+#    - Si pasa: Solicitar review
+
+# 5. Una vez aprobado y con CI verde:
+#    - Merge via interfaz de GitHub
+#    - El botón de merge solo está habilitado si todo pasó
+```
