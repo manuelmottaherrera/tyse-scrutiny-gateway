@@ -38,12 +38,12 @@ export const DashboardGrid: React.FC = () => {
       title: 'Statistics',
       description: 'Electoral statistical reports and analyses',
       icon: moduleIcons.statistics,
-      path: '/estadistics',
-      role: ['ADMIN', 'ANALYST', 'VIEWER'],
+      path: 'https://estadisticaselectorales.registraduria.gov.co/stage-one',
+      role: ['ADMIN', 'USER'],
       color: '#43ac6a',
-      enabled: false,
-      disabledReasonKey: 'comingSoon',
-      comingSoon: true,
+      enabled: true,
+      disabledReasonKey: '',
+      comingSoon: false,
       hidden: false,
     },
     {
@@ -64,12 +64,12 @@ export const DashboardGrid: React.FC = () => {
       title: 'Vote Count',
       description: 'Real-time counting and scrutiny system',
       icon: moduleIcons.voteCount,
-      path: '/vote-count',
-      role: ['ADMIN', 'COORDINATOR', 'OPERATOR'],
+      path: 'http://186.31.4.135/CuentaVotos/',
+      role: ['ADMIN', 'USER'],
       color: '#f04124',
-      enabled: false,
-      disabledReasonKey: 'comingSoon',
-      comingSoon: true,
+      enabled: true,
+      disabledReasonKey: '',
+      comingSoon: false,
       hidden: false,
     },
     {
@@ -103,12 +103,12 @@ export const DashboardGrid: React.FC = () => {
       title: 'Trainings',
       description: 'Training programs for electoral staff',
       icon: moduleIcons.trainings,
-      path: '/training',
-      role: ['ADMIN', 'COORDINATOR', 'TRAINER'],
+      path: 'http://jurna.top/',
+      role: ['ADMIN', 'USER'],
       color: '#20c997',
-      enabled: false,
-      disabledReasonKey: 'comingSoon',
-      comingSoon: true,
+      enabled: true,
+      disabledReasonKey: '',
+      comingSoon: false,
       hidden: false,
     },
     {
@@ -141,7 +141,13 @@ export const DashboardGrid: React.FC = () => {
 
   // Filtrar módulos según el rol del usuario (debes integrar con tu sistema de auth)
   const userRoles = ['ADMIN', 'USER']; // Ejemplo - reemplazar con roles reales
-  const accessibleModules = modules.filter(module => module.role.some(role => userRoles.includes(role)));
+  const accessibleModules = modules
+    .filter(module => module.role.some(role => userRoles.includes(role)))
+    .sort((a, b) => {
+      // Ordenar: habilitados primero, luego deshabilitados
+      if (a.enabled === b.enabled) return 0;
+      return a.enabled ? -1 : 1;
+    });
 
   return (
     <div className="dashboard-grid">
