@@ -3,6 +3,7 @@
     "title": "DIVIPOL - Political Division",
     "subtitle": "Management and query of Colombia's electoral political division",
     "error": "Error loading data",
+    "mallaButton": "Electoral Grid",
     "filters": {
       "departamento": "Department",
       "municipio": "Municipality",

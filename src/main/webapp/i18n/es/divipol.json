@@ -3,6 +3,7 @@
     "title": "DIVIPOL - División Política",
     "subtitle": "Gestión y consulta de la división política electoral de Colombia",
     "error": "Error al cargar datos",
+    "mallaButton": "Malla",
     "filters": {
       "departamento": "Departamento",
       "municipio": "Municipio",
