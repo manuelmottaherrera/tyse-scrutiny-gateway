@@ -4,7 +4,7 @@
 
 **Fecha de creación:** 2025-10-31
 **Última actualización:** 2025-11-07
-**Estado:** Fases 0-9 completadas | Fase 10 CASI COMPLETA (89%) | Fases 11-12 pendientes
+**Estado:** Fases 0-9 completadas | Fase 10 CASI COMPLETA (89%) | Fase 11 COMPLETADA | Fase 12 pendiente
 **Rama:** `feature/enterprise-authorization-system`
 
 ---
@@ -129,13 +129,40 @@ El sistema de autorización enterprise backend + auditoría está **100% complet
 - ⏳ Tests de UI con Jest (authority-list.spec.tsx, permission-list.spec.tsx, user-authority-list.spec.tsx)
   - **Nota:** Decidido postergar hasta completar implementación de todas las fases
 
-### Fase 11: Dashboard de Administración Avanzado
+### ✅ Fase 11: Dashboard de Administración Avanzado - COMPLETADA (2025-11-07)
 
-- Panel de control con métricas en tiempo real
-- Visualización de permisos activos por usuario
-- Alertas de roles próximos a expirar
-- Gráficos y estadísticas de uso (Recharts)
-- Integración con dashboard existente
+**Commits:** 1 commit | **Archivos:** 25+ nuevos | **Líneas:** ~2,000+
+
+**Backend (Completado):**
+
+- ✅ AuthorizationDashboardService con 8 queries reactivas
+- ✅ AuthorizationDashboardResource (GET /api/authorization/dashboard/metrics)
+- ✅ 5 DTOs: DashboardMetricsDTO, RecentActivityDTO, ExpiringRoleDTO, AuthorityUsageDTO, PermissionUsageDTO
+
+**Frontend (Completado):**
+
+- ✅ 5 modelos TypeScript para dashboard
+- ✅ Servicio dashboard.service.ts
+- ✅ Componente MetricCard reutilizable (4 tarjetas de métricas)
+- ✅ RecentActivityWidget (últimas 10 acciones de auditoría)
+- ✅ ExpiringRolesWidget (alertas con badges danger/warning/info)
+- ✅ TopAuthoritiesChart (gráfico de barras con Recharts)
+- ✅ PermissionUsageChart (gráfico de dona con Recharts)
+- ✅ AuthorizationDashboard (componente principal integrador)
+- ✅ Integración en rutas /admin/authorization-dashboard
+- ✅ Menú admin actualizado con ícono chart-line
+- ✅ i18n completo (dashboard.json ES + EN)
+- ✅ SCSS con sistema de temas (light/dark) usando variables CSS
+
+**Características:**
+
+- Panel de control con 4 métricas: Total Roles, Total Permisos, Usuarios Activos, Roles Expirados
+- Widget de actividad reciente con badges por tipo de acción
+- Widget de roles próximos a expirar con alertas por urgencia (hoy/mañana/días)
+- Gráfico de barras mostrando roles más asignados (activos vs expirados)
+- Gráfico de dona mostrando uso de permisos
+- Botón de actualización manual de métricas
+- Totalmente responsive y compatible con tema claro/oscuro
 
 ### Fase 12: Documentación de Usuario Final
 
@@ -1014,7 +1041,7 @@ public Mono<ResponseEntity<DashboardMetricsDTO>> getDashboardMetrics() {
 
 ```
 
-**DTO de respuesta:**
+✅**DTO de respuesta:**
 
 ```java
 public class DashboardMetricsDTO {

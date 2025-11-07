@@ -1,0 +1,35 @@
+@import 'app/color-variables';
+
+.recent-activity-widget {
+  .activity-item {
+    padding: 1rem;
+    border-color: var(--bs-table-border-color);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: $color-dark-overlay-lightest;
+
+      [data-theme='dark'] &,
+      .theme-dark & {
+        background-color: $color-dark-overlay-light;
+      }
+    }
+
+    .activity-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .activity-details {
+      font-size: 0.875rem;
+
+      .activity-description {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}

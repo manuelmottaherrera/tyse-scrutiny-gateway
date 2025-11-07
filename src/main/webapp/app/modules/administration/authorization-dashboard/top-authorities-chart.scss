@@ -1,0 +1,12 @@
+.top-authorities-chart {
+  .recharts-wrapper {
+    .recharts-cartesian-grid-horizontal line,
+    .recharts-cartesian-grid-vertical line {
+      stroke: var(--bs-table-border-color);
+    }
+
+    .recharts-text {
+      fill: var(--bs-body-color);
+    }
+  }
+}

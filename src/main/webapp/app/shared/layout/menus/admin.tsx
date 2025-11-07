@@ -18,6 +18,9 @@ const adminMenuItems = () => (
     <MenuItem icon="key" to="/admin/permission">
       <Translate contentKey="global.menu.admin.permission">Permissions</Translate>
     </MenuItem>
+    <MenuItem icon="chart-line" to="/admin/authorization-dashboard">
+      <Translate contentKey="global.menu.admin.authorizationDashboard">Authorization Dashboard</Translate>
+    </MenuItem>
     <MenuItem icon="tachometer-alt" to="/admin/metrics">
       <Translate contentKey="global.menu.admin.metrics">Metrics</Translate>
     </MenuItem>

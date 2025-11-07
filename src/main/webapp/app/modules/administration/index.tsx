@@ -11,6 +11,7 @@ import Docs from './docs/docs';
 import Gateway from './gateway/gateway';
 import AuthorityRoutes from './authorization/authority';
 import PermissionRoutes from './authorization/permission';
+import AuthorizationDashboard from './authorization-dashboard/authorization-dashboard';
 
 const AdministrationRoutes = () => (
   <div>
@@ -18,6 +19,7 @@ const AdministrationRoutes = () => (
       <Route path="user-management/*" element={<UserManagement />} />
       <Route path="authority/*" element={<AuthorityRoutes />} />
       <Route path="permission/*" element={<PermissionRoutes />} />
+      <Route path="authorization-dashboard" element={<AuthorizationDashboard />} />
       <Route path="gateway" element={<Gateway />} />
       <Route path="health" element={<Health />} />
       <Route path="metrics" element={<Metrics />} />

@@ -1,0 +1,40 @@
+{
+  "dashboard": {
+    "title": "Authorization Dashboard",
+    "refresh": "Refresh",
+    "error": "Error loading dashboard metrics",
+    "metrics": {
+      "totalAuthorities": "Total Authorities",
+      "totalPermissions": "Total Permissions",
+      "activeUsers": "Active Users",
+      "expiredRoles": "Expired Roles"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "empty": "No recent activity"
+    },
+    "auditAction": {
+      "CREATED": "Created",
+      "UPDATED": "Updated",
+      "DELETED": "Deleted",
+      "ACTIVATED": "Activated",
+      "DEACTIVATED": "Deactivated"
+    },
+    "expiringRoles": {
+      "title": "Expiring Roles",
+      "empty": "No expiring roles",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "days": "{{days}} days",
+      "expiresOn": "Expires on"
+    },
+    "topAuthorities": {
+      "title": "Top Authorities",
+      "empty": "No data available"
+    },
+    "permissionUsage": {
+      "title": "Permission Usage",
+      "empty": "No data available"
+    }
+  }
+}

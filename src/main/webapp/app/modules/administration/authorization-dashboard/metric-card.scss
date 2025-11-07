@@ -1,0 +1,55 @@
+@import 'app/color-variables';
+
+.metric-card {
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px $color-shadow-secondary;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px $color-shadow-medium;
+  }
+
+  .metric-card-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .metric-icon {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background-color: $color-dark-overlay-lightest;
+
+      // Tema oscuro: usar overlay más visible
+      [data-theme='dark'] &,
+      .theme-dark & {
+        background-color: $color-dark-overlay-medium;
+      }
+    }
+
+    .metric-details {
+      flex-grow: 1;
+
+      .metric-title {
+        font-size: 0.875rem;
+        font-weight: var(--bs-heading-font-weight);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        color: var(--bs-subtitle-color);
+      }
+
+      .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--bs-heading-color);
+      }
+    }
+  }
+}

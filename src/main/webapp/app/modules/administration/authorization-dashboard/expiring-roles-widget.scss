@@ -1,0 +1,42 @@
+@import 'app/color-variables';
+
+.expiring-roles-widget {
+  .expiring-role-item {
+    padding: 1rem;
+    border-color: var(--bs-table-border-color);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $color-dark-overlay-lightest;
+
+      [data-theme='dark'] &,
+      .theme-dark & {
+        background-color: $color-dark-overlay-light;
+      }
+    }
+
+    .role-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .role-details {
+      h6 {
+        color: var(--bs-heading-color);
+        font-weight: var(--bs-heading-font-weight);
+      }
+
+      .role-authority {
+        color: var(--bs-body-color);
+        font-size: 0.9rem;
+      }
+
+      .role-expiration {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}
