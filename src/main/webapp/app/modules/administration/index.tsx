@@ -9,11 +9,15 @@ import Metrics from './metrics/metrics';
 import Configuration from './configuration/configuration';
 import Docs from './docs/docs';
 import Gateway from './gateway/gateway';
+import AuthorityRoutes from './authorization/authority';
+import PermissionRoutes from './authorization/permission';
 
 const AdministrationRoutes = () => (
   <div>
     <ErrorBoundaryRoutes>
       <Route path="user-management/*" element={<UserManagement />} />
+      <Route path="authority/*" element={<AuthorityRoutes />} />
+      <Route path="permission/*" element={<PermissionRoutes />} />
       <Route path="gateway" element={<Gateway />} />
       <Route path="health" element={<Health />} />
       <Route path="metrics" element={<Metrics />} />
