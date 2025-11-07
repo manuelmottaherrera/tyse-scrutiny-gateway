@@ -147,6 +147,302 @@ Rollback will:
 
 **Recommendation:** Always use `rollback` to maintain control and history. Use `dropAll` only when you need a complete reset.
 
+## Sistema de Autorización Enterprise
+
+Tyse Scrutiny Gateway implementa un sistema de autorización avanzado basado en **RBAC (Role-Based Access Control)** con características enterprise.
+
+### Características Principales
+
+- ✅ **Roles jerárquicos** con metadatos (hierarchy_level, category)
+- ✅ **Permisos granulares** (patrón `resource.action`)
+- ✅ **Asignaciones temporales** de roles con expiración automática
+- ✅ **Permisos directos** a usuarios (bypass de roles)
+- ✅ **Auditoría completa** (todos los cambios registrados con IP, User-Agent)
+- ✅ **Dashboard interactivo** con métricas y alertas
+- ✅ **Exportación** de logs de auditoría (CSV/JSON)
+- ✅ **API REST completa** con Swagger/OpenAPI
+- ✅ **Frontend React** con Redux Toolkit
+- ✅ **Programación reactiva** (Spring WebFlux + R2DBC)
+
+### Arquitectura
+
+**6 tablas principales:**
+
+- `scr_authority` - Roles del sistema
+- `scr_permission` - Permisos granulares
+- `scr_authority_permission` - Relación N:N roles-permisos
+- `scr_user_authority` - Asignaciones user-rol (con expiración)
+- `scr_user_permission` - Permisos directos
+- `scr_authority_audit` - Log completo de cambios
+
+**8 servicios backend:**
+
+- AuthorityService, PermissionService, UserAuthorityService
+- AuthorityAuditService, AuthorizationDashboardService, AuditExportService
+
+**6 REST controllers:**
+
+- `/api/authorities`, `/api/permissions`, `/api/user-authorities`
+- `/api/authorization/dashboard`, `/api/authority-audits`
+
+**Frontend completo:**
+
+- 14 componentes UI (Authority, Permission, User Authority CRUD)
+- Dashboard con 5 widgets (métricas, actividad reciente, alertas, gráficos)
+- Redux slices con 21+ async thunks
+- i18n completo (ES + EN) con 150+ claves
+
+### Quick Start
+
+**Acceder a la UI de administración:**
+
+```bash
+# 1. Iniciar aplicación
+./mvnw
+
+# 2. En navegador, ir a:
+http://localhost:8080/admin/authority           # Gestión de roles
+http://localhost:8080/admin/permission          # Gestión de permisos
+http://localhost:8080/admin/authorization-dashboard  # Dashboard de métricas
+```
+
+**Requisitos:**
+
+- Usuario con rol `ROLE_ADMIN`
+- Credenciales por defecto: `admin` / `admin`
+
+**API Documentation:**
+
+```bash
+# Swagger UI
+http://localhost:8080/swagger-ui.html
+
+# API Reference completa
+docs/api/AUTHORIZATION_API_REFERENCE.md
+```
+
+### Datos Iniciales
+
+**Roles del sistema (seed data):**
+
+- `ROLE_ADMIN` (id=1) - Administrador con acceso total
+- `ROLE_USER` (id=2) - Usuario estándar
+
+**Permisos base (13 permisos):**
+
+- `user.create`, `user.read`, `user.update`, `user.delete`
+- `authority.create`, `authority.read`, `authority.update`, `authority.delete`, `authority.assign`
+- `permission.create`, `permission.read`, `permission.update`, `permission.delete`
+
+### Scheduled Jobs
+
+**ExpiredAuthoritiesCleanupJob:**
+
+- **Cron:** Diario a las 2 AM (`0 0 2 * * *`)
+- **Función:** Marca como `is_active=false` los roles y permisos directos expirados
+- **Logs:** `grep "ExpiredAuthoritiesCleanupJob" logs/spring.log`
+
+### Documentación Completa
+
+| Documento                                                          | Descripción                            | Audiencia     |
+| ------------------------------------------------------------------ | -------------------------------------- | ------------- |
+| [Manual de Usuario](docs/user-manual/AUTHORIZATION_ADMIN_GUIDE.md) | Guía completa para administradores     | Admins        |
+| [FAQ](docs/FAQ.md)                                                 | 15 preguntas frecuentes                | Todos         |
+| [Troubleshooting](docs/TROUBLESHOOTING.md)                         | 15 problemas comunes y soluciones      | Soporte       |
+| [Guía de Operaciones](docs/operations/AUTHORIZATION_OPS_GUIDE.md)  | Arquitectura, DB, monitoreo, backup    | SysOps/DevOps |
+| [API Reference](docs/api/AUTHORIZATION_API_REFERENCE.md)           | Especificación completa de endpoints   | Developers    |
+| [Diagramas](docs/diagrams/)                                        | ER, flujo de autorización, componentes | Arquitectos   |
+
+### Testing
+
+**Backend (67 tests de integración):**
+
+```bash
+./mvnw verify  # Ejecutar todos los tests
+```
+
+**Frontend (pendiente):**
+
+```bash
+./npmw test  # Jest + React Testing Library
+```
+
+### Ejemplos de Uso
+
+**Crear un rol personalizado:**
+
+```bash
+curl -X POST "http://localhost:8080/api/authorities" \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Manager",
+    "code": "ROLE_MANAGER",
+    "description": "Can manage teams and view reports",
+    "category": "CUSTOM",
+    "isActive": true,
+    "hierarchyLevel": 100
+  }'
+```
+
+**Asignar rol temporal (30 días):**
+
+```bash
+curl -X POST "http://localhost:8080/api/user-authorities" \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 123,
+    "authorityId": 3,
+    "expiresAt": "2025-12-07T23:59:59Z"
+  }'
+```
+
+**Ver métricas del dashboard:**
+
+```bash
+curl -X GET "http://localhost:8080/api/authorization/dashboard/metrics" \
+  -H "Authorization: Bearer YOUR_JWT"
+```
+
+### Diagramas
+
+**Diagrama ER (6 tablas):**
+
+```mermaid
+erDiagram
+    SCR_USER ||--o{ SCR_USER_AUTHORITY : has
+    SCR_AUTHORITY ||--o{ SCR_USER_AUTHORITY : assigned_to
+    SCR_AUTHORITY ||--o{ SCR_AUTHORITY_PERMISSION : has
+    SCR_PERMISSION ||--o{ SCR_AUTHORITY_PERMISSION : granted_to
+    SCR_AUTHORITY ||--o{ SCR_AUTHORITY_AUDIT : audited_by
+```
+
+Ver diagrama completo en [docs/diagrams/database-er-diagram.md](docs/diagrams/database-er-diagram.md)
+
+**Flujo de Autorización:**
+
+Ver diagramas de secuencia en [docs/diagrams/authorization-flow.md](docs/diagrams/authorization-flow.md)
+
+**Arquitectura de Componentes:**
+
+Ver diagrama de componentes en [docs/diagrams/component-architecture.md](docs/diagrams/component-architecture.md)
+
+### Migración y Rollback
+
+**Aplicar sistema de autorización:**
+
+```bash
+./mvnw liquibase:update
+```
+
+**Rollback al snapshot de autorización:**
+
+```bash
+./mvnw liquibase:rollback -Dliquibase.rollbackTag=sistema-autorizacion
+```
+
+**Rollback a BD vacía:**
+
+```bash
+./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio
+```
+
+### Configuración de Producción
+
+**Variables de entorno importantes:**
+
+```yaml
+# JWT secret (cambiar en producción)
+JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET: [generated-secret]
+
+# Database
+SPRING_R2DBC_URL: r2dbc:postgresql://db-host:5432/tysescrutinygateway
+SPRING_R2DBC_USERNAME: tyse_app
+SPRING_R2DBC_PASSWORD: [secure-password]
+
+# Scheduled jobs
+SPRING_TASK_SCHEDULING_ENABLED: true
+```
+
+**Backup recomendado:**
+
+```bash
+# Backup de tablas de autorización
+pg_dump -U postgres tysescrutinygateway -t "scr_*" > backup_auth.sql
+
+# Restore
+psql -U postgres tysescrutinygateway < backup_auth.sql
+```
+
+### Monitoreo
+
+**Métricas (Prometheus/Actuator):**
+
+```bash
+# Endpoint de métricas
+curl http://localhost:8080/actuator/metrics
+
+# Métricas específicas de autorización
+curl http://localhost:8080/api/authorization/dashboard/metrics
+```
+
+**Logs importantes:**
+
+```bash
+# Auditoría de cambios
+grep "AuthorityService" logs/spring.log
+
+# Scheduled job execution
+grep "ExpiredAuthoritiesCleanupJob" logs/spring.log
+
+# Errores de autorización
+grep "Access Denied" logs/spring.log
+```
+
+### Seguridad
+
+- **Todos los endpoints** requieren autenticación JWT con rol `ROLE_ADMIN`
+- **Roles de sistema** (`ROLE_ADMIN`, `ROLE_USER`) están protegidos contra modificación/eliminación
+- **Auditoría completa** captura IP address, User-Agent, timestamp, old/new values
+- **Validaciones estrictas** en backend y frontend
+- **Soft delete** para roles y permisos (preserva historial)
+
+### Contribuir
+
+Para extender el sistema de autorización:
+
+1. **Agregar nuevo permiso:**
+
+   - UI: `/admin/permission` → "Create new Permission"
+   - API: `POST /api/permissions` con `{resource, action, description}`
+
+2. **Crear nuevo rol:**
+
+   - UI: `/admin/authority` → "Create new Authority"
+   - API: `POST /api/authorities` con `{name, code, category, hierarchyLevel}`
+
+3. **Asignar permisos al rol:**
+   - UI: Ver detalle del rol → "Permissions" → "Add Permission"
+   - API: `POST /api/authority-permissions` con `{authorityId, permissionId}`
+
+### Soporte
+
+**Problemas comunes:**
+
+- Ver [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+**Preguntas frecuentes:**
+
+- Ver [docs/FAQ.md](docs/FAQ.md)
+
+**Reportar issues:**
+
+- GitHub Issues del proyecto
+- Email: [soporte-técnico]
+
+---
+
 ## Development
 
 ### Doing API-First development using openapi-generator-cli
