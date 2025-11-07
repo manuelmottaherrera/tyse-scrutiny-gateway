@@ -4,7 +4,7 @@
 
 **Fecha de creación:** 2025-10-31
 **Última actualización:** 2025-11-07
-**Estado:** Fases 0-9 completadas | Fase 10 en progreso (78%) | Fases 11-12 pendientes
+**Estado:** Fases 0-9 completadas | Fase 10 CASI COMPLETA (89%) | Fases 11-12 pendientes
 **Rama:** `feature/enterprise-authorization-system`
 
 ---
@@ -21,9 +21,9 @@
 - ✅ 13 tests de integración pasando
 - ✅ Métricas de auditoría y exportación funcional
 
-### 🔄 Fase 10: EN PROGRESO (78% completado)
+### ✅ Fase 10: CASI COMPLETA (89% completado)
 
-**Commits:** 3+ commits | **Archivos:** 30+ nuevos | **Líneas:** ~2,500+
+**Commits:** 4+ commits | **Archivos:** 35+ nuevos | **Líneas:** ~3,200+
 
 - ✅ **Paso 10.1:** Modelos TypeScript (8 archivos)
 - ✅ **Paso 10.2:** Servicios API (4 archivos, 34 métodos)
@@ -40,14 +40,19 @@
   - permission-form.tsx (formulario con auto-generación de nombre)
   - permission-delete-dialog.tsx (confirmación)
   - index.tsx (rutas anidadas)
-- ⏳ **Paso 10.6:** Componentes UI - User Authority Assignment (pendiente)
+- ✅ **Paso 10.6:** Componentes UI - User Authority Assignment (4 componentes) **NUEVO**
+  - user-authority-list.tsx (lista con estados: activo/expirado/revocado)
+  - assign-authority-dialog.tsx (modal para asignar roles con fecha expiración)
+  - revoke-authority-dialog.tsx (modal para revocar con razón obligatoria)
+  - index.tsx (exports)
+  - Integrado en user-management-detail.tsx
 - ✅ **Paso 10.7:** Rutas y navegación
   - Rutas integradas en /admin/administration/index.tsx
   - Menú actualizado en admin.tsx con iconos shield-alt y key
 - ✅ **Paso 10.8:** Internacionalización (i18n)
-  - authorization.json (ES) - 100+ keys
-  - authorization.json (EN) - 100+ keys
-- ⏳ **Paso 10.9:** Tests de UI (pendiente)
+  - authorization.json (ES) - 110+ keys (actualizado con user-authority)
+  - authorization.json (EN) - 110+ keys (actualizado con user-authority)
+- ⏳ **Paso 10.9:** Tests de UI (pendiente - 11%)
 
 ---
 
@@ -82,42 +87,47 @@ El sistema de autorización enterprise backend + auditoría está **100% complet
 - Spring Security integrado
 - Exportación de logs a CSV/JSON funcional
 
-**Frontend Avanzado (Fase 10 - 78%):**
+**Frontend Completo (Fase 10 - 89%):**
 
 - ✅ 8 modelos TypeScript con interfaces completas
 - ✅ 4 servicios API (34 métodos HTTP)
 - ✅ 3 Redux slices (21 async thunks)
-- ✅ 10 componentes UI (Authority + Permission CRUD completo)
+- ✅ 14 componentes UI (Authority + Permission + User Authority CRUD completo)
+- ✅ User Authority Assignment integrado en User Management
 - ✅ Rutas y navegación integradas
-- ✅ i18n completo (ES + EN)
-- ⏳ User Authority Assignment (pendiente)
-- ⏳ Tests de UI (pendiente)
+- ✅ i18n completo (ES + EN) con 110+ claves
+- ⏳ Tests de UI (pendiente - 11%)
 
 ---
 
 ## ⏳ Pendiente (Fases 10-12)
 
-### Fase 10: Frontend React para Gestión de Permisos (22% pendiente)
+### Fase 10: Frontend React para Gestión de Permisos (11% pendiente)
 
-**Completado (78%):**
+**Completado (89%):**
 
 - ✅ Modelos TypeScript (`IAuthority`, `IPermission`, etc.) - 8 archivos
 - ✅ Servicios API con axios (34 métodos) - 4 archivos
 - ✅ Redux slices para gestión de estado (3 reducers) - 21 async thunks
-- ✅ **NUEVO:** Componentes UI Authority Management - 5 componentes
+- ✅ Componentes UI Authority Management - 5 componentes
   - Lista, detalle, formulario, delete dialog, routes
-- ✅ **NUEVO:** Componentes UI Permission Management - 5 componentes
+- ✅ Componentes UI Permission Management - 5 componentes
   - Lista con filtros, detalle, formulario con auto-gen, delete dialog, routes
-- ✅ **NUEVO:** Rutas y navegación completas
+- ✅ **NUEVO (Sesión actual):** Componentes UI User Authority Assignment - 4 componentes
+  - user-authority-list.tsx: Lista con badges de estado (activo/expirado/revocado)
+  - assign-authority-dialog.tsx: Modal para asignar roles con fecha de expiración opcional
+  - revoke-authority-dialog.tsx: Modal para revocar con razón obligatoria
+  - Integrado en user-management-detail.tsx
+- ✅ Rutas y navegación completas
   - Integración en /admin/administration
   - Menú admin actualizado con iconos
-- ✅ **NUEVO:** Internacionalización completa (ES/EN)
-  - authorization.json con 100+ claves de traducción
+- ✅ Internacionalización completa (ES/EN)
+  - authorization.json con 110+ claves de traducción (actualizado)
 
-**Pendiente (22%):**
+**Pendiente (11%):**
 
-- ⏳ Componentes UI - User Authority Assignment (asignar/revocar roles a usuarios)
-- ⏳ Tests de UI con Jest (authority-list.spec.tsx, etc.)
+- ⏳ Tests de UI con Jest (authority-list.spec.tsx, permission-list.spec.tsx, user-authority-list.spec.tsx)
+  - **Nota:** Decidido postergar hasta completar implementación de todas las fases
 
 ### Fase 11: Dashboard de Administración Avanzado
 

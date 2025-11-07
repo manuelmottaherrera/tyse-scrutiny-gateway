@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Badge, Button, Row } from 'reactstrap';
+import { Badge, Button, Row, Col } from 'reactstrap';
 import { TextFormat, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -8,6 +8,7 @@ import { APP_DATE_FORMAT } from 'app/config/constants';
 import { languages } from 'app/config/translation';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getUser } from './user-management.reducer';
+import UserAuthorityList from '../authorization/user-authority/user-authority-list';
 
 export const UserManagementDetail = () => {
   const dispatch = useAppDispatch();
@@ -100,6 +101,8 @@ export const UserManagementDetail = () => {
           <Translate contentKey="entity.action.back">Back</Translate>
         </span>
       </Button>
+
+      {user.id && <UserAuthorityList userId={user.id} />}
     </div>
   );
 };
