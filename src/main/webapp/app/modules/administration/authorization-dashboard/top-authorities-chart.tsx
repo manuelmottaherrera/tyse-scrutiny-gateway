@@ -23,7 +23,7 @@ export const TopAuthoritiesChart: React.FC<TopAuthoritiesChartProps> = ({ data, 
     <Card className="top-authorities-chart">
       <CardHeader>
         <h5 className="mb-0">
-          <FontAwesomeIcon icon="shield-alt" className="me-2" />
+          <FontAwesomeIcon icon="shield" className="me-2" />
           <Translate contentKey="dashboard.topAuthorities.title">Roles Más Asignados</Translate>
         </h5>
       </CardHeader>

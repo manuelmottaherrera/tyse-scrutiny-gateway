@@ -60,7 +60,7 @@ export const AuthorizationDashboard = () => {
           <MetricCard
             title={<Translate contentKey="dashboard.metrics.totalAuthorities">Total Authorities</Translate>}
             value={metrics?.totalAuthorities || 0}
-            icon="shield-alt"
+            icon="shield"
             color="primary"
             loading={loading}
           />

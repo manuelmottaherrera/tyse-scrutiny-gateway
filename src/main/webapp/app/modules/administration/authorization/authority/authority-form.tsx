@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Row, Alert } from 'reactstrap';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
@@ -55,17 +55,20 @@ export const AuthorityForm = () => {
     }
   };
 
-  const defaultValues = () =>
-    isNew
-      ? {
-          isActive: true,
-          isSystem: false,
-          hierarchyLevel: 1,
-          category: AuthorityCategory.CUSTOM,
-        }
-      : {
-          ...authority,
-        };
+  const defaultValues = useMemo(
+    () =>
+      isNew
+        ? {
+            isActive: true,
+            isSystem: false,
+            hierarchyLevel: 1,
+            category: AuthorityCategory.CUSTOM,
+          }
+        : {
+            ...authority,
+          },
+    [isNew, authority],
+  );
 
   return (
     <div>
@@ -81,7 +84,7 @@ export const AuthorityForm = () => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues} onSubmit={saveEntity}>
               {errorMessage && (
                 <Alert color="danger" className="d-flex justify-content-between align-items-center">
                   <div>

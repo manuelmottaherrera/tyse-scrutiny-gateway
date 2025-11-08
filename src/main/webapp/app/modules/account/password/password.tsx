@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { Button, Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getSession } from 'app/shared/reducers/authentication';
@@ -27,17 +26,6 @@ export const PasswordPage = () => {
   const updatePassword = event => setPassword(event.target.value);
 
   const account = useAppSelector(state => state.authentication.account);
-  const successMessage = useAppSelector(state => state.password.successMessage);
-  const errorMessage = useAppSelector(state => state.password.errorMessage);
-
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    } else if (errorMessage) {
-      toast.error(translate(errorMessage));
-    }
-    dispatch(reset());
-  }, [successMessage, errorMessage]);
 
   return (
     <div>

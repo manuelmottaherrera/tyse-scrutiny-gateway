@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
 import { Alert, Button, Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { handlePasswordResetInit, reset } from '../password-reset.reducer';
@@ -19,14 +18,6 @@ export const PasswordResetInit = () => {
   const handleValidSubmit = ({ email }) => {
     dispatch(handlePasswordResetInit(email));
   };
-
-  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
-
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    }
-  }, [successMessage]);
 
   return (
     <div>

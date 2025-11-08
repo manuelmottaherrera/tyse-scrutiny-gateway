@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
-import { toast } from 'react-toastify';
 
 import { languages, locales } from 'app/config/translation';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -11,7 +10,6 @@ import { reset, saveAccountSettings } from './settings.reducer';
 export const SettingsPage = () => {
   const dispatch = useAppDispatch();
   const account = useAppSelector(state => state.authentication.account);
-  const successMessage = useAppSelector(state => state.settings.successMessage);
 
   useEffect(() => {
     dispatch(getSession());
@@ -19,12 +17,6 @@ export const SettingsPage = () => {
       dispatch(reset());
     };
   }, []);
-
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    }
-  }, [successMessage]);
 
   const handleValidSubmit = values => {
     dispatch(

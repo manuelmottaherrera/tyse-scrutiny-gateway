@@ -14,12 +14,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import tech.jhipster.web.util.HeaderUtil;
 
 /**
  * REST controller for managing {@link Permission}.
@@ -30,6 +32,11 @@ import reactor.core.publisher.Mono;
 public class PermissionResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PermissionResource.class);
+
+    private static final String ENTITY_NAME = "authorization.permission";
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     private final PermissionService permissionService;
 
@@ -124,7 +131,9 @@ public class PermissionResource {
             .map(PermissionDTO::new)
             .map(result -> {
                 try {
-                    return ResponseEntity.created(new URI("/api/permissions/" + result.getId())).body(result);
+                    return ResponseEntity.created(new URI("/api/permissions/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
@@ -163,7 +172,11 @@ public class PermissionResource {
         return permissionService
             .updatePermission(id, permission)
             .map(PermissionDTO::new)
-            .map(ResponseEntity::ok)
+            .map(result ->
+                ResponseEntity.ok()
+                    .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                    .body(result)
+            )
             .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

@@ -217,6 +217,19 @@ body {
   color: var(--bs-body-color);
 }
 
+// Input Groups
+.input-group-text {
+  background-color: var(--bs-card-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-table-border-color);
+}
+
+.input-group > .form-control {
+  &:not(:first-child) {
+    border-left-color: var(--bs-table-border-color);
+  }
+}
+
 // Modals
 .modal-content {
   background-color: var(--bs-modal-bg);

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
 import { Alert, Button, Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 import { Link, Navigate } from 'react-router-dom';
 
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
@@ -37,14 +36,9 @@ export const RegisterPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.success(translate(successMessage));
       setNavigateToHome(true);
     }
-    if (errorRecaptcha) {
-      toast.error(errorRecaptcha);
-      setNavigateToHome(true);
-    }
-  }, [successMessage, errorRecaptcha]);
+  }, [successMessage]);
 
   if (navigateToHome === true) {
     return <Navigate to="/" />;

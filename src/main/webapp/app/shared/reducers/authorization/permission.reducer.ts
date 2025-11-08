@@ -44,7 +44,7 @@ export const createPermission = createAsyncThunk(
   'permission/create_entity',
   async (permission: IPermission) => {
     const response = await permissionService.createPermission(permission);
-    return response.data;
+    return response; // Return full response to allow notification middleware to read headers
   },
   { serializeError: serializeAxiosError },
 );
@@ -53,7 +53,7 @@ export const updatePermission = createAsyncThunk(
   'permission/update_entity',
   async (permission: IPermission) => {
     const response = await permissionService.updatePermission(permission);
-    return response.data;
+    return response; // Return full response to allow notification middleware to read headers
   },
   { serializeError: serializeAxiosError },
 );
@@ -83,6 +83,10 @@ export const PermissionSlice = createSlice({
   reducers: {
     reset() {
       return initialState;
+    },
+    clearError(state) {
+      state.errorMessage = null;
+      state.updateSuccess = false;
     },
   },
   extraReducers(builder) {
@@ -122,8 +126,8 @@ export const PermissionSlice = createSlice({
       .addCase(createPermission.fulfilled, (state, action) => {
         state.updating = false;
         state.updateSuccess = true;
-        state.entity = action.payload;
-        state.entities.push(action.payload);
+        state.entity = action.payload.data;
+        state.entities.push(action.payload.data);
       })
       .addCase(createPermission.rejected, (state, action) => {
         state.updating = false;
@@ -139,10 +143,10 @@ export const PermissionSlice = createSlice({
       .addCase(updatePermission.fulfilled, (state, action) => {
         state.updating = false;
         state.updateSuccess = true;
-        state.entity = action.payload;
-        const index = state.entities.findIndex(e => e.id === action.payload.id);
+        state.entity = action.payload.data;
+        const index = state.entities.findIndex(e => e.id === action.payload.data.id);
         if (index !== -1) {
-          state.entities[index] = action.payload;
+          state.entities[index] = action.payload.data;
         }
       })
       .addCase(updatePermission.rejected, (state, action) => {
@@ -182,6 +186,6 @@ export const PermissionSlice = createSlice({
   },
 });
 
-export const { reset } = PermissionSlice.actions;
+export const { reset, clearError } = PermissionSlice.actions;
 
 export default PermissionSlice.reducer;

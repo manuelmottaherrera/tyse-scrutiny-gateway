@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -63,14 +62,6 @@ export const PasswordResetFinishPage = () => {
       </ValidatedForm>
     );
   };
-
-  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
-
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    }
-  }, [successMessage]);
 
   return (
     <div>

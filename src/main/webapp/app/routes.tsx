@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Route } from 'react-router';
-
-import Loadable from 'react-loadable';
 
 import Login from 'app/modules/login/login';
 import Register from 'app/modules/account/register/register';
@@ -18,15 +16,9 @@ import { AUTHORITIES } from 'app/config/constants';
 
 const loading = <div>loading ...</div>;
 
-const Account = Loadable({
-  loader: () => import(/* webpackChunkName: "account" */ 'app/modules/account'),
-  loading: () => loading,
-});
+const Account = React.lazy(() => import(/* webpackChunkName: "account" */ 'app/modules/account'));
 
-const Admin = Loadable({
-  loader: () => import(/* webpackChunkName: "administration" */ 'app/modules/administration'),
-  loading: () => loading,
-});
+const Admin = React.lazy(() => import(/* webpackChunkName: "administration" */ 'app/modules/administration'));
 const AppRoutes = () => {
   return (
     <div className="view-routes">
@@ -39,7 +31,9 @@ const AppRoutes = () => {
             path="*"
             element={
               <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                <Account />
+                <Suspense fallback={loading}>
+                  <Account />
+                </Suspense>
               </PrivateRoute>
             }
           />
@@ -54,7 +48,9 @@ const AppRoutes = () => {
           path="admin/*"
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-              <Admin />
+              <Suspense fallback={loading}>
+                <Admin />
+              </Suspense>
             </PrivateRoute>
           }
         />

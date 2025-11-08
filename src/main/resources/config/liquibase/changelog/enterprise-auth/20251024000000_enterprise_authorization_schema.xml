@@ -697,4 +697,46 @@
 
     </changeSet>
 
+    <!-- ========================================================================= -->
+    <!-- CHANGESET: Reset sequences after loading data                            -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251024000010-reset-sequences" author="Manuel A. Motta H.">
+        <comment>
+            Reset auto-increment sequences after loading initial data.
+            PostgreSQL sequences are not automatically updated when inserting
+            data with explicit IDs, so we need to manually set them to prevent
+            duplicate key violations.
+        </comment>
+
+        <!-- Reset scr_permission sequence (13 permissions loaded) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_permission_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_permission));
+        </sql>
+
+        <!-- Reset scr_authority sequence (2 authorities loaded) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_authority_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_authority));
+        </sql>
+
+        <!-- Reset scr_authority_permission sequence (16 mappings loaded) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_authority_permission_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_authority_permission));
+        </sql>
+
+        <!-- Reset scr_user_authority sequence (data may vary) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_user_authority_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_user_authority));
+        </sql>
+
+        <!-- Reset scr_user_permission sequence (if any data loaded) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_user_permission_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_user_permission));
+        </sql>
+
+        <!-- Reset scr_authority_audit sequence (if any data loaded) -->
+        <sql dbms="postgresql">
+            SELECT setval('scr_authority_audit_id_seq', (SELECT COALESCE(MAX(id), 1) FROM scr_authority_audit));
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
