@@ -102,6 +102,10 @@ export const AuthoritySlice = createSlice({
     reset() {
       return initialState;
     },
+    clearError(state) {
+      state.errorMessage = null;
+      state.updateSuccess = false;
+    },
   },
   extraReducers(builder) {
     builder
@@ -143,10 +147,18 @@ export const AuthoritySlice = createSlice({
         state.entity = action.payload;
         state.entities.push(action.payload);
       })
-      .addCase(createAuthority.rejected, (state, action) => {
+      .addCase(createAuthority.rejected, (state, action: any) => {
         state.updating = false;
         state.updateSuccess = false;
-        state.errorMessage = action.error.message || 'Error creating authority';
+        // Extract error message from Axios error response
+        const axiosError = action.payload || action.error;
+        if (axiosError?.response?.data?.message) {
+          state.errorMessage = axiosError.response.data.message;
+        } else if (axiosError?.message) {
+          state.errorMessage = axiosError.message;
+        } else {
+          state.errorMessage = 'Error creating authority';
+        }
       })
       // Update authority
       .addCase(updateAuthority.pending, state => {
@@ -213,6 +225,6 @@ export const AuthoritySlice = createSlice({
   },
 });
 
-export const { reset } = AuthoritySlice.actions;
+export const { reset, clearError } = AuthoritySlice.actions;
 
 export default AuthoritySlice.reducer;

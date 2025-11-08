@@ -33,8 +33,9 @@
       "active": "Active",
       "inactive": "Inactive",
       "system": "System",
+      "codeHelp": "Code must start with ROLE_ followed by uppercase letters and underscores (example: ROLE_MANAGER)",
       "validation": {
-        "codePattern": "Code must be uppercase and use underscores (e.g., ROLE_ADMIN)"
+        "codePattern": "Code must start with ROLE_ followed by uppercase letters and underscores"
       }
     },
     "permission": {

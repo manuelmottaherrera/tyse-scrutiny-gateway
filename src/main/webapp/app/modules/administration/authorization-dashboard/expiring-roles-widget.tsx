@@ -67,7 +67,7 @@ export const ExpiringRolesWidget: React.FC<ExpiringRolesWidgetProps> = ({ expiri
                           <Translate contentKey="dashboard.expiringRoles.tomorrow">Mañana</Translate>
                         ) : (
                           <Translate contentKey="dashboard.expiringRoles.days" interpolate={{ days: role.daysUntilExpiration }}>
-                            {role.daysUntilExpiration} días
+                            {String(role.daysUntilExpiration)} días
                           </Translate>
                         )}
                       </Badge>

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, Row } from 'reactstrap';
+import { Button, Col, Row, Alert } from 'reactstrap';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { createAuthority, getAuthority, updateAuthority, reset } from 'app/shared/reducers/authorization/authority.reducer';
+import { createAuthority, getAuthority, updateAuthority, reset, clearError } from 'app/shared/reducers/authorization/authority.reducer';
 import { AuthorityCategory } from 'app/shared/model/enumerations/authority-category.model';
 
 export const AuthorityForm = () => {
@@ -14,20 +14,23 @@ export const AuthorityForm = () => {
   const isNew = id === undefined;
 
   useEffect(() => {
-    if (isNew) {
-      dispatch(reset());
-    } else {
+    if (!isNew) {
       dispatch(getAuthority(Number(id)));
     }
+  }, [id]);
+
+  useEffect(() => {
+    // Clear error message when component unmounts
     return () => {
       dispatch(reset());
     };
-  }, [id]);
+  }, []);
 
   const authority = useAppSelector(state => state.authority.entity);
   const loading = useAppSelector(state => state.authority.loading);
   const updating = useAppSelector(state => state.authority.updating);
   const updateSuccess = useAppSelector(state => state.authority.updateSuccess);
+  const errorMessage = useAppSelector(state => state.authority.errorMessage);
 
   useEffect(() => {
     if (updateSuccess) {
@@ -79,6 +82,15 @@ export const AuthorityForm = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
+              {errorMessage && (
+                <Alert color="danger" className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <FontAwesomeIcon icon="exclamation-triangle" className="me-2" />
+                    {errorMessage.startsWith('error.') ? <Translate contentKey={errorMessage} /> : errorMessage}
+                  </div>
+                  <Button close onClick={() => dispatch(clearError())} />
+                </Alert>
+              )}
               {!isNew ? (
                 <ValidatedField
                   name="id"
@@ -111,12 +123,17 @@ export const AuthorityForm = () => {
                   required: { value: true, message: translate('entity.validation.required') },
                   maxLength: { value: 50, message: translate('entity.validation.maxlength', { max: 50 }) },
                   pattern: {
-                    value: /^[A-Z_]+$/,
+                    value: /^ROLE_[A-Z_]+$/,
                     message: translate('authorization.authority.validation.codePattern'),
                   },
                 }}
                 disabled={authority?.isSystem}
               />
+              <small className="form-text text-muted">
+                <Translate contentKey="authorization.authority.codeHelp">
+                  El código debe comenzar con ROLE_ (ejemplo: ROLE_MANAGER)
+                </Translate>
+              </small>
               <ValidatedField
                 label={translate('authorization.authority.description')}
                 id="authority-description"
@@ -147,7 +164,7 @@ export const AuthorityForm = () => {
                 type="number"
                 validate={{
                   min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
-                  max: { value: 10, message: translate('entity.validation.max', { max: 10 }) },
+                  max: { value: 1000, message: translate('entity.validation.max', { max: 1000 }) },
                 }}
               />
               <ValidatedField

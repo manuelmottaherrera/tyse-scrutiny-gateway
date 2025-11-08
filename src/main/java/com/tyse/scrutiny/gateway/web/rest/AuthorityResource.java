@@ -79,6 +79,12 @@ public class AuthorityResource {
         @Parameter(description = "Autoridad a crear", required = true) @Valid @RequestBody Authority authority
     ) throws URISyntaxException {
         LOG.debug("REST request to save Authority : {}", authority);
+
+        // Validate ROLE_ prefix
+        if (authority.getCode() != null && !authority.getCode().startsWith("ROLE_")) {
+            return Mono.error(new BadRequestAlertException("Authority code must start with ROLE_ prefix", ENTITY_NAME, "invalidcode"));
+        }
+
         return authorityRepository
             .existsByCode(authority.getCode())
             .flatMap(exists -> {
@@ -89,8 +95,10 @@ public class AuthorityResource {
                     .save(authority)
                     .map(result -> {
                         try {
-                            return ResponseEntity.created(new URI("/api/authorities/" + result.getName()))
-                                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getName()))
+                            return ResponseEntity.created(new URI("/api/authorities/" + result.getId()))
+                                .headers(
+                                    HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString())
+                                )
                                 .body(result);
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);

@@ -1,10 +1,10 @@
-import { AuditActionType } from '../authorization/audit-action-type.model';
+import { AuditAction } from '../enumerations/audit-action.model';
 
 export interface IRecentActivity {
   id?: number;
   authorityId?: number;
   authorityName?: string;
-  action?: AuditActionType;
+  action?: AuditAction;
   changedBy?: string;
   changedDate?: Date;
   description?: string;

@@ -55,7 +55,8 @@ export const RevokeAuthorityDialog: React.FC<RevokeAuthorityDialogProps> = ({ us
           />
           <small className="form-text text-muted">
             <Translate contentKey="authorization.userAuthority.revokedReasonHelp">
-              Please provide a reason for revoking this role (e.g., "User changed department", "Security policy violation")
+              Please provide a reason for revoking this role (e.g., &quot;User changed department&quot;, &quot;Security policy
+              violation&quot;)
             </Translate>
           </small>
         </ModalBody>

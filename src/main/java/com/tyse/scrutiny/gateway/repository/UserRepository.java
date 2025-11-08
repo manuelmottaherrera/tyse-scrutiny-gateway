@@ -120,9 +120,9 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
             .sql(
                 """
                 SELECT u.*, a.id as authority_id, a.code as authority_code, a.name as authority_name
-                FROM jhi_user u
+                FROM scr_user u
                 LEFT JOIN scr_user_authority ua ON u.id = ua.user_id AND ua.is_active = true
-                  AND (ua.expires_date IS NULL OR ua.expires_date > CURRENT_TIMESTAMP)
+                  AND (ua.expires_at IS NULL OR ua.expires_at > CURRENT_TIMESTAMP)
                 LEFT JOIN scr_authority a ON ua.authority_id = a.id
                 """
             )
@@ -159,9 +159,9 @@ class UserRepositoryInternalImpl implements UserRepositoryInternal {
         String sql =
             """
             SELECT u.*, a.id as authority_id, a.code as authority_code, a.name as authority_name
-            FROM jhi_user u
+            FROM scr_user u
             LEFT JOIN scr_user_authority ua ON u.id = ua.user_id AND ua.is_active = true
-              AND (ua.expires_date IS NULL OR ua.expires_date > CURRENT_TIMESTAMP)
+              AND (ua.expires_at IS NULL OR ua.expires_at > CURRENT_TIMESTAMP)
             LEFT JOIN scr_authority a ON ua.authority_id = a.id
             WHERE u.%s = :%s
             """.formatted(fieldName, fieldName);

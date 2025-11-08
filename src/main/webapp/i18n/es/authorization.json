@@ -33,8 +33,9 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "system": "Sistema",
+      "codeHelp": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos (ejemplo: ROLE_MANAGER)",
       "validation": {
-        "codePattern": "El código debe estar en mayúsculas y usar guiones bajos (ej: ROLE_ADMIN)"
+        "codePattern": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos"
       }
     },
     "permission": {

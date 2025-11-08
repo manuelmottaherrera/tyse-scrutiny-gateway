@@ -13,6 +13,12 @@ interface PermissionUsageChartProps {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d0ed57'];
 
+const renderLabel = (entry: any) => {
+  const name = entry.name || '';
+  const value = Number(entry.value) || 0;
+  return `${name}: ${value}`;
+};
+
 export const PermissionUsageChart: React.FC<PermissionUsageChartProps> = ({ data, loading = false }) => {
   const chartData = data.map(item => ({
     name: item.permissionName || `${item.resource}.${item.action}`,
@@ -42,7 +48,7 @@ export const PermissionUsageChart: React.FC<PermissionUsageChartProps> = ({ data
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={entry => `${entry.name}: ${entry.value}`}
+                label={renderLabel}
                 outerRadius={80}
                 fill={COLORS[4]}
                 dataKey="value"

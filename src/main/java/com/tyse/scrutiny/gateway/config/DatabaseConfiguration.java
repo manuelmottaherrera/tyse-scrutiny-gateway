@@ -1,5 +1,6 @@
 package com.tyse.scrutiny.gateway.config;
 
+import com.tyse.scrutiny.gateway.security.SecurityUtils;
 import io.r2dbc.spi.ConnectionFactory;
 import java.time.Duration;
 import java.time.Instant;
@@ -9,11 +10,14 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.domain.ReactiveAuditorAware;
+import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
 import org.springframework.data.r2dbc.convert.MappingR2dbcConverter;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.dialect.DialectResolver;
@@ -23,9 +27,11 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.relational.core.dialect.RenderContextFactory;
 import org.springframework.data.relational.core.sql.render.SqlRenderer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableR2dbcRepositories({ "com.tyse.scrutiny.gateway.repository" })
+@EnableR2dbcAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
@@ -128,5 +134,10 @@ public class DatabaseConfiguration {
         public Duration convert(Long source) {
             return source != null ? Duration.ofMillis(source) : null;
         }
+    }
+
+    @Bean
+    public ReactiveAuditorAware<String> springSecurityAuditorAware() {
+        return () -> SecurityUtils.getCurrentUserLogin().switchIfEmpty(Mono.just(Constants.SYSTEM));
     }
 }
