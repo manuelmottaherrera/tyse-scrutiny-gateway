@@ -21,9 +21,12 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import tech.jhipster.web.util.HeaderUtil;
 
 /**
  * REST controller for managing the current user's account.
@@ -41,6 +44,9 @@ public class AccountResource {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountResource.class);
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     private final UserRepository userRepository;
 
@@ -71,13 +77,22 @@ public class AccountResource {
     )
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Void> registerAccount(
+    public Mono<ResponseEntity<Void>> registerAccount(
         @Parameter(description = "Información del usuario a registrar", required = true) @Valid @RequestBody ManagedUserVM managedUserVM
     ) {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        return userService.registerUser(managedUserVM, managedUserVM.getPassword()).doOnSuccess(mailService::sendActivationEmail).then();
+        return userService
+            .registerUser(managedUserVM, managedUserVM.getPassword())
+            .doOnSuccess(mailService::sendActivationEmail)
+            .then(
+                Mono.just(
+                    ResponseEntity.status(HttpStatus.CREATED)
+                        .headers(HeaderUtil.createAlert(applicationName, "register.messages.success", managedUserVM.getLogin()))
+                        .build()
+                )
+            );
     }
 
     /**
