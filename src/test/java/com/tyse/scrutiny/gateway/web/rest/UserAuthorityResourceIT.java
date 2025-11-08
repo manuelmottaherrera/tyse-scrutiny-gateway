@@ -67,11 +67,14 @@ class UserAuthorityResourceIT {
         testUser.setLogin("testuser" + System.currentTimeMillis());
         testUser.setEmail("testuser@example.com");
         testUser.setActivated(true);
+        testUser.setPassword("password_hash_for_test");
         testUser = userRepository.save(testUser).block();
 
         // Create test authority
         testAuthority = new Authority();
-        testAuthority.setName("TEST_ROLE_" + System.currentTimeMillis());
+        String authName = "TEST_ROLE_" + System.currentTimeMillis();
+        testAuthority.setName(authName);
+        testAuthority.setCode(authName);
         testAuthority = authorityRepository.save(testAuthority).block();
     }
 

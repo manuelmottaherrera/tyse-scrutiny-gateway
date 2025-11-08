@@ -63,6 +63,7 @@ class PermissionResourceIT {
      */
     public static Permission createEntity() {
         Permission permission = new Permission();
+        permission.setName(DEFAULT_RESOURCE + ":" + DEFAULT_ACTION);
         permission.setResource(DEFAULT_RESOURCE);
         permission.setAction(DEFAULT_ACTION);
         permission.setDescription(DEFAULT_DESCRIPTION);

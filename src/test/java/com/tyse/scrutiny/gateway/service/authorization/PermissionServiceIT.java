@@ -25,8 +25,17 @@ class PermissionServiceIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository authorityPermissionRepository;
+
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.UserPermissionRepository userPermissionRepository;
+
     @BeforeEach
     void setUp() {
+        // Delete child entities first to avoid FK violations
+        authorityPermissionRepository.deleteAll().block();
+        userPermissionRepository.deleteAll().block();
         permissionRepository.deleteAll().block();
     }
 

@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tyse.scrutiny.gateway.IntegrationTest;
+import com.tyse.scrutiny.gateway.domain.Authority;
 import com.tyse.scrutiny.gateway.domain.authorization.AuthorityAudit;
 import com.tyse.scrutiny.gateway.domain.enumeration.AuditAction;
+import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.EntityManager;
 import com.tyse.scrutiny.gateway.repository.authorization.AuthorityAuditRepository;
 import java.time.Instant;
@@ -54,6 +56,9 @@ class AuthorityAuditResourceIT {
     private AuthorityAuditRepository auditRepository;
 
     @Autowired
+    private AuthorityRepository authorityRepository;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -62,6 +67,8 @@ class AuthorityAuditResourceIT {
     private AuthorityAudit authorityAudit;
 
     private AuthorityAudit insertedAudit;
+
+    private Authority testAuthority;
 
     /**
      * Create an entity for this test.
@@ -80,7 +87,15 @@ class AuthorityAuditResourceIT {
 
     @BeforeEach
     void initTest() {
+        // Create a test authority first (required for FK constraint)
+        testAuthority = new Authority();
+        testAuthority.setName("Test Audit Authority");
+        testAuthority.setCode("ROLE_TEST_AUDIT");
+        testAuthority = authorityRepository.save(testAuthority).block();
+
+        // Create audit with real authority ID
         authorityAudit = createEntity();
+        authorityAudit.setAuthorityId(testAuthority.getId());
     }
 
     @AfterEach
@@ -91,6 +106,12 @@ class AuthorityAuditResourceIT {
         }
         // Clean all audit records for testing
         auditRepository.deleteAll().block();
+
+        // Clean test authority
+        if (testAuthority != null) {
+            authorityRepository.delete(testAuthority).block();
+            testAuthority = null;
+        }
     }
 
     @Test

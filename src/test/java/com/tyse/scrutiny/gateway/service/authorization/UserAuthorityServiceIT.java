@@ -78,22 +78,27 @@ class UserAuthorityServiceIT {
 
     @AfterEach
     void cleanup() {
-        // Delete all user_authority assignments first (to avoid FK violations)
-        userAuthorityRepository.deleteAll().block();
+        try {
+            // Delete all child entities first to avoid FK violations
+            userAuthorityRepository.deleteAll().block();
 
-        // Delete all test users (matching pattern)
-        userRepository
-            .findAll()
-            .filter(u -> u.getLogin().startsWith("testuser"))
-            .flatMap(u -> userRepository.deleteById(u.getId()))
-            .blockLast();
+            // Delete all test users (matching pattern)
+            userRepository
+                .findAll()
+                .filter(u -> u.getLogin().startsWith("testuser"))
+                .flatMap(u -> userRepository.deleteById(u.getId()))
+                .blockLast();
 
-        // Delete all test authorities (matching pattern)
-        authorityRepository
-            .findAll()
-            .filter(a -> a.getCode().startsWith("ROLE_TEST") || a.getCode().startsWith("ROLE_EXPIRED"))
-            .flatMap(a -> authorityRepository.deleteById(a.getId()))
-            .blockLast();
+            // Delete all test authorities (matching pattern)
+            authorityRepository
+                .findAll()
+                .filter(a -> a.getCode().startsWith("ROLE_TEST") || a.getCode().startsWith("ROLE_EXPIRED"))
+                .flatMap(a -> authorityRepository.deleteById(a.getId()))
+                .blockLast();
+        } catch (Exception e) {
+            // Log but don't fail test cleanup
+            System.err.println("Error during test cleanup: " + e.getMessage());
+        }
     }
 
     @Test
@@ -170,7 +175,8 @@ class UserAuthorityServiceIT {
         assertThat(validAuthorities).hasSize(1);
         assertThat(validAuthorities.get(0).getAuthorityId()).isEqualTo(authority.getId());
 
-        // Cleanup
+        // Cleanup - delete user_authority associations first, then authority
+        userAuthorityRepository.deleteByAuthorityId(expiredAuthority.getId()).block();
         authorityRepository.deleteById(expiredAuthority.getId()).block();
     }
 
@@ -328,7 +334,8 @@ class UserAuthorityServiceIT {
         assertThat(allAuthorities).anyMatch(a -> a.getAuthorityId().equals(authority.getId()) && a.getIsActive());
         assertThat(allAuthorities).anyMatch(a -> a.getAuthorityId().equals(authority2.getId()) && !a.getIsActive());
 
-        // Cleanup
+        // Cleanup - delete user_authority associations first, then authority
+        userAuthorityRepository.deleteByAuthorityId(authority2.getId()).block();
         authorityRepository.deleteById(authority2.getId()).block();
     }
 

@@ -67,10 +67,12 @@ class UserPermissionResourceIT {
         testUser.setLogin("testuser" + System.currentTimeMillis());
         testUser.setEmail("testuser@example.com");
         testUser.setActivated(true);
+        testUser.setPassword("password_hash_for_test");
         testUser = userRepository.save(testUser).block();
 
         // Create test permission
         testPermission = new Permission();
+        testPermission.setName("test_resource:read");
         testPermission.setResource("test_resource");
         testPermission.setAction("read");
         testPermission.setDescription("Test permission");

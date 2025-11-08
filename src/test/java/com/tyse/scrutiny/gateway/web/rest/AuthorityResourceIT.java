@@ -56,7 +56,8 @@ class AuthorityResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Authority createEntity() {
-        return new Authority().name(UUID.randomUUID().toString());
+        String code = "ROLE_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return new Authority().name(UUID.randomUUID().toString()).code(code);
     }
 
     /**
@@ -66,7 +67,8 @@ class AuthorityResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Authority createUpdatedEntity() {
-        return new Authority().name(UUID.randomUUID().toString());
+        String code = "ROLE_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return new Authority().name(UUID.randomUUID().toString()).code(code);
     }
 
     public static void deleteEntities(EntityManager em) {

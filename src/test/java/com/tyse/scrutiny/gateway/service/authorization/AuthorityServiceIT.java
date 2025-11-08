@@ -38,12 +38,24 @@ class AuthorityServiceIT {
     @Autowired
     private AuthorityAuditRepository authorityAuditRepository;
 
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository authorityPermissionRepository;
+
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository userAuthorityRepository;
+
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.UserPermissionRepository userPermissionRepository;
+
     private ServerWebExchange mockExchange;
 
     @BeforeEach
     void setUp() {
-        // Clean up before each test
+        // Clean up before each test - delete child entities first to avoid FK violations
         authorityAuditRepository.deleteAll().block();
+        authorityPermissionRepository.deleteAll().block();
+        userAuthorityRepository.deleteAll().block();
+        userPermissionRepository.deleteAll().block();
         authorityRepository.deleteAll().block();
 
         // Create mock exchange for audit logging
