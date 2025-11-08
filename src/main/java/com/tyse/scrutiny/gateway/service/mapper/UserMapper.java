@@ -72,6 +72,7 @@ public class UserMapper {
                 .map(string -> {
                     Authority auth = new Authority();
                     auth.setName(string);
+                    auth.setCode(string);
                     return auth;
                 })
                 .collect(Collectors.toSet());

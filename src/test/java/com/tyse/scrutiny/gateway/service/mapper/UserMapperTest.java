@@ -48,6 +48,7 @@ class UserMapperTest {
         Set<Authority> authorities = new HashSet<>();
         Authority authority = new Authority();
         authority.setName(AuthoritiesConstants.USER);
+        authority.setCode(AuthoritiesConstants.USER);
         authorities.add(authority);
         user.setAuthorities(authorities);
 
