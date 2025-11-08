@@ -379,12 +379,12 @@ class AuthorityPermissionRepositoryIT {
         // Admin should have 4 permissions
         var adminStats = stats.stream().filter(s -> s.authorityCode().equals("ROLE_ADMIN_TEST")).findFirst();
         assertThat(adminStats).isPresent();
-        assertThat(adminStats.get().permissionCount()).isEqualTo(4L);
+        assertThat(adminStats.orElseThrow().permissionCount()).isEqualTo(4L);
 
         // User should have 1 permission
         var userStats = stats.stream().filter(s -> s.authorityCode().equals("ROLE_USER_TEST")).findFirst();
         assertThat(userStats).isPresent();
-        assertThat(userStats.get().permissionCount()).isEqualTo(1L);
+        assertThat(userStats.orElseThrow().permissionCount()).isEqualTo(1L);
     }
 
     @Test
