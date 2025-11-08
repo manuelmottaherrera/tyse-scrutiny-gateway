@@ -10,6 +10,8 @@ interface AuthorityState {
   entity: IAuthority | null;
   updating: boolean;
   updateSuccess: boolean;
+  permissions: any[];
+  permissionsLoading: boolean;
 }
 
 const initialState: AuthorityState = {
@@ -19,6 +21,8 @@ const initialState: AuthorityState = {
   entity: null,
   updating: false,
   updateSuccess: false,
+  permissions: [],
+  permissionsLoading: false,
 };
 
 // Async thunks
@@ -221,6 +225,21 @@ export const AuthoritySlice = createSlice({
       .addCase(revokePermissionFromAuthority.rejected, (state, action) => {
         state.updating = false;
         state.errorMessage = action.error.message || 'Error revoking permission';
+      })
+      // Get authority permissions
+      .addCase(getAuthorityPermissions.pending, state => {
+        state.permissionsLoading = true;
+        // Don't set errorMessage here - let silent failures happen
+      })
+      .addCase(getAuthorityPermissions.fulfilled, (state, action) => {
+        state.permissionsLoading = false;
+        state.permissions = action.payload;
+      })
+      .addCase(getAuthorityPermissions.rejected, state => {
+        state.permissionsLoading = false;
+        // Silently handle error - just set empty permissions
+        state.permissions = [];
+        // Don't set errorMessage - this prevents toast notification
       });
   },
 });

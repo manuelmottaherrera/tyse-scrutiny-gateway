@@ -1,7 +1,10 @@
 package com.tyse.scrutiny.gateway.web.rest;
 
 import com.tyse.scrutiny.gateway.domain.Authority;
+import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
 import com.tyse.scrutiny.gateway.web.rest.errors.BadRequestAlertException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,9 +48,17 @@ public class AuthorityResource {
     private String applicationName;
 
     private final AuthorityRepository authorityRepository;
+    private final AuthorityPermissionRepository authorityPermissionRepository;
+    private final PermissionRepository permissionRepository;
 
-    public AuthorityResource(AuthorityRepository authorityRepository) {
+    public AuthorityResource(
+        AuthorityRepository authorityRepository,
+        AuthorityPermissionRepository authorityPermissionRepository,
+        PermissionRepository permissionRepository
+    ) {
         this.authorityRepository = authorityRepository;
+        this.authorityPermissionRepository = authorityPermissionRepository;
+        this.permissionRepository = permissionRepository;
     }
 
     /**
@@ -182,6 +193,48 @@ public class AuthorityResource {
         LOG.debug("REST request to get Authority : {}", id);
         Mono<Authority> authority = authorityRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(authority);
+    }
+
+    /**
+     * {@code GET  /authorities/:id/permissions} : get all permissions for an authority.
+     *
+     * @param id the id of the authority to get permissions for.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and list of permissions in body (can be empty).
+     */
+    @Operation(
+        summary = "Obtener permisos de una autoridad",
+        description = "Retorna la lista de permisos asignados a una autoridad. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "Lista de permisos obtenida exitosamente (puede estar vacía)"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Autoridad no encontrada", content = @Content),
+        }
+    )
+    @GetMapping("/{id}/permissions")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public Mono<ResponseEntity<List<Permission>>> getAuthorityPermissions(
+        @Parameter(description = "ID de la autoridad", required = true) @PathVariable("id") Long id
+    ) {
+        LOG.debug("REST request to get Permissions for Authority : {}", id);
+
+        // First check if authority exists
+        return authorityRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.just(ResponseEntity.notFound().build());
+                }
+
+                // Get all permission IDs for this authority
+                return authorityPermissionRepository
+                    .findByAuthorityId(id)
+                    .flatMap(ap -> permissionRepository.findById(ap.getPermissionId()))
+                    .collectList()
+                    .map(permissions -> ResponseEntity.ok().body(permissions));
+            });
     }
 
     /**

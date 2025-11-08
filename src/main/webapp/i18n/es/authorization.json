@@ -34,6 +34,8 @@
       "inactive": "Inactivo",
       "system": "Sistema",
       "codeHelp": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos (ejemplo: ROLE_MANAGER)",
+      "loadingPermissions": "Cargando permisos...",
+      "noPermissions": "Este rol no tiene permisos asignados aún. Puede asignar permisos desde la página de gestión de permisos.",
       "validation": {
         "codePattern": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos"
       }

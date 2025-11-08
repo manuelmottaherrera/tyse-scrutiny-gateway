@@ -21,6 +21,7 @@ export const AuthorityDetail = () => {
   const authority = useAppSelector(state => state.authority.entity);
   const permissions = useAppSelector(state => state.authority.permissions);
   const loading = useAppSelector(state => state.authority.loading);
+  const permissionsLoading = useAppSelector(state => state.authority.permissionsLoading);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -147,54 +148,64 @@ export const AuthorityDetail = () => {
             )}
           </dl>
         )}
-        {permissions && permissions.length > 0 && (
-          <>
-            <h3 className="mt-4">
-              <Translate contentKey="authorization.authority.permissions">Permissions</Translate>
-            </h3>
-            <Table responsive size="sm">
-              <thead>
-                <tr>
-                  <th>
-                    <Translate contentKey="authorization.permission.name">Name</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="authorization.permission.resource">Resource</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="authorization.permission.action">Action</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="authorization.permission.isActive">Active</Translate>
-                  </th>
+        <h3 className="mt-4">
+          <Translate contentKey="authorization.authority.permissions">Permissions</Translate>
+        </h3>
+        {permissionsLoading ? (
+          <p className="text-muted">
+            <FontAwesomeIcon icon="spinner" spin className="me-2" />
+            <Translate contentKey="authorization.authority.loadingPermissions">Loading permissions...</Translate>
+          </p>
+        ) : permissions && permissions.length > 0 ? (
+          <Table responsive size="sm">
+            <thead>
+              <tr>
+                <th>
+                  <Translate contentKey="authorization.permission.name">Name</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="authorization.permission.resource">Resource</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="authorization.permission.action">Action</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="authorization.permission.isActive">Active</Translate>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {permissions.map((permission, i) => (
+                <tr key={`permission-${i}`}>
+                  <td>{permission.name}</td>
+                  <td>
+                    <Badge color="secondary">{permission.resource}</Badge>
+                  </td>
+                  <td>
+                    <Badge color="primary">{permission.action}</Badge>
+                  </td>
+                  <td>
+                    {permission.isActive ? (
+                      <Badge color="success">
+                        <Translate contentKey="authorization.permission.active">Active</Translate>
+                      </Badge>
+                    ) : (
+                      <Badge color="secondary">
+                        <Translate contentKey="authorization.permission.inactive">Inactive</Translate>
+                      </Badge>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {permissions.map((permission, i) => (
-                  <tr key={`permission-${i}`}>
-                    <td>{permission.name}</td>
-                    <td>
-                      <Badge color="secondary">{permission.resource}</Badge>
-                    </td>
-                    <td>
-                      <Badge color="primary">{permission.action}</Badge>
-                    </td>
-                    <td>
-                      {permission.isActive ? (
-                        <Badge color="success">
-                          <Translate contentKey="authorization.permission.active">Active</Translate>
-                        </Badge>
-                      ) : (
-                        <Badge color="secondary">
-                          <Translate contentKey="authorization.permission.inactive">Inactive</Translate>
-                        </Badge>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <div className="alert alert-info">
+            <FontAwesomeIcon icon="info-circle" className="me-2" />
+            <Translate contentKey="authorization.authority.noPermissions">
+              This role has no permissions assigned yet. You can assign permissions from the permissions management page.
+            </Translate>
+          </div>
         )}
         <Button tag={Link} to="/admin/authority" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}
