@@ -28,7 +28,7 @@ export const ModuleCardCore: React.FC<{
       <h3 className="card-title">
         <Translate contentKey={`dashboardGrid.items.${id}.title`}>{title}</Translate>
         {comingSoon && (
-          <span className="badge bg-secondary ms-2">
+          <span className="badge badge-coming-soon ms-2">
             <Translate contentKey="dashboardGrid.general.comingSoon">Coming Soon</Translate>
           </span>
         )}
@@ -71,6 +71,22 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
       </div>
     );
   }
+
+  // Detectar si es un enlace externo (no comienza con '/')
+  const isExternalLink = !module.path.startsWith('/');
+
+  if (isExternalLink) {
+    return (
+      <a href={module.path} className="module-card" hidden={module.hidden} target="_blank" rel="noopener noreferrer">
+        <div className="card-content">
+          <ModuleCardIcon icon={module.icon} color={module.color} />
+          <ModuleCardCore id={module.id} title={module.title} description={module.description} />
+          <ModuleCardSubIcon enabled={module.enabled} />
+        </div>
+      </a>
+    );
+  }
+
   return (
     <Link to={module.path} className="module-card" hidden={module.hidden}>
       <div className="card-content">

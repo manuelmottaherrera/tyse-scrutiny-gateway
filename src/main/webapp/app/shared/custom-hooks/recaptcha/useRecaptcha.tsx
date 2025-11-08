@@ -8,6 +8,11 @@ export const useRecaptcha = (action?: string) => {
   const [error, setError] = useState<string | null>(null);
 
   const verifyRecaptcha = useCallback(async (): Promise<boolean> => {
+    // Skip reCAPTCHA verification in E2E test environment
+    if (window.location.hostname === 'localhost' && (window as any).Cypress) {
+      return true;
+    }
+
     try {
       setIsLoading(true);
       const tokenGenerated = await executeRecaptcha(action || 'default');

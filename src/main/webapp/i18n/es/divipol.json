@@ -1,0 +1,40 @@
+{
+  "divipol": {
+    "title": "DIVIPOL - División Política",
+    "subtitle": "Gestión y consulta de la división política electoral de Colombia",
+    "error": "Error al cargar datos",
+    "mallaButton": "Malla",
+    "filters": {
+      "departamento": "Departamento",
+      "municipio": "Municipio",
+      "zona": "Zona",
+      "puesto": "Puesto",
+      "selectDepartamento": "Seleccione departamento",
+      "selectMunicipio": "Seleccione municipio",
+      "selectZona": "Seleccione zona",
+      "reset": "Limpiar Filtros"
+    },
+    "stats": {
+      "departamentos": "Departamentos",
+      "municipios": "Municipios",
+      "zonas": "Zonas",
+      "mesas": "Mesas",
+      "potencialElectoral": "Potencial Electoral",
+      "total": "Total",
+      "women": "Mujeres",
+      "men": "Hombres"
+    },
+    "table": {
+      "code": "Cod. Divipol",
+      "name": "Nombre",
+      "women": "Mujeres",
+      "men": "Hombres",
+      "total": "Total Potencial",
+      "mesas": "Mesas",
+      "noData": "No hay datos para mostrar. Seleccione filtros para visualizar información."
+    },
+    "export": {
+      "download": "Descargar Reporte"
+    }
+  }
+}

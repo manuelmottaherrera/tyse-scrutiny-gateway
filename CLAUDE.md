@@ -153,6 +153,160 @@ Redux Toolkit with injectable reducers for code splitting:
 
 Use `useAppSelector` and `useAppDispatch` hooks for type-safe Redux access.
 
+### Frontend Styling
+
+#### Color Variables (IMPORTANT)
+
+All SCSS files MUST use color variables defined in `src/main/webapp/app/_color-variables.scss` instead of hardcoded color values.
+
+**Why?**
+
+- Ensures consistent theming across light and dark modes
+- Centralizes color management for easier maintenance
+- Improves accessibility and visual consistency
+
+**How to use:**
+
+```scss
+// Import variables at the top of your SCSS file
+@import '../../color-variables';
+
+// Use variables instead of hardcoded colors
+.my-component {
+  color: $color-text-primary; // NOT #333
+  background: $color-white; // NOT #fff
+  border: 1px solid $color-gray-light; // NOT #eee
+  box-shadow: 0 2px 4px $color-shadow-medium; // NOT rgba(0,0,0,0.15)
+}
+```
+
+**Available variable categories:**
+
+- **Base colors**: `$color-white`, `$color-black`, `$color-gray-*`
+- **Text colors**: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
+- **State colors**: `$color-danger`, `$color-warning`, `$color-success`
+- **Shadows**: `$color-shadow-primary`, `$color-shadow-medium`, `$color-shadow-strong`, etc.
+- **Dark theme**: `$color-dark-overlay-*`, `$color-dark-background`
+- **Component-specific**: See `_color-variables.scss` for the complete list
+
+**Before adding new colors:**
+
+1. Check if a suitable variable already exists in `_color-variables.scss`
+2. If not, add the new color variable to `_color-variables.scss` following the existing pattern
+3. Use the new variable in your component
+
+#### CSS/SCSS Best Practices
+
+##### !important Usage Policy
+
+The codebase follows **strict guidelines** for `!important` usage to maintain clean, maintainable CSS:
+
+**✅ Allowed cases (justified):**
+
+- **Utility classes**: Classes designed to override component styles
+  - `.bg-*`, `.text-*` color utilities
+  - Spacing utilities (`.pad-*`, `.margin-*`)
+  - `.fullscreen` and similar layout utilities
+- **Accessibility overrides**: Disabled states that must always be visible
+  - `:disabled` form controls
+  - `[disabled]` attribute selectors
+- **Theme system overrides**: Framework theme variables
+  - Navbar background colors
+  - Bootstrap variable overrides in `themes.scss`
+
+**❌ Prohibited cases:**
+
+- Component-specific styling
+- Layout positioning (flexbox, grid)
+- Typography (except utility classes)
+- Color overrides (use custom classes or CSS variables instead)
+- Any case where specificity can be increased
+
+##### When you need to override styles:
+
+Follow this decision tree:
+
+1. **First**: Try increasing selector specificity
+
+   ```scss
+   // Instead of:
+   .badge {
+     color: white !important;
+   }
+
+   // Use more specific selector:
+   .dashboard .module-card .badge {
+     color: white;
+   }
+   ```
+
+2. **Second**: Use CSS custom properties (CSS variables)
+
+   ```scss
+   :root {
+     --badge-color: black;
+   }
+   [data-theme='dark'] {
+     --badge-color: white;
+   }
+   .badge {
+     color: var(--badge-color);
+   }
+   ```
+
+3. **Third**: Create a custom utility/helper class
+
+   ```scss
+   // Create semantic class in themes.scss
+   .badge-coming-soon {
+     background-color: var(--bs-secondary);
+     color: var(--bs-body-color);
+   }
+   ```
+
+4. **Last resort**: Use `!important` ONLY for genuine utility classes
+
+##### Examples
+
+**❌ Wrong approach:**
+
+```scss
+.my-component {
+  color: red !important; // Never do this
+  background: #fff !important; // Hardcoded color + !important
+}
+```
+
+**✅ Right approach:**
+
+```scss
+// Option 1: Custom class with proper cascade
+.badge-coming-soon {
+  background-color: var(--bs-secondary);
+  color: var(--bs-body-color);
+  font-weight: 700;
+}
+
+[data-theme='dark'] .badge-coming-soon {
+  background-color: $color-gray-darker;
+  color: $color-white-full;
+}
+
+// Option 2: Increase specificity
+.dashboard .module-card .badge {
+  background-color: var(--bs-secondary);
+}
+```
+
+##### Sass/SCSS Resources
+
+For more information on Sass best practices:
+
+- [Sass Official Documentation](https://sass-lang.com/documentation)
+- Specificity follows standard CSS rules
+- Use nesting carefully (max 3-4 levels deep)
+- Prefer composition over inheritance with `@mixin` and `@extend`
+
 ### Key Technologies
 
 - **Reactive Programming**: All backend operations use Reactor (`Mono`, `Flux`)

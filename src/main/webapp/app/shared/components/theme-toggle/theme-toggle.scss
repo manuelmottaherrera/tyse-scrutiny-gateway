@@ -1,20 +1,20 @@
 @import '../../../color-variables';
 
-.theme-toggle {
+.navbar .theme-toggle {
   .theme-toggle-button {
-    color: $color-white !important;
+    color: $color-white;
 
     svg {
       margin-right: 0.5rem;
     }
   }
 
-  .theme-dropdown-menu {
+  .dropdown-menu {
     min-width: 10rem;
     border-radius: 0.5rem;
     box-shadow: 0 8px 16px $color-shadow-medium;
     padding: 0.5rem;
-    margin-top: 0.25rem !important;
+    margin-top: 0.25rem;
     background-color: $color-dark-background;
     border: 1px solid $color-dark-overlay-border;
   }

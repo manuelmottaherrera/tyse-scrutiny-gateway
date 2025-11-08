@@ -126,7 +126,7 @@ jhipster:
 # ===================================================================
 google:
   recaptcha:
-    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+    secret-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
 
 management:
   health:

@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class RecaptchaService {
 
-    @Value("${google.recaptcha.site-key}")
+    @Value("${google.recaptcha.secret-key}")
     private String secretKey;
 
     private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";

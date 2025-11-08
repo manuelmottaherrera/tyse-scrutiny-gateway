@@ -445,6 +445,11 @@ Para extender el sistema de autorización:
 
 ## Development
 
+### Ports
+
+This aplication: 8080
+Micro divipol: 8081
+
 ### Doing API-First development using openapi-generator-cli
 
 [OpenAPI-Generator]() is configured for this application. You can generate API code from the `src/main/resources/swagger/api.yml` definition file by running:
@@ -519,6 +524,82 @@ Then you would import the JS and CSS files specified in library's installation i
 Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+
+### Code Linting and Formatting
+
+This project uses ESLint and Prettier to maintain code quality and consistent formatting.
+
+#### Check for linting issues
+
+```bash
+npm run lint
+```
+
+#### Automatically fix linting issues
+
+```bash
+npm run lint:fix
+```
+
+This command will automatically fix most ESLint and Prettier formatting issues. It's particularly useful when you encounter compilation errors related to code formatting.
+
+#### Check code formatting with Prettier
+
+```bash
+npm run prettier:check
+```
+
+#### Format code with Prettier
+
+```bash
+npm run prettier:format
+```
+
+**Note**: If you encounter compilation errors mentioning `prettier/prettier` or `object-shorthand`, running `npm run lint:fix` will typically resolve them automatically.
+
+### Styling Guidelines
+
+#### Color Variables
+
+**IMPORTANT**: All SCSS files must use color variables defined in `src/main/webapp/app/_color-variables.scss` instead of hardcoded color values.
+
+❌ **Incorrect** (hardcoded colors):
+
+```scss
+.my-component {
+  color: #333;
+  background: #fff;
+  border: 1px solid #eee;
+}
+```
+
+✅ **Correct** (using variables):
+
+```scss
+@import '../../color-variables';
+
+.my-component {
+  color: $color-text-primary;
+  background: $color-white;
+  border: 1px solid $color-gray-light;
+}
+```
+
+**Benefits**:
+
+- Ensures consistent theming across light and dark modes
+- Makes color changes centralized and easier to maintain
+- Improves accessibility and visual consistency
+
+**Available color categories**:
+
+- Base colors: `$color-white`, `$color-black`, grays
+- Text colors: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
+- State colors: `$color-danger`, `$color-warning`, `$color-success`
+- Shadow colors: `$color-shadow-*` variants
+- Dark theme colors: `$color-dark-overlay-*` variants
+
+See `src/main/webapp/app/_color-variables.scss` for the complete list of available variables.
 
 ## Building for production
 
@@ -675,6 +756,22 @@ docker compose -f src/main/docker/app.yml up -d
 ```
 
 For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
+
+#### Email Testing with MailHog
+
+For **local development**, the application uses MailHog (or MailDev) running on `localhost:1025` to capture emails. To start MailHog locally:
+
+```bash
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog:v1.0.1
+```
+
+Access the MailHog web interface at [http://localhost:8025](http://localhost:8025) to view captured emails.
+
+For **staging environment**, MailHog is already configured in the Docker Compose setup. Users with VPN access can view emails at:
+
+- **Staging URL**: `192.168.0.58:8035` (via browser with VPN)
+
+All emails sent by the application (user activation, password reset, etc.) are automatically captured and can be viewed through this interface. No real email server or credentials are required.
 
 ## Continuous Integration (optional)
 

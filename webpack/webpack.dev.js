@@ -10,9 +10,16 @@ const commonConfig = require('./webpack.common.js');
 
 const ENV = 'development';
 
-const dotenv = require('dotenv').config({ path: utils.root('.env') });
-if (dotenv.error) {
-  throw dotenv.error;
+// Try to load .env, fallback to .env.example, or use empty config
+const fs = require('fs');
+let dotenvPath = utils.root('.env');
+if (!fs.existsSync(dotenvPath)) {
+  dotenvPath = utils.root('.env.example');
+}
+const dotenv = require('dotenv').config({ path: dotenvPath });
+// Don't throw error if .env doesn't exist - it's optional
+if (dotenv.error && !dotenv.error.message.includes('ENOENT')) {
+  console.warn('Warning loading .env file:', dotenv.error.message);
 }
 
 module.exports = async options =>

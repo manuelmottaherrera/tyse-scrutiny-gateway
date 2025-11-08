@@ -1,0 +1,40 @@
+@import '../../../color-variables';
+
+.divipol-stats-cards {
+  .stats-card {
+    transition:
+      transform 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px $color-shadow-medium;
+    }
+
+    .stats-card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $color-text-secondary;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .stats-card-value {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+      color: $color-text-primary;
+    }
+
+    .stats-card-detail {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid $color-border;
+
+      small {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
