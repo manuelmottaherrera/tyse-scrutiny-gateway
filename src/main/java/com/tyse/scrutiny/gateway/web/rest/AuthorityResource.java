@@ -42,7 +42,7 @@ public class AuthorityResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthorityResource.class);
 
-    private static final String ENTITY_NAME = "adminAuthority";
+    private static final String ENTITY_NAME = "authorization.authority";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -114,6 +114,85 @@ public class AuthorityResource {
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);
                         }
+                    });
+            });
+    }
+
+    /**
+     * {@code PUT  /authorities/:id} : Updates an existing authority.
+     *
+     * @param id the id of the authority to update.
+     * @param authority the authority to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated authority,
+     * or with status {@code 400 (Bad Request)} if the authority is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the authority couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @Operation(
+        summary = "Actualizar autoridad/rol",
+        description = "Actualiza una autoridad (rol) existente en el sistema. Solo accesible para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Autoridad actualizada exitosamente",
+                content = @Content(schema = @Schema(implementation = Authority.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Datos de autoridad inválidos", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Autoridad no encontrada", content = @Content),
+        }
+    )
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public Mono<ResponseEntity<Authority>> updateAuthority(
+        @Parameter(description = "ID de la autoridad", required = true) @PathVariable("id") Long id,
+        @Parameter(description = "Datos actualizados de la autoridad", required = true) @Valid @RequestBody Authority authority
+    ) {
+        LOG.debug("REST request to update Authority : {}, {}", id, authority);
+
+        if (authority.getId() == null) {
+            return Mono.error(new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull"));
+        }
+        if (!authority.getId().equals(id)) {
+            return Mono.error(new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid"));
+        }
+
+        // Validate ROLE_ prefix
+        if (authority.getCode() != null && !authority.getCode().startsWith("ROLE_")) {
+            return Mono.error(new BadRequestAlertException("Authority code must start with ROLE_ prefix", ENTITY_NAME, "invalidcode"));
+        }
+
+        // First, load the existing entity to preserve audit fields
+        return authorityRepository
+            .findById(id)
+            .switchIfEmpty(Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound")))
+            .flatMap(existingAuthority -> {
+                // Check if trying to change code to one that already exists (excluding current entity)
+                return authorityRepository
+                    .findByCode(authority.getCode())
+                    .defaultIfEmpty(new Authority())
+                    .flatMap(codeCheck -> {
+                        if (codeCheck.getId() != null && !codeCheck.getId().equals(id)) {
+                            return Mono.error(new BadRequestAlertException("Authority code already in use", ENTITY_NAME, "codeexists"));
+                        }
+
+                        // Preserve creation audit fields from existing entity
+                        authority.setCreatedBy(existingAuthority.getCreatedBy());
+                        authority.setCreatedDate(existingAuthority.getCreatedDate());
+
+                        // Save with updated data - @LastModifiedBy and @LastModifiedDate will be set automatically
+                        return authorityRepository
+                            .save(authority)
+                            .map(result ->
+                                ResponseEntity.ok()
+                                    .headers(
+                                        HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString())
+                                    )
+                                    .body(result)
+                            );
                     });
             });
     }

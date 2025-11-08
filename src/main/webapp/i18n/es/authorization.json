@@ -1,4 +1,13 @@
 {
+  "tyseScrutinyGatewayApp": {
+    "authorization": {
+      "authority": {
+        "created": "Rol creado con el identificador {{ param }}",
+        "updated": "Rol actualizado con el identificador {{ param }}",
+        "deleted": "Rol eliminado con el identificador {{ param }}"
+      }
+    }
+  },
   "authorization": {
     "authority": {
       "home": {

@@ -147,6 +147,11 @@
     "idinvalid": "Invalid ID",
     "idnotfound": "ID cannot be found",
     "invalidcode": "Authority code must start with ROLE_ prefix",
+    "codeexists": "Another role with this code already exists",
+    "authority": {
+      "updateFailed": "Could not update the role. Please check the data and try again.",
+      "createFailed": "Could not create the role. Please check the data and try again."
+    },
     "file": {
       "could.not.extract": "Could not extract file",
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""

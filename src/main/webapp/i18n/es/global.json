@@ -146,6 +146,11 @@
     "idinvalid": "ID inválido",
     "idnotfound": "ID no encontrado",
     "invalidcode": "El código del rol debe comenzar con el prefijo ROLE_",
+    "codeexists": "Ya existe otro rol con ese código",
+    "authority": {
+      "updateFailed": "No se pudo actualizar el rol. Por favor, revise los datos e intente nuevamente.",
+      "createFailed": "No se pudo crear el rol. Por favor, revise los datos e intente nuevamente."
+    },
     "file": {
       "could.not.extract": "No se pudo extraer el fichero",
       "not.image": "Se esperaba que el fichero fuera una imagen pero se encontro \"{{ fileType }}\""

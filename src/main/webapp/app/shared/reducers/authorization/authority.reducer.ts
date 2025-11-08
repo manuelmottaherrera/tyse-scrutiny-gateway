@@ -48,7 +48,7 @@ export const createAuthority = createAsyncThunk(
   'authority/create_entity',
   async (authority: IAuthority) => {
     const response = await authorityService.createAuthority(authority);
-    return response.data;
+    return response; // Return full response to allow notification middleware to read headers
   },
   { serializeError: serializeAxiosError },
 );
@@ -57,7 +57,7 @@ export const updateAuthority = createAsyncThunk(
   'authority/update_entity',
   async (authority: IAuthority) => {
     const response = await authorityService.updateAuthority(authority);
-    return response.data;
+    return response; // Return full response to allow notification middleware to read headers
   },
   { serializeError: serializeAxiosError },
 );
@@ -148,8 +148,8 @@ export const AuthoritySlice = createSlice({
       .addCase(createAuthority.fulfilled, (state, action) => {
         state.updating = false;
         state.updateSuccess = true;
-        state.entity = action.payload;
-        state.entities.push(action.payload);
+        state.entity = action.payload.data;
+        state.entities.push(action.payload.data);
       })
       .addCase(createAuthority.rejected, (state, action: any) => {
         state.updating = false;
@@ -158,10 +158,13 @@ export const AuthoritySlice = createSlice({
         const axiosError = action.payload || action.error;
         if (axiosError?.response?.data?.message) {
           state.errorMessage = axiosError.response.data.message;
+        } else if (axiosError?.response?.data?.title) {
+          // Map technical HTTP errors to user-friendly messages
+          state.errorMessage = 'error.authority.createFailed';
         } else if (axiosError?.message) {
           state.errorMessage = axiosError.message;
         } else {
-          state.errorMessage = 'Error creating authority';
+          state.errorMessage = 'error.authority.createFailed';
         }
       })
       // Update authority
@@ -173,16 +176,27 @@ export const AuthoritySlice = createSlice({
       .addCase(updateAuthority.fulfilled, (state, action) => {
         state.updating = false;
         state.updateSuccess = true;
-        state.entity = action.payload;
-        const index = state.entities.findIndex(e => e.id === action.payload.id);
+        state.entity = action.payload.data;
+        const index = state.entities.findIndex(e => e.id === action.payload.data.id);
         if (index !== -1) {
-          state.entities[index] = action.payload;
+          state.entities[index] = action.payload.data;
         }
       })
-      .addCase(updateAuthority.rejected, (state, action) => {
+      .addCase(updateAuthority.rejected, (state, action: any) => {
         state.updating = false;
         state.updateSuccess = false;
-        state.errorMessage = action.error.message || 'Error updating authority';
+        // Extract error message from Axios error response
+        const axiosError = action.payload || action.error;
+        if (axiosError?.response?.data?.message) {
+          state.errorMessage = axiosError.response.data.message;
+        } else if (axiosError?.response?.data?.title) {
+          // Map technical HTTP errors to user-friendly messages
+          state.errorMessage = 'error.authority.updateFailed';
+        } else if (axiosError?.message) {
+          state.errorMessage = axiosError.message;
+        } else {
+          state.errorMessage = 'error.authority.updateFailed';
+        }
       })
       // Delete authority
       .addCase(deleteAuthority.pending, state => {

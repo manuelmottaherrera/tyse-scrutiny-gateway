@@ -1,4 +1,13 @@
 {
+  "tyseScrutinyGatewayApp": {
+    "authorization": {
+      "authority": {
+        "created": "A role is created with identifier {{ param }}",
+        "updated": "A role is updated with identifier {{ param }}",
+        "deleted": "A role is deleted with identifier {{ param }}"
+      }
+    }
+  },
   "authorization": {
     "authority": {
       "home": {
