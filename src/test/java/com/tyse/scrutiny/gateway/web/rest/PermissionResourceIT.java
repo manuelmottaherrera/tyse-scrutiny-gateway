@@ -56,6 +56,8 @@ class PermissionResourceIT {
             permissionRepository.delete(insertedPermission).block();
             insertedPermission = null;
         }
+        // Clean all permissions with proper FK order (via repository cascade)
+        permissionRepository.deleteAll().block();
     }
 
     /**

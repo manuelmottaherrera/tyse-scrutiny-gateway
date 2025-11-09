@@ -8,6 +8,7 @@ import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.domain.authorization.UserPermission;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.UserPermissionRepository;
@@ -60,6 +61,9 @@ class DomainUserDetailsServiceIT {
 
     @Autowired
     private UserPermissionRepository userPermissionRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private Permission createPermission(String resource, String action, String name, String description) {
         Permission permission = new Permission();
@@ -114,6 +118,9 @@ class DomainUserDetailsServiceIT {
 
     @BeforeEach
     void init() {
+        // Clean permissions to avoid duplicate key violations
+        entityManager.deleteAllPermissions().block();
+
         userRepository.save(getUserOne()).block();
         userRepository.save(getUserTwo()).block();
         userRepository.save(getUserThree()).block();

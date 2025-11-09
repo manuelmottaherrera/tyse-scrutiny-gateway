@@ -7,6 +7,7 @@ import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.Authority;
 import com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,15 @@ class AuthorityRepositoryIT {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     private Authority testAuthority;
 
     @BeforeEach
     void setUp() {
         // Clean up before each test
-        authorityRepository.deleteAll().block();
+        entityManager.deleteAllAuthorities().block();
 
         // Create a test authority
         testAuthority = new Authority();

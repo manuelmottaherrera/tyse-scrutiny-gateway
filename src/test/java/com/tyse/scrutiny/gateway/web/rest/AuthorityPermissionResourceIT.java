@@ -47,6 +47,9 @@ class AuthorityPermissionResourceIT {
     private com.tyse.scrutiny.gateway.repository.authorization.UserPermissionRepository userPermissionRepository;
 
     @Autowired
+    private com.tyse.scrutiny.gateway.repository.EntityManager entityManager;
+
+    @Autowired
     private WebTestClient webTestClient;
 
     private Authority adminAuthority;
@@ -57,12 +60,9 @@ class AuthorityPermissionResourceIT {
 
     @BeforeEach
     void setUp() {
-        // Delete child entities first to avoid FK violations
-        authorityPermissionRepository.deleteAll().block();
-        userAuthorityRepository.deleteAll().block();
-        userPermissionRepository.deleteAll().block();
-        permissionRepository.deleteAll().block();
-        authorityRepository.deleteAll().block();
+        // Delete child entities first to avoid FK violations - use EntityManager for proper FK order
+        entityManager.deleteAllAuthorities().block();
+        entityManager.deleteAllPermissions().block();
 
         // Create test authorities
         adminAuthority = createAuthority("ROLE_ADMIN_TEST", "Admin", false, 0);

@@ -73,7 +73,7 @@ class AuthorityResourceIT {
 
     public static void deleteEntities(EntityManager em) {
         try {
-            em.deleteAll(Authority.class).block();
+            em.deleteAllAuthorities().block();
         } catch (Exception e) {
             // It can fail, if other entities are still referring this - it will be removed later.
         }

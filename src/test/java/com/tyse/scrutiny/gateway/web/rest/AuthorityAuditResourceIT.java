@@ -87,6 +87,9 @@ class AuthorityAuditResourceIT {
 
     @BeforeEach
     void initTest() {
+        // Clean up before each test using EntityManager to handle FK constraints
+        em.deleteAllAuthorities().block();
+
         // Create a test authority first (required for FK constraint)
         testAuthority = new Authority();
         testAuthority.setName("Test Audit Authority");

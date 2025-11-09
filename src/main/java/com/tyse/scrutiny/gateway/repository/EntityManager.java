@@ -275,4 +275,28 @@ public class EntityManager {
         // and convert it to lower case.
         return input.replaceAll(regex, replacement).toLowerCase();
     }
+
+    /**
+     * Delete all authorities and related entities in the correct order to avoid FK violations.
+     * This method deletes child entities first before deleting authorities.
+     *
+     * @return the number of deleted authorities
+     */
+    public Mono<Void> deleteAllAuthorities() {
+        return deleteAll("scr_authority_audit")
+            .then(deleteAll("scr_authority_permission"))
+            .then(deleteAll("scr_user_authority"))
+            .then(deleteAll("scr_authority"))
+            .then();
+    }
+
+    /**
+     * Delete all permissions and related entities in the correct order to avoid FK violations.
+     * This method deletes child entities first before deleting permissions.
+     *
+     * @return completion signal
+     */
+    public Mono<Void> deleteAllPermissions() {
+        return deleteAll("scr_authority_permission").then(deleteAll("scr_user_permission")).then(deleteAll("scr_permission")).then();
+    }
 }

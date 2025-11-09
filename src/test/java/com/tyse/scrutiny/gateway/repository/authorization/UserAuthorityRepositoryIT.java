@@ -5,11 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.tyse.scrutiny.gateway.IntegrationTest;
 import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.Authority;
+import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.domain.authorization.UserAuthority;
 import com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
+import com.tyse.scrutiny.gateway.repository.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,26 +30,55 @@ class UserAuthorityRepositoryIT {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
     private Authority adminAuthority;
     private Authority userAuthority;
     private Authority managerAuthority;
+    private User testUser;
+    private User anotherUser;
     private Long testUserId;
     private Long anotherUserId;
 
     @BeforeEach
     void setUp() {
         // Clean up before each test
-        userAuthorityRepository.deleteAll().block();
-        authorityRepository.deleteAll().block();
+        entityManager.deleteAllAuthorities().block();
+        userRepository.deleteAll().block();
+
+        // Create test users
+        testUser = new User();
+        testUser.setLogin("testuser_auth_" + System.currentTimeMillis());
+        testUser.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        testUser.setActivated(true);
+        testUser.setEmail("testuser_auth@localhost");
+        testUser.setFirstName("Test");
+        testUser.setLastName("User");
+        testUser.setLangKey("en");
+        testUser.setCreatedBy(Constants.SYSTEM);
+        testUser = userRepository.save(testUser).block();
+        testUserId = testUser.getId();
+
+        anotherUser = new User();
+        anotherUser.setLogin("anotheruser_auth_" + System.currentTimeMillis());
+        anotherUser.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        anotherUser.setActivated(true);
+        anotherUser.setEmail("anotheruser_auth@localhost");
+        anotherUser.setFirstName("Another");
+        anotherUser.setLastName("User");
+        anotherUser.setLangKey("en");
+        anotherUser.setCreatedBy(Constants.SYSTEM);
+        anotherUser = userRepository.save(anotherUser).block();
+        anotherUserId = anotherUser.getId();
 
         // Create test authorities
         adminAuthority = createAuthority("ROLE_ADMIN_TEST", "Administrator", 0);
         userAuthority = createAuthority("ROLE_USER_TEST", "User", 500);
         managerAuthority = createAuthority("ROLE_MANAGER_TEST", "Manager", 100);
-
-        // Test user IDs
-        testUserId = 1000L;
-        anotherUserId = 2000L;
     }
 
     @Test

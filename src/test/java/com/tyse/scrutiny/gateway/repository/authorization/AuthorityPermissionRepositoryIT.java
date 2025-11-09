@@ -9,6 +9,7 @@ import com.tyse.scrutiny.gateway.domain.authorization.AuthorityPermission;
 import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
 import java.time.Instant;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,9 @@ class AuthorityPermissionRepositoryIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     private Authority adminAuthority;
     private Authority userAuthority;
     private Permission createPermission;
@@ -39,10 +43,9 @@ class AuthorityPermissionRepositoryIT {
 
     @BeforeEach
     void setUp() {
-        // Clean up before each test
-        authorityPermissionRepository.deleteAll().block();
-        permissionRepository.deleteAll().block();
-        authorityRepository.deleteAll().block();
+        // Clean up before each test - delete in FK order
+        entityManager.deleteAllAuthorities().block();
+        entityManager.deleteAllPermissions().block();
 
         // Create test authorities
         adminAuthority = new Authority();

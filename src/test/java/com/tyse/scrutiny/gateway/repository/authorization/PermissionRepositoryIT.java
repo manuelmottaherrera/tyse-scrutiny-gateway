@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.tyse.scrutiny.gateway.IntegrationTest;
 import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.authorization.Permission;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,15 @@ class PermissionRepositoryIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     private Permission testPermission;
 
     @BeforeEach
     void setUp() {
         // Clean up before each test
-        permissionRepository.deleteAll().block();
+        entityManager.deleteAllPermissions().block();
 
         // Create a test permission
         testPermission = new Permission();

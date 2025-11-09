@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tyse.scrutiny.gateway.IntegrationTest;
 import com.tyse.scrutiny.gateway.config.Constants;
+import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.domain.authorization.UserPermission;
+import com.tyse.scrutiny.gateway.repository.EntityManager;
+import com.tyse.scrutiny.gateway.repository.UserRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,28 +28,57 @@ class UserPermissionRepositoryIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
     private Permission createPermission;
     private Permission readPermission;
     private Permission updatePermission;
     private Permission deletePermission;
+    private User testUser;
+    private User anotherUser;
     private Long testUserId;
     private Long anotherUserId;
 
     @BeforeEach
     void setUp() {
         // Clean up before each test
-        userPermissionRepository.deleteAll().block();
-        permissionRepository.deleteAll().block();
+        entityManager.deleteAllPermissions().block();
+        userRepository.deleteAll().block();
+
+        // Create test users
+        testUser = new User();
+        testUser.setLogin("testuser_perm_" + System.currentTimeMillis());
+        testUser.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        testUser.setActivated(true);
+        testUser.setEmail("testuser_perm@localhost");
+        testUser.setFirstName("Test");
+        testUser.setLastName("User");
+        testUser.setLangKey("en");
+        testUser.setCreatedBy(Constants.SYSTEM);
+        testUser = userRepository.save(testUser).block();
+        testUserId = testUser.getId();
+
+        anotherUser = new User();
+        anotherUser.setLogin("anotheruser_perm_" + System.currentTimeMillis());
+        anotherUser.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        anotherUser.setActivated(true);
+        anotherUser.setEmail("anotheruser_perm@localhost");
+        anotherUser.setFirstName("Another");
+        anotherUser.setLastName("User");
+        anotherUser.setLangKey("en");
+        anotherUser.setCreatedBy(Constants.SYSTEM);
+        anotherUser = userRepository.save(anotherUser).block();
+        anotherUserId = anotherUser.getId();
 
         // Create test permissions
         createPermission = createPermission("user.create", "user", "create", "Create users");
         readPermission = createPermission("user.read", "user", "read", "Read users");
         updatePermission = createPermission("user.update", "user", "update", "Update users");
         deletePermission = createPermission("user.delete", "user", "delete", "Delete users");
-
-        // Test user IDs
-        testUserId = 1000L;
-        anotherUserId = 2000L;
     }
 
     @Test
