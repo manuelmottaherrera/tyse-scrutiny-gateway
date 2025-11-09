@@ -41,6 +41,12 @@ class AuthorityPermissionResourceIT {
     private PermissionRepository permissionRepository;
 
     @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository userAuthorityRepository;
+
+    @Autowired
+    private com.tyse.scrutiny.gateway.repository.authorization.UserPermissionRepository userPermissionRepository;
+
+    @Autowired
     private WebTestClient webTestClient;
 
     private Authority adminAuthority;
@@ -51,7 +57,10 @@ class AuthorityPermissionResourceIT {
 
     @BeforeEach
     void setUp() {
+        // Delete child entities first to avoid FK violations
         authorityPermissionRepository.deleteAll().block();
+        userAuthorityRepository.deleteAll().block();
+        userPermissionRepository.deleteAll().block();
         permissionRepository.deleteAll().block();
         authorityRepository.deleteAll().block();
 
