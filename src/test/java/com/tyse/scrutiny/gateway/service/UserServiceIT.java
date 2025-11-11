@@ -138,7 +138,7 @@ class UserServiceIT {
     void assertThatNotActivatedUsersWithNotNullActivationKeyCreatedBefore3DaysAreDeleted() {
         Instant now = Instant.now();
         user.setActivated(false);
-        user.setActivationKey(RandomStringUtils.insecure().next(20));
+        user.setActivationKey(RandomUtil.generateActivationKey());
         User dbUser = userRepository.save(user).block();
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
         userRepository.save(user).block();

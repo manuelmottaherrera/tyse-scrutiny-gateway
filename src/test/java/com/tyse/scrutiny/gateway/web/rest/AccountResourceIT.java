@@ -719,7 +719,7 @@ class AccountResourceIT {
         user.setCreatedBy(Constants.SYSTEM);
         userRepository.save(user).block();
 
-        String newPassword = RandomStringUtils.insecure().next(ManagedUserVM.PASSWORD_MIN_LENGTH - 1);
+        String newPassword = RandomStringUtils.insecure().nextAlphanumeric(ManagedUserVM.PASSWORD_MIN_LENGTH - 1);
 
         accountWebTestClient
             .post()
@@ -747,7 +747,7 @@ class AccountResourceIT {
         user.setCreatedBy(Constants.SYSTEM);
         userRepository.save(user).block();
 
-        String newPassword = RandomStringUtils.insecure().next(ManagedUserVM.PASSWORD_MAX_LENGTH + 1);
+        String newPassword = RandomStringUtils.insecure().nextAlphanumeric(ManagedUserVM.PASSWORD_MAX_LENGTH + 1);
 
         accountWebTestClient
             .post()
