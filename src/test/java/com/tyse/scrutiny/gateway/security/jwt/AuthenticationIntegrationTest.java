@@ -4,6 +4,7 @@ import com.tyse.scrutiny.gateway.config.SecurityConfiguration;
 import com.tyse.scrutiny.gateway.config.SecurityJwtConfiguration;
 import com.tyse.scrutiny.gateway.config.WebConfigurer;
 import com.tyse.scrutiny.gateway.management.SecurityMetersService;
+import com.tyse.scrutiny.gateway.security.EnterprisePermissionEvaluator;
 import com.tyse.scrutiny.gateway.web.rest.AuthenticateController;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,6 +24,7 @@ import tech.jhipster.config.JHipsterProperties;
         SecurityConfiguration.class,
         SecurityJwtConfiguration.class,
         SecurityMetersService.class,
+        EnterprisePermissionEvaluator.class,
         JwtAuthenticationTestUtils.class,
     }
 )
