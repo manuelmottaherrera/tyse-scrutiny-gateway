@@ -54,37 +54,6 @@ public interface AuthorityPermissionRepository extends R2dbcRepository<Authority
     Mono<Boolean> existsByAuthorityIdAndPermissionId(Long authorityId, Long permissionId);
 
     /**
-     * Delete a specific authority-permission mapping.
-     * This revokes a permission from a role.
-     *
-     * @param authorityId the ID of the authority (role)
-     * @param permissionId the ID of the permission
-     * @return number of deleted rows (0 or 1)
-     */
-    @Query("DELETE FROM scr_authority_permission WHERE authority_id = :authorityId AND permission_id = :permissionId")
-    Mono<Long> deleteByAuthorityIdAndPermissionId(Long authorityId, Long permissionId);
-
-    /**
-     * Delete all permission mappings for a specific authority.
-     * Useful when deactivating or deleting a role.
-     *
-     * @param authorityId the ID of the authority (role)
-     * @return number of deleted rows
-     */
-    @Query("DELETE FROM scr_authority_permission WHERE authority_id = :authorityId")
-    Mono<Long> deleteByAuthorityId(Long authorityId);
-
-    /**
-     * Delete all authority mappings for a specific permission.
-     * Useful when deactivating or deleting a permission.
-     *
-     * @param permissionId the ID of the permission
-     * @return number of deleted rows
-     */
-    @Query("DELETE FROM scr_authority_permission WHERE permission_id = :permissionId")
-    Mono<Long> deleteByPermissionId(Long permissionId);
-
-    /**
      * Count how many permissions are assigned to a specific authority.
      *
      * @param authorityId the ID of the authority (role)
@@ -123,6 +92,34 @@ interface AuthorityPermissionRepositoryInternal {
      * @return flux of tuples (authority_name, permission_count)
      */
     Flux<AuthorityPermissionStats> getPermissionStatsByAuthority();
+
+    /**
+     * Delete a specific authority-permission mapping.
+     * This revokes a permission from a role.
+     *
+     * @param authorityId the ID of the authority (role)
+     * @param permissionId the ID of the permission
+     * @return number of deleted rows (0 or 1)
+     */
+    Mono<Long> deleteByAuthorityIdAndPermissionId(Long authorityId, Long permissionId);
+
+    /**
+     * Delete all permission mappings for a specific authority.
+     * Useful when deactivating or deleting a role.
+     *
+     * @param authorityId the ID of the authority (role)
+     * @return number of deleted rows
+     */
+    Mono<Long> deleteByAuthorityId(Long authorityId);
+
+    /**
+     * Delete all authority mappings for a specific permission.
+     * Useful when deactivating or deleting a permission.
+     *
+     * @param permissionId the ID of the permission
+     * @return number of deleted rows
+     */
+    Mono<Long> deleteByPermissionId(Long permissionId);
 }
 
 /**
@@ -190,6 +187,37 @@ class AuthorityPermissionRepositoryInternalImpl implements AuthorityPermissionRe
                 )
             )
             .all();
+    }
+
+    @Override
+    public Mono<Long> deleteByAuthorityIdAndPermissionId(Long authorityId, Long permissionId) {
+        return db
+            .sql("DELETE FROM scr_authority_permission WHERE authority_id = :authorityId AND permission_id = :permissionId")
+            .bind("authorityId", authorityId)
+            .bind("permissionId", permissionId)
+            .fetch()
+            .rowsUpdated()
+            .map(Long::valueOf);
+    }
+
+    @Override
+    public Mono<Long> deleteByAuthorityId(Long authorityId) {
+        return db
+            .sql("DELETE FROM scr_authority_permission WHERE authority_id = :authorityId")
+            .bind("authorityId", authorityId)
+            .fetch()
+            .rowsUpdated()
+            .map(Long::valueOf);
+    }
+
+    @Override
+    public Mono<Long> deleteByPermissionId(Long permissionId) {
+        return db
+            .sql("DELETE FROM scr_authority_permission WHERE permission_id = :permissionId")
+            .bind("permissionId", permissionId)
+            .fetch()
+            .rowsUpdated()
+            .map(Long::valueOf);
     }
 }
 

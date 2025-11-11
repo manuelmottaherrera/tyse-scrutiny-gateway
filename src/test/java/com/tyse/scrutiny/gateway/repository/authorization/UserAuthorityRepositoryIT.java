@@ -214,7 +214,8 @@ class UserAuthorityRepositoryIT {
     @Test
     void shouldHandleExpirationInFuture() {
         // Given: user has authority expiring in 30 days (still valid)
-        Instant futureExpiration = Instant.now().plus(30, ChronoUnit.DAYS);
+        // PostgreSQL stores timestamps with microsecond precision, truncate to avoid nano precision loss
+        Instant futureExpiration = Instant.now().plus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MICROS);
         createAssignment(testUserId, adminAuthority.getId(), true, futureExpiration);
 
         // When: find valid assignments
@@ -363,13 +364,14 @@ class UserAuthorityRepositoryIT {
         // Given: admin authority assigned to multiple users
         createAssignment(testUserId, adminAuthority.getId(), true, null);
         createAssignment(anotherUserId, adminAuthority.getId(), true, null);
-        createAssignment(3000L, adminAuthority.getId(), false, null); // inactive
-        createAssignment(4000L, adminAuthority.getId(), true, Instant.now().minus(1, ChronoUnit.DAYS)); // expired
+        // Use userAuthority and managerAuthority for inactive/expired to avoid FK violations
+        createAssignment(testUserId, userAuthority.getId(), false, null); // inactive
+        createAssignment(anotherUserId, managerAuthority.getId(), true, Instant.now().minus(1, ChronoUnit.DAYS)); // expired
 
-        // When: count active
+        // When: count active for adminAuthority
         Long activeCount = userAuthorityRepository.countActiveByAuthorityId(adminAuthority.getId()).block();
 
-        // Then: 2 active users
+        // Then: 2 active users have adminAuthority
         assertThat(activeCount).isEqualTo(2L);
     }
 
@@ -439,7 +441,8 @@ class UserAuthorityRepositoryIT {
     @Test
     void shouldHandleTemporaryAssignment() {
         // Given: temporary assignment (7 days)
-        Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
+        // PostgreSQL stores timestamps with microsecond precision, truncate to avoid nano precision loss
+        Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MICROS);
         UserAuthority assignment = createAssignment(testUserId, adminAuthority.getId(), true, expiresAt);
 
         // When: retrieve

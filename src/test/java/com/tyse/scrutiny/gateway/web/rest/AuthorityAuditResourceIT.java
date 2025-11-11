@@ -136,7 +136,7 @@ class AuthorityAuditResourceIT {
             .jsonPath("$.[*].id")
             .value(hasItem(insertedAudit.getId().intValue()))
             .jsonPath("$.[*].authorityId")
-            .value(hasItem(DEFAULT_AUTHORITY_ID.intValue()))
+            .value(hasItem(testAuthority.getId().intValue()))
             .jsonPath("$.[*].action")
             .value(hasItem(DEFAULT_ACTION.name()))
             .jsonPath("$.[*].changedBy")
@@ -162,7 +162,7 @@ class AuthorityAuditResourceIT {
             .jsonPath("$.id")
             .value(is(insertedAudit.getId().intValue()))
             .jsonPath("$.authorityId")
-            .value(is(DEFAULT_AUTHORITY_ID.intValue()))
+            .value(is(testAuthority.getId().intValue()))
             .jsonPath("$.action")
             .value(is(DEFAULT_ACTION.name()))
             .jsonPath("$.changedBy")
@@ -187,14 +187,16 @@ class AuthorityAuditResourceIT {
     void getAuditsByAuthority() throws Exception {
         // Initialize the database with multiple audits for the same authority
         insertedAudit = auditRepository.save(authorityAudit).block();
-        AuthorityAudit audit2 = auditRepository
-            .save(createEntity().action(AuditAction.UPDATED).changedDate(Instant.now().truncatedTo(ChronoUnit.MILLIS).plusSeconds(1)))
-            .block();
+        AuthorityAudit audit2 = createEntity()
+            .authorityId(testAuthority.getId())
+            .action(AuditAction.UPDATED)
+            .changedDate(Instant.now().truncatedTo(ChronoUnit.MILLIS).plusSeconds(1));
+        audit2 = auditRepository.save(audit2).block();
 
         // Get audits by authority
         webTestClient
             .get()
-            .uri(ENTITY_API_URL_AUTHORITY, DEFAULT_AUTHORITY_ID)
+            .uri(ENTITY_API_URL_AUTHORITY, testAuthority.getId())
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -203,7 +205,7 @@ class AuthorityAuditResourceIT {
             .contentType(MediaType.APPLICATION_JSON)
             .expectBody()
             .jsonPath("$.[*].authorityId")
-            .value(everyItem(is(DEFAULT_AUTHORITY_ID.intValue())))
+            .value(everyItem(is(testAuthority.getId().intValue())))
             .jsonPath("$.length()")
             .value(is(2));
 
@@ -222,7 +224,7 @@ class AuthorityAuditResourceIT {
             .uri(uriBuilder ->
                 uriBuilder
                     .path(ENTITY_API_URL_SEARCH)
-                    .queryParam("authorityId", DEFAULT_AUTHORITY_ID)
+                    .queryParam("authorityId", testAuthority.getId())
                     .queryParam("changedBy", DEFAULT_CHANGED_BY)
                     .queryParam("action", DEFAULT_ACTION.name())
                     .build()
@@ -237,7 +239,7 @@ class AuthorityAuditResourceIT {
             .jsonPath("$.[*].id")
             .value(hasItem(insertedAudit.getId().intValue()))
             .jsonPath("$.[*].authorityId")
-            .value(hasItem(DEFAULT_AUTHORITY_ID.intValue()))
+            .value(hasItem(testAuthority.getId().intValue()))
             .jsonPath("$.[*].changedBy")
             .value(hasItem(DEFAULT_CHANGED_BY));
     }
@@ -378,7 +380,7 @@ class AuthorityAuditResourceIT {
         // Get metrics for specific authority
         webTestClient
             .get()
-            .uri(ENTITY_API_URL_METRICS_BY_AUTHORITY, DEFAULT_AUTHORITY_ID)
+            .uri(ENTITY_API_URL_METRICS_BY_AUTHORITY, testAuthority.getId())
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()

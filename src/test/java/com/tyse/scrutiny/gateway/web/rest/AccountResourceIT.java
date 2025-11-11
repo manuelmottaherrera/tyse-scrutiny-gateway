@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.
@@ -56,6 +57,49 @@ class AccountResourceIT {
 
     @Autowired
     private WebTestClient accountWebTestClient;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        // Ensure USER authority exists for registration tests
+        authorityRepository
+            .findByCode(AuthoritiesConstants.USER)
+            .switchIfEmpty(
+                Mono.defer(() -> {
+                    com.tyse.scrutiny.gateway.domain.Authority userAuthority = new com.tyse.scrutiny.gateway.domain.Authority();
+                    userAuthority.setName("User");
+                    userAuthority.setCode(AuthoritiesConstants.USER);
+                    userAuthority.setDescription("User role");
+                    userAuthority.setCategory(com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory.SYSTEM);
+                    userAuthority.setIsSystem(true);
+                    userAuthority.setIsActive(true);
+                    userAuthority.setHierarchyLevel(500);
+                    userAuthority.setCreatedBy(Constants.SYSTEM);
+                    userAuthority.setCreatedDate(java.time.Instant.now());
+                    return authorityRepository.save(userAuthority);
+                })
+            )
+            .block();
+
+        // Ensure ADMIN authority exists for some tests
+        authorityRepository
+            .findByCode(AuthoritiesConstants.ADMIN)
+            .switchIfEmpty(
+                Mono.defer(() -> {
+                    com.tyse.scrutiny.gateway.domain.Authority adminAuthority = new com.tyse.scrutiny.gateway.domain.Authority();
+                    adminAuthority.setName("Admin");
+                    adminAuthority.setCode(AuthoritiesConstants.ADMIN);
+                    adminAuthority.setDescription("Admin role");
+                    adminAuthority.setCategory(com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory.SYSTEM);
+                    adminAuthority.setIsSystem(true);
+                    adminAuthority.setIsActive(true);
+                    adminAuthority.setHierarchyLevel(0);
+                    adminAuthority.setCreatedBy(Constants.SYSTEM);
+                    adminAuthority.setCreatedDate(java.time.Instant.now());
+                    return authorityRepository.save(adminAuthority);
+                })
+            )
+            .block();
+    }
 
     @AfterEach
     void cleanupAndCheck() {
@@ -112,7 +156,7 @@ class AccountResourceIT {
             .isEqualTo("http://placehold.it/50x50")
             .jsonPath("$.langKey")
             .isEqualTo("en")
-            .jsonPath("$.authorities")
+            .jsonPath("$.authorities[0]")
             .isEqualTo(AuthoritiesConstants.ADMIN);
 
         userService.deleteUser(TEST_USER_LOGIN).block();

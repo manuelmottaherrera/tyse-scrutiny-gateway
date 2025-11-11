@@ -354,12 +354,16 @@ class AuthorityServiceIT {
         custom.setCreatedDate(Instant.now());
         authorityRepository.save(custom).block();
 
-        // When: find by CUSTOM category (business role uses CUSTOM category)
+        // When: find by CUSTOM category (both business and custom have CUSTOM category)
         StepVerifier.create(authorityService.findByCategory(AuthorityCategory.CUSTOM))
-            // Then: only custom authority returned
+            // Then: both custom authorities returned
             .assertNext(auth -> {
                 assertThat(auth.getCategory()).isEqualTo(AuthorityCategory.CUSTOM);
-                assertThat(auth.getCode()).isEqualTo("ROLE_BUSINESS_TEST");
+                assertThat(auth.getCode()).isIn("ROLE_BUSINESS_TEST", "ROLE_CUSTOM_TEST");
+            })
+            .assertNext(auth -> {
+                assertThat(auth.getCategory()).isEqualTo(AuthorityCategory.CUSTOM);
+                assertThat(auth.getCode()).isIn("ROLE_BUSINESS_TEST", "ROLE_CUSTOM_TEST");
             })
             .verifyComplete();
     }

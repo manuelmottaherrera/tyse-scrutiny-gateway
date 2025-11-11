@@ -45,8 +45,9 @@ class UserPermissionRepositoryIT {
 
     @BeforeEach
     void setUp() {
-        // Clean up before each test
-        entityManager.deleteAllPermissions().block();
+        // Clean up before each test - respect FK constraints order
+        entityManager.deleteAllPermissions().block(); // Cleans scr_user_permission
+        entityManager.deleteAll("scr_user_authority").block(); // Clean user_authority before users
         userRepository.deleteAll().block();
 
         // Create test users
@@ -217,7 +218,8 @@ class UserPermissionRepositoryIT {
     @Test
     void shouldHandleExpirationInFuture() {
         // Given: user has permission expiring in 30 days (still valid)
-        Instant futureExpiration = Instant.now().plus(30, ChronoUnit.DAYS);
+        // PostgreSQL stores timestamps with microsecond precision, truncate to avoid nano precision loss
+        Instant futureExpiration = Instant.now().plus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MICROS);
         createGrant(testUserId, createPermission.getId(), true, futureExpiration, "Temporary escalation");
 
         // When: find valid grants
@@ -398,13 +400,14 @@ class UserPermissionRepositoryIT {
         // Given: create permission granted to multiple users
         createGrant(testUserId, createPermission.getId(), true, null, "Active");
         createGrant(anotherUserId, createPermission.getId(), true, null, "Active");
-        createGrant(3000L, createPermission.getId(), false, null, "Inactive"); // inactive
-        createGrant(4000L, createPermission.getId(), true, Instant.now().minus(1, ChronoUnit.DAYS), "Expired"); // expired
+        // Use readPermission and updatePermission for inactive/expired to avoid FK violations
+        createGrant(testUserId, readPermission.getId(), false, null, "Inactive"); // inactive
+        createGrant(anotherUserId, updatePermission.getId(), true, Instant.now().minus(1, ChronoUnit.DAYS), "Expired"); // expired
 
-        // When: count active
+        // When: count active for createPermission
         Long activeCount = userPermissionRepository.countActiveByPermissionId(createPermission.getId()).block();
 
-        // Then: 2 active users
+        // Then: 2 active users have createPermission
         assertThat(activeCount).isEqualTo(2L);
     }
 
@@ -489,7 +492,8 @@ class UserPermissionRepositoryIT {
     @Test
     void shouldHandleTemporaryGrant() {
         // Given: temporary grant (7 days)
-        Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
+        // PostgreSQL stores timestamps with microsecond precision, truncate to avoid nano precision loss
+        Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MICROS);
         UserPermission grant = createGrant(testUserId, createPermission.getId(), true, expiresAt, "Project access");
 
         // When: retrieve

@@ -31,7 +31,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class AuthorityResourceIT {
 
     private static final String ENTITY_API_URL = "/api/authorities";
-    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{name}";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     @Autowired
     private ObjectMapper om;
@@ -197,7 +197,7 @@ class AuthorityResourceIT {
         // Get the authority
         webTestClient
             .get()
-            .uri(ENTITY_API_URL_ID, authority.getName())
+            .uri(ENTITY_API_URL_ID, insertedAuthority.getId())
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -232,7 +232,7 @@ class AuthorityResourceIT {
         // Delete the authority
         webTestClient
             .delete()
-            .uri(ENTITY_API_URL_ID, authority.getName())
+            .uri(ENTITY_API_URL_ID, insertedAuthority.getId())
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
