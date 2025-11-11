@@ -241,8 +241,7 @@ public class AuthorityPermissionService {
         LOG.debug("Request to batch assign permissions to authority {}", authorityId);
 
         return Flux.fromIterable(permissionIds).flatMap(permissionId ->
-            assignPermissionToAuthority(authorityId, permissionId)// Continue on error (e.g., if one permission is already assigned)
-            .onErrorResume(error -> {
+            assignPermissionToAuthority(authorityId, permissionId).onErrorResume(error -> { // Continue on error (e.g., if one permission is already assigned)
                 LOG.warn("Failed to assign permission {} to authority {}: {}", permissionId, authorityId, error.getMessage());
                 return Mono.empty();
             })
