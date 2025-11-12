@@ -20,7 +20,7 @@ const Account = React.lazy(() => import(/* webpackChunkName: "account" */ 'app/m
 
 const Admin = React.lazy(() => import(/* webpackChunkName: "administration" */ 'app/modules/administration'));
 
-const Divipol = React.lazy(() => import(/* webpackChunkName: "divipol" */ 'app/modules/divipol/divipol'));
+const Divipol = React.lazy(() => import(/* webpackChunkName: "divipol" */ 'app/modules/divipol'));
 const AppRoutes = () => {
   return (
     <div className="view-routes">
