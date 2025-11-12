@@ -50,6 +50,18 @@
       "codeHelp": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos (ejemplo: ROLE_MANAGER)",
       "loadingPermissions": "Cargando permisos...",
       "noPermissions": "Este rol no tiene permisos asignados aún. Puede asignar permisos desde la página de gestión de permisos.",
+      "managePermissions": {
+        "button": "Gestionar Permisos",
+        "title": "Gestionar Permisos",
+        "search": "Buscar",
+        "searchPlaceholder": "Buscar por nombre o descripción...",
+        "filterByResource": "Filtrar por Recurso",
+        "allResources": "Todos los recursos",
+        "assigned": "Asignado",
+        "loading": "Cargando permisos...",
+        "noResults": "No se encontraron permisos",
+        "info": "Haga clic en los checkboxes para asignar o revocar permisos de este rol"
+      },
       "validation": {
         "codePattern": "El código debe comenzar con ROLE_ seguido de letras mayúsculas y guiones bajos"
       }

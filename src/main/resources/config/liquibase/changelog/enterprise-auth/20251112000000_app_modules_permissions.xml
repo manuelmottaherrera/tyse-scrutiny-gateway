@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Application Modules Permissions
+
+        This changelog adds granular permissions for all application modules:
+
+        DASHBOARD MODULES:
+        - Divipol (Political Division)
+        - Statistics (Electoral Statistics)
+        - Heat Map (Geographic Visualizations)
+        - Vote Count (Scrutiny System)
+        - File Upload (Document Management)
+        - Voting Juries (Jury Management)
+        - Trainings (Training Programs)
+        - Witnesses (Electoral Witnesses)
+        - Analytics (Electoral Analytics)
+
+        ADMINISTRATION MODULES:
+        - Gateway Routes
+        - Metrics (Application Metrics)
+        - Health (Health Checks)
+        - Configuration (System Configuration)
+        - Logs (Log Management)
+        - API Docs (Documentation)
+        - Authorization Dashboard
+
+        ACCOUNT MODULES:
+        - Account Settings
+        - Password Management
+
+        All permissions are assigned to ROLE_ADMIN by default.
+
+        Author: Claude Code
+        Date: 2025-11-12
+    -->
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 1: Load Application Modules Permissions                        -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251112000001-load-app-permissions" author="claude">
+        <comment>
+            Load permissions for all application modules.
+
+            Creates 34 new permissions (IDs 14-47):
+            - Divipol: 4 permissions (read, create, update, delete)
+            - Statistics: 2 permissions (read, export)
+            - Heat Map: 2 permissions (read, configure)
+            - Vote Count: 2 permissions (read, manage)
+            - File Upload: 3 permissions (read, upload, delete)
+            - Voting Juries: 2 permissions (read, manage)
+            - Trainings: 2 permissions (read, enroll)
+            - Witnesses: 2 permissions (read, manage)
+            - Analytics: 2 permissions (read, export)
+            - Gateway: 2 permissions (read, manage)
+            - Metrics: 1 permission (read)
+            - Health: 1 permission (read)
+            - Configuration: 2 permissions (read, update)
+            - Logs: 2 permissions (read, update)
+            - API Docs: 1 permission (read)
+            - Authorization Dashboard: 1 permission (read)
+            - Account: 3 permissions (settings.read, settings.update, password.update)
+        </comment>
+
+        <!-- Load new permissions -->
+        <loadData file="config/liquibase/data/permission_app_modules.csv"
+                  separator=";"
+                  tableName="scr_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_active" type="boolean"/>
+        </loadData>
+
+        <rollback>
+            <delete tableName="scr_permission">
+                <where>id BETWEEN 14 AND 47</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 2: Assign All Permissions to ROLE_ADMIN                        -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251112000002-assign-permissions-to-admin" author="claude">
+        <comment>
+            Assign all new application module permissions to ROLE_ADMIN.
+
+            Creates 34 authority-permission mappings (IDs 17-50).
+            ROLE_ADMIN (authority_id=1) gets full access to all modules.
+        </comment>
+
+        <!-- Load authority-permission mappings -->
+        <loadData file="config/liquibase/data/authority_permission_app_modules.csv"
+                  separator=";"
+                  tableName="scr_authority_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="authority_id" type="numeric"/>
+            <column name="permission_id" type="numeric"/>
+        </loadData>
+
+        <rollback>
+            <delete tableName="scr_authority_permission">
+                <where>id BETWEEN 17 AND 50</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -50,6 +50,18 @@
       "codeHelp": "Code must start with ROLE_ followed by uppercase letters and underscores (example: ROLE_MANAGER)",
       "loadingPermissions": "Loading permissions...",
       "noPermissions": "This role has no permissions assigned yet. You can assign permissions from the permissions management page.",
+      "managePermissions": {
+        "button": "Manage Permissions",
+        "title": "Manage Permissions",
+        "search": "Search",
+        "searchPlaceholder": "Search by name or description...",
+        "filterByResource": "Filter by Resource",
+        "allResources": "All resources",
+        "assigned": "Assigned",
+        "loading": "Loading permissions...",
+        "noResults": "No permissions found",
+        "info": "Click on the checkboxes to assign or revoke permissions from this role"
+      },
       "validation": {
         "codePattern": "Code must start with ROLE_ followed by uppercase letters and underscores"
       }

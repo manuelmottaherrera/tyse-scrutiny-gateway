@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Row, Col, Badge, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
@@ -6,10 +6,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { APP_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getAuthority, getAuthorityPermissions } from 'app/shared/reducers/authorization/authority.reducer';
+import ManagePermissionsDialog from './manage-permissions-dialog';
 
 export const AuthorityDetail = () => {
   const dispatch = useAppDispatch();
   const { id } = useParams<'id'>();
+  const [showManagePermissions, setShowManagePermissions] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -22,6 +24,14 @@ export const AuthorityDetail = () => {
   const permissions = useAppSelector(state => state.authority.permissions);
   const loading = useAppSelector(state => state.authority.loading);
   const permissionsLoading = useAppSelector(state => state.authority.permissionsLoading);
+
+  const handleCloseManagePermissions = () => {
+    setShowManagePermissions(false);
+    // Refresh permissions after dialog closes
+    if (id) {
+      dispatch(getAuthorityPermissions(Number(id)));
+    }
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -148,9 +158,21 @@ export const AuthorityDetail = () => {
             )}
           </dl>
         )}
-        <h3 className="mt-4">
-          <Translate contentKey="authorization.authority.permissions">Permissions</Translate>
-        </h3>
+        <div className="d-flex justify-content-between align-items-center mt-4 mb-3">
+          <h3 className="mb-0">
+            <Translate contentKey="authorization.authority.permissions">Permissions</Translate>
+          </h3>
+          <Button
+            color="primary"
+            size="sm"
+            onClick={() => setShowManagePermissions(true)}
+            disabled={authority?.isSystem}
+            data-cy="managePermissionsButton"
+          >
+            <FontAwesomeIcon icon="key" className="me-2" />
+            <Translate contentKey="authorization.authority.managePermissions.button">Manage Permissions</Translate>
+          </Button>
+        </div>
         {permissionsLoading ? (
           <p className="text-muted">
             <FontAwesomeIcon icon="spinner" spin className="me-2" />
@@ -220,6 +242,14 @@ export const AuthorityDetail = () => {
             <Translate contentKey="entity.action.edit">Edit</Translate>
           </span>
         </Button>
+        {authority && (
+          <ManagePermissionsDialog
+            authorityId={authority.id}
+            authorityName={authority.name || ''}
+            isOpen={showManagePermissions}
+            onClose={handleCloseManagePermissions}
+          />
+        )}
       </Col>
     </Row>
   );

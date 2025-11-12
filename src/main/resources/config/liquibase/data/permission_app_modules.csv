@@ -1,0 +1,35 @@
+id;name;resource;action;description;is_active;created_by;created_date
+14;divipol.read;divipol;read;View political division data;true;system;2025-01-01T00:00:00
+15;divipol.create;divipol;create;Create new divipol entries;true;system;2025-01-01T00:00:00
+16;divipol.update;divipol;update;Update divipol information;true;system;2025-01-01T00:00:00
+17;divipol.delete;divipol;delete;Delete divipol entries;true;system;2025-01-01T00:00:00
+18;statistics.read;statistics;read;View electoral statistics;true;system;2025-01-01T00:00:00
+19;statistics.export;statistics;export;Export statistical reports;true;system;2025-01-01T00:00:00
+20;heatmap.read;heatmap;read;View heat map visualizations;true;system;2025-01-01T00:00:00
+21;heatmap.configure;heatmap;configure;Configure heat map parameters;true;system;2025-01-01T00:00:00
+22;votecount.read;votecount;read;View vote counting data;true;system;2025-01-01T00:00:00
+23;votecount.manage;votecount;manage;Manage vote counting process;true;system;2025-01-01T00:00:00
+24;fileupload.read;fileupload;read;View uploaded files;true;system;2025-01-01T00:00:00
+25;fileupload.upload;fileupload;upload;Upload electoral files;true;system;2025-01-01T00:00:00
+26;fileupload.delete;fileupload;delete;Delete uploaded files;true;system;2025-01-01T00:00:00
+27;votingjuries.read;votingjuries;read;View voting juries information;true;system;2025-01-01T00:00:00
+28;votingjuries.manage;votingjuries;manage;Manage voting juries assignments;true;system;2025-01-01T00:00:00
+29;trainings.read;trainings;read;View training programs;true;system;2025-01-01T00:00:00
+30;trainings.enroll;trainings;enroll;Enroll in training programs;true;system;2025-01-01T00:00:00
+31;witnesses.read;witnesses;read;View electoral witnesses data;true;system;2025-01-01T00:00:00
+32;witnesses.manage;witnesses;manage;Manage electoral witnesses;true;system;2025-01-01T00:00:00
+33;analytics.read;analytics;read;View electoral analytics;true;system;2025-01-01T00:00:00
+34;analytics.export;analytics;export;Export analytics reports;true;system;2025-01-01T00:00:00
+35;gateway.read;gateway;read;View gateway routes;true;system;2025-01-01T00:00:00
+36;gateway.manage;gateway;manage;Manage gateway configuration;true;system;2025-01-01T00:00:00
+37;metrics.read;metrics;read;View application metrics;true;system;2025-01-01T00:00:00
+38;health.read;health;read;View application health status;true;system;2025-01-01T00:00:00
+39;configuration.read;configuration;read;View application configuration;true;system;2025-01-01T00:00:00
+40;configuration.update;configuration;update;Update application configuration;true;system;2025-01-01T00:00:00
+41;logs.read;logs;read;View application logs;true;system;2025-01-01T00:00:00
+42;logs.update;logs;update;Update log levels;true;system;2025-01-01T00:00:00
+43;docs.read;docs;read;View API documentation;true;system;2025-01-01T00:00:00
+44;authorization_dashboard.read;authorization_dashboard;read;View authorization dashboard;true;system;2025-01-01T00:00:00
+45;account.settings.read;account;settings.read;View account settings;true;system;2025-01-01T00:00:00
+46;account.settings.update;account;settings.update;Update account settings;true;system;2025-01-01T00:00:00
+47;account.password.update;account;password.update;Change account password;true;system;2025-01-01T00:00:00
