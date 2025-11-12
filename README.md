@@ -1,71 +1,71 @@
 # tyseScrutinyGateway
 
-This application was generated using JHipster 8.11.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v8.11.0](https://www.jhipster.tech/documentation-archive/v8.11.0).
+Esta aplicación fue generada usando JHipster 8.11.0, puedes encontrar documentación y ayuda en [https://www.jhipster.tech/documentation-archive/v8.11.0](https://www.jhipster.tech/documentation-archive/v8.11.0).
 
-This is a "gateway" application intended to be part of a microservice architecture, please refer to the [Doing microservices with JHipster][] page of the documentation for more information.
+Esta es una aplicación "gateway" diseñada para ser parte de una arquitectura de microservicios. Para más información, consulta la página [Doing microservices with JHipster][] de la documentación.
 
-This application is configured for Service Discovery and Configuration with Consul. On launch, it will refuse to start if it is not able to connect to Consul at [http://localhost:8500](http://localhost:8500). For more information, read our documentation on [Service Discovery and Configuration with Consul][].
+Esta aplicación está configurada para Service Discovery y Configuration con Consul. Al iniciar, se negará a arrancar si no puede conectarse a Consul en [http://localhost:8500](http://localhost:8500). Para más información, lee nuestra documentación sobre [Service Discovery and Configuration with Consul][].
 
-## Project Structure
+## Estructura del Proyecto
 
-Node is required for generation and recommended for development. `package.json` is always generated for a better development experience with prettier, commit hooks, scripts and so on.
+Node es requerido para la generación y recomendado para desarrollo. `package.json` siempre se genera para una mejor experiencia de desarrollo con prettier, commit hooks, scripts y más.
 
-In the project root, JHipster generates configuration files for tools like git, prettier, eslint, husky, and others that are well known and you can find references in the web.
+En la raíz del proyecto, JHipster genera archivos de configuración para herramientas como git, prettier, eslint, husky y otras ampliamente conocidas que puedes consultar en la web.
 
-`/src/*` structure follows default Java structure.
+La estructura `/src/*` sigue la estructura estándar de Java.
 
-- `.yo-rc.json` - Yeoman configuration file
-  JHipster configuration is stored in this file at `generator-jhipster` key. You may find `generator-jhipster-*` for specific blueprints configuration.
-- `.yo-resolve` (optional) - Yeoman conflict resolver
-  Allows to use a specific action when conflicts are found skipping prompts for files that matches a pattern. Each line should match `[pattern] [action]` with pattern been a [Minimatch](https://github.com/isaacs/minimatch#minimatch) pattern and action been one of skip (default if omitted) or force. Lines starting with `#` are considered comments and are ignored.
-- `.jhipster/*.json` - JHipster entity configuration files
+- `.yo-rc.json` - Archivo de configuración de Yeoman
+  La configuración de JHipster se almacena en este archivo bajo la clave `generator-jhipster`. Puedes encontrar `generator-jhipster-*` para configuraciones específicas de blueprints.
+- `.yo-resolve` (opcional) - Resolver de conflictos de Yeoman
+  Permite usar una acción específica cuando se encuentran conflictos, omitiendo prompts para archivos que coincidan con un patrón. Cada línea debe coincidir con `[patrón] [acción]` donde patrón es un patrón [Minimatch](https://github.com/isaacs/minimatch#minimatch) y acción es skip (por defecto si se omite) o force. Las líneas que comienzan con `#` se consideran comentarios y se ignoran.
+- `.jhipster/*.json` - Archivos de configuración de entidades JHipster
 
-- `npmw` - wrapper to use locally installed npm.
-  JHipster installs Node and npm locally using the build tool by default. This wrapper makes sure npm is installed locally and uses it avoiding some differences different versions can cause. By using `./npmw` instead of the traditional `npm` you can configure a Node-less environment to develop or test your application.
-- `/src/main/docker` - Docker configurations for the application and services that the application depends on
+- `npmw` - wrapper para usar npm instalado localmente.
+  JHipster instala Node y npm localmente usando la herramienta de compilación por defecto. Este wrapper asegura que npm esté instalado localmente y lo usa evitando diferencias que pueden causar diferentes versiones. Al usar `./npmw` en lugar del tradicional `npm` puedes configurar un entorno sin Node para desarrollar o probar tu aplicación.
+- `/src/main/docker` - Configuraciones Docker para la aplicación y servicios de los que depende
 
-## Database Naming Conventions
+## Convenciones de Nomenclatura de Base de Datos
 
-This project uses the `scr_` prefix for all database tables to ensure portability across different database management systems and avoid conflicts with reserved keywords.
+Este proyecto usa el prefijo `scr_` para todas las tablas de base de datos para asegurar portabilidad entre diferentes sistemas de gestión de bases de datos y evitar conflictos con palabras reservadas.
 
-### Prefix: `scr_`
+### Prefijo: `scr_`
 
-**Meaning:** **Scr**utiny (short for Tyse Scrutiny Gateway)
+**Significado:** **Scr**utiny (abreviación de Tyse Scrutiny Gateway)
 
-**Rationale:**
+**Justificación:**
 
-- **Portability:** The word `user` is a reserved keyword in PostgreSQL, MySQL, Oracle, SQL Server, and H2. Using the `scr_` prefix ensures our schema works seamlessly across all major database systems without requiring quotes, backticks, or brackets.
-- **Namespace Clarity:** All application tables are clearly identified with the `scr_` prefix, making it easy for DBAs to distinguish them from system tables or tables from other applications.
-- **Future-Proof:** If the database is shared with other applications in the future, the prefix prevents table name collisions.
-- **Liquibase Compatibility:** Adheres to Liquibase's philosophy of database-agnostic migrations.
+- **Portabilidad:** La palabra `user` es una palabra reservada en PostgreSQL, MySQL, Oracle, SQL Server y H2. Usar el prefijo `scr_` asegura que nuestro esquema funcione sin problemas en todos los principales sistemas de bases de datos sin requerir comillas, backticks o corchetes.
+- **Claridad de Namespace:** Todas las tablas de la aplicación están claramente identificadas con el prefijo `scr_`, facilitando a los DBAs distinguirlas de tablas del sistema o tablas de otras aplicaciones.
+- **A Prueba de Futuro:** Si la base de datos se comparte con otras aplicaciones en el futuro, el prefijo previene colisiones de nombres de tablas.
+- **Compatibilidad con Liquibase:** Se adhiere a la filosofía de Liquibase de migraciones agnósticas de base de datos.
 
-### Naming Standard
+### Estándar de Nomenclatura
 
-All table names follow this pattern:
+Todos los nombres de tablas siguen este patrón:
 
 ```
-scr_[descriptive_name]
+scr_[nombre_descriptivo]
 ```
 
-**Examples:**
+**Ejemplos:**
 
-- `scr_user` - User accounts
-- `scr_authority` - Roles/authorities
-- `scr_permission` - Granular permissions
-- `scr_user_authority` - User-role assignments
-- `scr_authority_permission` - Role-permission mappings
-- `scr_authority_audit` - Audit log for authority changes
+- `scr_user` - Cuentas de usuario
+- `scr_authority` - Roles/autoridades
+- `scr_permission` - Permisos granulares
+- `scr_user_authority` - Asignaciones usuario-rol
+- `scr_authority_permission` - Mapeos rol-permiso
+- `scr_authority_audit` - Registro de auditoría para cambios de autoridad
 
-**Rules:**
+**Reglas:**
 
-- Use **singular** nouns for table names (e.g., `scr_user`, not `scr_users`)
-- Use **snake_case** for multi-word names (e.g., `scr_user_authority`)
-- Always use lowercase
-- Keep names descriptive but concise
+- Usar sustantivos en **singular** para nombres de tablas (ej., `scr_user`, no `scr_users`)
+- Usar **snake_case** para nombres de múltiples palabras (ej., `scr_user_authority`)
+- Siempre usar minúsculas
+- Mantener nombres descriptivos pero concisos
 
-### Entity Mapping
+### Mapeo de Entidades
 
-In Java entity classes, the `@Table` annotation maps to these prefixed table names:
+En las clases de entidad Java, la anotación `@Table` mapea a estos nombres de tabla con prefijo:
 
 ```java
 @Table("scr_user")
@@ -75,77 +75,77 @@ public class User extends AbstractAuditingEntity<Long> { ... }
 public class Authority extends AbstractAuditingEntity<Long> { ... }
 ```
 
-## Liquibase Database Management
+## Gestión de Base de Datos con Liquibase
 
-This project uses Liquibase for database version control and migration management. Tags enable controlled rollback to specific database states.
+Este proyecto usa Liquibase para control de versiones de base de datos y gestión de migraciones. Los tags permiten rollback controlado a estados específicos de la base de datos.
 
-### Apply Database Changes
+### Aplicar Cambios de Base de Datos
 
-**Apply all pending changesets:**
+**Aplicar todos los changesets pendientes:**
 
 ```bash
 ./mvnw liquibase:update
 ```
 
-This command:
+Este comando:
 
-- ✅ Applies all unapplied changesets from `master.xml`
-- ✅ Creates database tags automatically
-- ✅ Updates the `databasechangelog` tracking table
-- ✅ Safe to run multiple times (idempotent)
+- ✅ Aplica todos los changesets no aplicados desde `master.xml`
+- ✅ Crea tags de base de datos automáticamente
+- ✅ Actualiza la tabla de seguimiento `databasechangelog`
+- ✅ Seguro para ejecutar múltiples veces (idempotente)
 
-### Available Database Tags
+### Tags de Base de Datos Disponibles
 
-Tags are snapshots of the database state at specific points in the migration history:
+Los tags son instantáneas del estado de la base de datos en puntos específicos del historial de migración:
 
-- **`estado-vacio`** - Empty database (no application tables, only Liquibase control tables)
-- **`sistema-autorizacion`** - Complete enterprise authorization system with:
-  - 6 authorization tables (scr_authority, scr_permission, scr_authority_permission, scr_user_authority, scr_user_permission, scr_authority_audit)
-  - Seed data loaded (2 roles, 13 permissions, 16 mappings)
-  - Foreign keys and indexes configured
+- **`estado-vacio`** - Base de datos vacía (sin tablas de aplicación, solo tablas de control de Liquibase)
+- **`sistema-autorizacion`** - Sistema completo de autorización enterprise con:
+  - 6 tablas de autorización (scr_authority, scr_permission, scr_authority_permission, scr_user_authority, scr_user_permission, scr_authority_audit)
+  - Datos semilla cargados (2 roles, 13 permisos, 16 mapeos)
+  - Claves foráneas e índices configurados
 
-### Rollback Commands
+### Comandos de Rollback
 
-**Return to authorization system snapshot:**
+**Volver a la instantánea del sistema de autorización:**
 
 ```bash
 ./mvnw liquibase:rollback -Dliquibase.rollbackTag=sistema-autorizacion
 ```
 
-**Return to empty database (controlled rollback):**
+**Volver a base de datos vacía (rollback controlado):**
 
 ```bash
 ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio
 ```
 
-Rollback will:
+El rollback:
 
-- ✅ Execute rollback changesets in reverse order
-- ✅ Respect foreign key dependencies
-- ✅ Leave Liquibase control tables intact
-- ✅ Maintain migration history for future re-application
+- ✅ Ejecuta changesets de rollback en orden inverso
+- ✅ Respeta dependencias de claves foráneas
+- ✅ Deja intactas las tablas de control de Liquibase
+- ✅ Mantiene el historial de migración para futura re-aplicación
 
-**Complete database wipe (destructive):**
+**Borrado completo de base de datos (destructivo):**
 
 ```bash
 ./mvnw liquibase:dropAll
 ```
 
-⚠️ **Warning:** This will:
+⚠️ **Advertencia:** Esto:
 
-- ❌ Drop ALL database objects directly (no changeset execution)
-- ❌ Remove even Liquibase control tables
-- ❌ Destroy all migration history
-- Use only for complete reset scenarios
+- ❌ Elimina TODOS los objetos de base de datos directamente (sin ejecutar changesets)
+- ❌ Remueve incluso las tablas de control de Liquibase
+- ❌ Destruye todo el historial de migración
+- Usar solo para escenarios de reset completo
 
-### Rollback vs DropAll Comparison
+### Comparación Rollback vs DropAll
 
-| Command                                  | Method                       | Reversible | Keeps History | Recommended         |
-| ---------------------------------------- | ---------------------------- | ---------- | ------------- | ------------------- |
-| `rollback -Dliquibase.rollbackTag=<tag>` | Executes `<rollback>` blocks | ✅ Yes     | ✅ Yes        | ✅ **Preferred**    |
-| `dropAll`                                | Direct DROP statements       | ❌ No      | ❌ No         | ⚠️ Use with caution |
+| Comando                                  | Método                       | Reversible | Mantiene Historial | Recomendado         |
+| ---------------------------------------- | ---------------------------- | ---------- | ------------------ | ------------------- |
+| `rollback -Dliquibase.rollbackTag=<tag>` | Ejecuta bloques `<rollback>` | ✅ Sí      | ✅ Sí              | ✅ **Preferido**    |
+| `dropAll`                                | Statements DROP directos     | ❌ No      | ❌ No              | ⚠️ Usar con cuidado |
 
-**Recommendation:** Always use `rollback` to maintain control and history. Use `dropAll` only when you need a complete reset.
+**Recomendación:** Siempre usar `rollback` para mantener control e historial. Usar `dropAll` solo cuando necesites un reset completo.
 
 ## Sistema de Autorización Enterprise
 
@@ -211,14 +211,14 @@ http://localhost:8080/admin/authorization-dashboard  # Dashboard de métricas
 - Usuario con rol `ROLE_ADMIN`
 - Credenciales por defecto: `admin` / `admin`
 
-**API Documentation:**
+**Documentación de API:**
 
 ```bash
 # Swagger UI
 http://localhost:8080/swagger-ui.html
 
-# API Reference completa
-docs/api/AUTHORIZATION_API_REFERENCE.md
+# Referencia de API completa
+docs/authorization/api/AUTHORIZATION_API_REFERENCE.md
 ```
 
 ### Datos Iniciales
@@ -244,14 +244,14 @@ docs/api/AUTHORIZATION_API_REFERENCE.md
 
 ### Documentación Completa
 
-| Documento                                                          | Descripción                            | Audiencia     |
-| ------------------------------------------------------------------ | -------------------------------------- | ------------- |
-| [Manual de Usuario](docs/user-manual/AUTHORIZATION_ADMIN_GUIDE.md) | Guía completa para administradores     | Admins        |
-| [FAQ](docs/FAQ.md)                                                 | 15 preguntas frecuentes                | Todos         |
-| [Troubleshooting](docs/TROUBLESHOOTING.md)                         | 15 problemas comunes y soluciones      | Soporte       |
-| [Guía de Operaciones](docs/operations/AUTHORIZATION_OPS_GUIDE.md)  | Arquitectura, DB, monitoreo, backup    | SysOps/DevOps |
-| [API Reference](docs/api/AUTHORIZATION_API_REFERENCE.md)           | Especificación completa de endpoints   | Developers    |
-| [Diagramas](docs/diagrams/)                                        | ER, flujo de autorización, componentes | Arquitectos   |
+| Documento                                                                        | Descripción                            | Audiencia     |
+| -------------------------------------------------------------------------------- | -------------------------------------- | ------------- |
+| [Manual de Usuario](docs/authorization/user-manual/AUTHORIZATION_ADMIN_GUIDE.md) | Guía completa para administradores     | Admins        |
+| [FAQ](docs/authorization/FAQ.md)                                                 | 15 preguntas frecuentes                | Todos         |
+| [Troubleshooting](docs/authorization/TROUBLESHOOTING.md)                         | 15 problemas comunes y soluciones      | Soporte       |
+| [Guía de Operaciones](docs/authorization/operations/AUTHORIZATION_OPS_GUIDE.md)  | Arquitectura, DB, monitoreo, backup    | SysOps/DevOps |
+| [Referencia de API](docs/authorization/api/AUTHORIZATION_API_REFERENCE.md)       | Especificación completa de endpoints   | Developers    |
+| [Diagramas](docs/authorization/diagrams/)                                        | ER, flujo de autorización, componentes | Arquitectos   |
 
 ### Testing
 
@@ -318,15 +318,15 @@ erDiagram
     SCR_AUTHORITY ||--o{ SCR_AUTHORITY_AUDIT : audited_by
 ```
 
-Ver diagrama completo en [docs/diagrams/database-er-diagram.md](docs/diagrams/database-er-diagram.md)
+Ver diagrama completo en [docs/authorization/diagrams/database-er-diagram.md](docs/authorization/diagrams/database-er-diagram.md)
 
 **Flujo de Autorización:**
 
-Ver diagramas de secuencia en [docs/diagrams/authorization-flow.md](docs/diagrams/authorization-flow.md)
+Ver diagramas de secuencia en [docs/authorization/diagrams/authorization-flow.md](docs/authorization/diagrams/authorization-flow.md)
 
 **Arquitectura de Componentes:**
 
-Ver diagrama de componentes en [docs/diagrams/component-architecture.md](docs/diagrams/component-architecture.md)
+Ver diagrama de componentes en [docs/authorization/diagrams/component-architecture.md](docs/authorization/diagrams/component-architecture.md)
 
 ### Migración y Rollback
 
@@ -430,11 +430,11 @@ Para extender el sistema de autorización:
 
 **Problemas comunes:**
 
-- Ver [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- Ver [docs/authorization/TROUBLESHOOTING.md](docs/authorization/TROUBLESHOOTING.md)
 
 **Preguntas frecuentes:**
 
-- Ver [docs/FAQ.md](docs/FAQ.md)
+- Ver [docs/authorization/FAQ.md](docs/authorization/FAQ.md)
 
 **Reportar issues:**
 
@@ -443,56 +443,56 @@ Para extender el sistema de autorización:
 
 ---
 
-## Development
+## Desarrollo
 
-### Ports
+### Puertos
 
-This aplication: 8080
+Esta aplicación: 8080
 Micro divipol: 8081
 
-### Doing API-First development using openapi-generator-cli
+### Desarrollo API-First usando openapi-generator-cli
 
-[OpenAPI-Generator]() is configured for this application. You can generate API code from the `src/main/resources/swagger/api.yml` definition file by running:
+[OpenAPI-Generator]() está configurado para esta aplicación. Puedes generar código de API desde el archivo de definición `src/main/resources/swagger/api.yml` ejecutando:
 
 ```bash
 ./mvnw generate-sources
 ```
 
-Then implements the generated delegate classes with `@Service` classes.
+Luego implementa las clases delegadas generadas con clases `@Service`.
 
-To edit the `api.yml` definition file, you can use a tool such as [Swagger-Editor](). Start a local instance of the swagger-editor using docker by running: `docker compose -f src/main/docker/swagger-editor.yml up -d`. The editor will then be reachable at [http://localhost:7742](http://localhost:7742).
+Para editar el archivo de definición `api.yml`, puedes usar una herramienta como [Swagger-Editor](). Inicia una instancia local del swagger-editor usando docker ejecutando: `docker compose -f src/main/docker/swagger-editor.yml up -d`. El editor estará disponible en [http://localhost:7742](http://localhost:7742).
 
-Refer to [Doing API-First development][] for more details.
-The build system will install automatically the recommended version of Node and npm.
+Consulta [Doing API-First development][] para más detalles.
+El sistema de compilación instalará automáticamente la versión recomendada de Node y npm.
 
-We provide a wrapper to launch npm.
-You will only need to run this command when dependencies change in [package.json](package.json).
+Proporcionamos un wrapper para lanzar npm.
+Solo necesitarás ejecutar este comando cuando cambien las dependencias en [package.json](package.json).
 
 ```
 ./npmw install
 ```
 
-We use npm scripts and [Webpack][] as our build system.
+Usamos scripts de npm y [Webpack][] como nuestro sistema de compilación.
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
+Ejecuta los siguientes comandos en dos terminales separadas para crear una experiencia de desarrollo placentera donde tu navegador
+se auto-actualiza cuando los archivos cambian en tu disco duro.
 
 ```
 ./mvnw
 ./npmw start
 ```
 
-Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
-specifying a newer version in [package.json](package.json). You can also run `./npmw update` and `./npmw install` to manage dependencies.
-Add the `help` flag on any command to see how you can use it. For example, `./npmw help update`.
+Npm también se usa para gestionar dependencias CSS y JavaScript usadas en esta aplicación. Puedes actualizar dependencias
+especificando una versión más nueva en [package.json](package.json). También puedes ejecutar `./npmw update` y `./npmw install` para gestionar dependencias.
+Agrega la bandera `help` en cualquier comando para ver cómo usarlo. Por ejemplo, `./npmw help update`.
 
-The `./npmw run` command will list all the scripts available to run for this project.
+El comando `./npmw run` listará todos los scripts disponibles para ejecutar en este proyecto.
 
-### PWA Support
+### Soporte PWA
 
-JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
+JHipster viene con soporte PWA (Progressive Web App), y está desactivado por defecto. Uno de los componentes principales de una PWA es un service worker.
 
-The service worker initialization code is commented out by default. To enable it, uncomment the following code in `src/main/webapp/index.html`:
+El código de inicialización del service worker está comentado por defecto. Para habilitarlo, descomenta el siguiente código en `src/main/webapp/index.html`:
 
 ```html
 <script>
@@ -504,66 +504,66 @@ The service worker initialization code is commented out by default. To enable it
 </script>
 ```
 
-Note: [Workbox](https://developers.google.com/web/tools/workbox/) powers JHipster's service worker. It dynamically generates the `service-worker.js` file.
+Nota: [Workbox](https://developers.google.com/web/tools/workbox/) impulsa el service worker de JHipster. Genera dinámicamente el archivo `service-worker.js`.
 
-### Managing dependencies
+### Gestión de dependencias
 
-For example, to add [Leaflet][] library as a runtime dependency of your application, you would run following command:
+Por ejemplo, para agregar la librería [Leaflet][] como una dependencia de runtime de tu aplicación, ejecutarías el siguiente comando:
 
 ```
 ./npmw install --save --save-exact leaflet
 ```
 
-To benefit from TypeScript type definitions from [DefinitelyTyped][] repository in development, you would run following command:
+Para beneficiarte de las definiciones de tipos TypeScript del repositorio [DefinitelyTyped][] en desarrollo, ejecutarías el siguiente comando:
 
 ```
 ./npmw install --save-dev --save-exact @types/leaflet
 ```
 
-Then you would import the JS and CSS files specified in library's installation instructions so that [Webpack][] knows about them:
-Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
+Luego importarías los archivos JS y CSS especificados en las instrucciones de instalación de la librería para que [Webpack][] los conozca:
+Nota: Todavía quedan algunas otras cosas por hacer para Leaflet que no detallaremos aquí.
 
-For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+Para más instrucciones sobre cómo desarrollar con JHipster, consulta [Using JHipster in development][].
 
-### Code Linting and Formatting
+### Linting y Formateo de Código
 
-This project uses ESLint and Prettier to maintain code quality and consistent formatting.
+Este proyecto usa ESLint y Prettier para mantener la calidad del código y un formateo consistente.
 
-#### Check for linting issues
+#### Verificar problemas de linting
 
 ```bash
 npm run lint
 ```
 
-#### Automatically fix linting issues
+#### Corregir automáticamente problemas de linting
 
 ```bash
 npm run lint:fix
 ```
 
-This command will automatically fix most ESLint and Prettier formatting issues. It's particularly useful when you encounter compilation errors related to code formatting.
+Este comando corregirá automáticamente la mayoría de problemas de formateo de ESLint y Prettier. Es particularmente útil cuando encuentras errores de compilación relacionados con el formateo del código.
 
-#### Check code formatting with Prettier
+#### Verificar formateo de código con Prettier
 
 ```bash
 npm run prettier:check
 ```
 
-#### Format code with Prettier
+#### Formatear código con Prettier
 
 ```bash
 npm run prettier:format
 ```
 
-**Note**: If you encounter compilation errors mentioning `prettier/prettier` or `object-shorthand`, running `npm run lint:fix` will typically resolve them automatically.
+**Nota**: Si encuentras errores de compilación mencionando `prettier/prettier` o `object-shorthand`, ejecutar `npm run lint:fix` típicamente los resolverá automáticamente.
 
-### Styling Guidelines
+### Guías de Estilo
 
-#### Color Variables
+#### Variables de Color
 
-**IMPORTANT**: All SCSS files must use color variables defined in `src/main/webapp/app/_color-variables.scss` instead of hardcoded color values.
+**IMPORTANTE**: Todos los archivos SCSS deben usar variables de color definidas en `src/main/webapp/app/_color-variables.scss` en lugar de valores de color hardcodeados.
 
-❌ **Incorrect** (hardcoded colors):
+❌ **Incorrecto** (colores hardcodeados):
 
 ```scss
 .my-component {
@@ -573,7 +573,7 @@ npm run prettier:format
 }
 ```
 
-✅ **Correct** (using variables):
+✅ **Correcto** (usando variables):
 
 ```scss
 @import '../../color-variables';
@@ -585,46 +585,46 @@ npm run prettier:format
 }
 ```
 
-**Benefits**:
+**Beneficios**:
 
-- Ensures consistent theming across light and dark modes
-- Makes color changes centralized and easier to maintain
-- Improves accessibility and visual consistency
+- Asegura tematización consistente en modos claro y oscuro
+- Hace los cambios de color centralizados y más fáciles de mantener
+- Mejora la accesibilidad y consistencia visual
 
-**Available color categories**:
+**Categorías de colores disponibles**:
 
-- Base colors: `$color-white`, `$color-black`, grays
-- Text colors: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
-- State colors: `$color-danger`, `$color-warning`, `$color-success`
-- Shadow colors: `$color-shadow-*` variants
-- Dark theme colors: `$color-dark-overlay-*` variants
+- Colores base: `$color-white`, `$color-black`, grises
+- Colores de texto: `$color-text-primary`, `$color-text-secondary`, `$color-text-tertiary`
+- Colores de estado: `$color-danger`, `$color-warning`, `$color-success`
+- Colores de sombra: variantes `$color-shadow-*`
+- Colores de tema oscuro: variantes `$color-dark-overlay-*`
 
-See `src/main/webapp/app/_color-variables.scss` for the complete list of available variables.
+Ver `src/main/webapp/app/_color-variables.scss` para la lista completa de variables disponibles.
 
-## Building for production
+## Compilación para producción
 
-### Packaging as jar
+### Empaquetado como jar
 
-To build the final jar and optimize the tyseScrutinyGateway application for production, run:
+Para compilar el jar final y optimizar la aplicación tyseScrutinyGateway para producción, ejecuta:
 
 ```
 ./mvnw -Pprod clean verify
 ```
 
-This will concatenate and minify the client CSS and JavaScript files. It will also modify `index.html` so it references these new files.
-To ensure everything worked, run:
+Esto concatenará y minificará los archivos CSS y JavaScript del cliente. También modificará `index.html` para que haga referencia a estos nuevos archivos.
+Para asegurar que todo funcionó, ejecuta:
 
 ```
 java -jar target/*.jar
 ```
 
-Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
+Luego navega a [http://localhost:8080](http://localhost:8080) en tu navegador.
 
-Refer to [Using JHipster in production][] for more details.
+Consulta [Using JHipster in production][] para más detalles.
 
-### Packaging as war
+### Empaquetado como war
 
-To package your application as a war in order to deploy it to an application server, run:
+Para empaquetar tu aplicación como un war para desplegarla en un servidor de aplicaciones, ejecuta:
 
 ```
 ./mvnw -Pprod,war clean verify
@@ -632,7 +632,7 @@ To package your application as a war in order to deploy it to an application ser
 
 ### JHipster Control Center
 
-JHipster Control Center can help you manage and control your application(s). You can start a local control center server (accessible on http://localhost:7419) with:
+JHipster Control Center puede ayudarte a gestionar y controlar tus aplicaciones. Puedes iniciar un servidor de control center local (accesible en http://localhost:7419) con:
 
 ```
 docker compose -f src/main/docker/jhipster-control-center.yml up
@@ -640,9 +640,9 @@ docker compose -f src/main/docker/jhipster-control-center.yml up
 
 ## Testing
 
-### Spring Boot tests
+### Tests de Spring Boot
 
-To launch your application's tests, run:
+Para lanzar los tests de tu aplicación, ejecuta:
 
 ```
 ./mvnw verify
@@ -650,83 +650,83 @@ To launch your application's tests, run:
 
 ### Gatling
 
-Performance tests are run by [Gatling][] and written in Scala. They're located in [src/test/java/gatling/simulations](src/test/java/gatling/simulations).
+Los tests de rendimiento son ejecutados por [Gatling][] y escritos en Scala. Están ubicados en [src/test/java/gatling/simulations](src/test/java/gatling/simulations).
 
-You can execute all Gatling tests with
+Puedes ejecutar todos los tests de Gatling con
 
 ```
 ./mvnw gatling:test
 ```
 
-### Client tests
+### Tests de Cliente
 
-Unit tests are run by [Jest][]. They're located near components and can be run with:
+Los tests unitarios son ejecutados por [Jest][]. Están ubicados cerca de los componentes y pueden ejecutarse con:
 
 ```
 ./npmw test
 ```
 
-UI end-to-end tests are powered by [Cypress][]. They're located in [src/test/javascript/cypress](src/test/javascript/cypress)
-and can be run by starting Spring Boot in one terminal (`./mvnw spring-boot:run`) and running the tests (`./npmw run e2e`) in a second one.
+Los tests end-to-end de UI son potenciados por [Cypress][]. Están ubicados en [src/test/javascript/cypress](src/test/javascript/cypress)
+y pueden ejecutarse iniciando Spring Boot en una terminal (`./mvnw spring-boot:run`) y ejecutando los tests (`./npmw run e2e`) en una segunda.
 
-#### Lighthouse audits
+#### Auditorías Lighthouse
 
-You can execute automated [Lighthouse audits](https://developers.google.com/web/tools/lighthouse/) with [cypress-audit](https://github.com/mfrachet/cypress-audit) by running `./npmw run e2e:cypress:audits`.
-You should only run the audits when your application is packaged with the production profile.
-The lighthouse report is created in `target/cypress/lhreport.html`
+Puedes ejecutar [auditorías Lighthouse](https://developers.google.com/web/tools/lighthouse/) automatizadas con [cypress-audit](https://github.com/mfrachet/cypress-audit) ejecutando `./npmw run e2e:cypress:audits`.
+Solo deberías ejecutar las auditorías cuando tu aplicación esté empaquetada con el perfil de producción.
+El reporte de lighthouse se crea en `target/cypress/lhreport.html`
 
-## Others
+## Otros
 
-### Code quality using Sonar
+### Calidad de código usando Sonar
 
-Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
+Sonar se usa para analizar la calidad del código. Puedes iniciar un servidor Sonar local (accesible en http://localhost:9001) con:
 
 ```
 docker compose -f src/main/docker/sonar.yml up -d
 ```
 
-Note: we have turned off forced authentication redirect for UI in [src/main/docker/sonar.yml](src/main/docker/sonar.yml) for out of the box experience while trying out SonarQube, for real use cases turn it back on.
+Nota: hemos desactivado el redireccionamiento forzado de autenticación para la UI en [src/main/docker/sonar.yml](src/main/docker/sonar.yml) para una experiencia lista para usar mientras pruebas SonarQube, para casos de uso reales actívalo nuevamente.
 
-You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the maven plugin.
+Puedes ejecutar un análisis de Sonar usando el [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) o usando el plugin de maven.
 
-Then, run a Sonar analysis:
+Luego, ejecuta un análisis de Sonar:
 
 ```
 ./mvnw -Pprod clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
 ```
 
-If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
+Si necesitas re-ejecutar la fase de Sonar, asegúrate de especificar al menos la fase `initialize` ya que las propiedades de Sonar se cargan desde el archivo sonar-project.properties.
 
 ```
 ./mvnw initialize sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
 ```
 
-Additionally, Instead of passing `sonar.password` and `sonar.login` as CLI arguments, these parameters can be configured from [sonar-project.properties](sonar-project.properties) as shown below:
+Adicionalmente, en lugar de pasar `sonar.password` y `sonar.login` como argumentos CLI, estos parámetros pueden configurarse desde [sonar-project.properties](sonar-project.properties) como se muestra a continuación:
 
 ```
 sonar.login=admin
 sonar.password=admin
 ```
 
-For more information, refer to the [Code quality page][].
+Para más información, consulta la [Code quality page][].
 
-### Docker Compose support
+### Soporte Docker Compose
 
-JHipster generates a number of Docker Compose configuration files in the [src/main/docker/](src/main/docker/) folder to launch required third party services.
+JHipster genera varios archivos de configuración Docker Compose en la carpeta [src/main/docker/](src/main/docker/) para lanzar servicios de terceros requeridos.
 
-For example, to start required services in Docker containers, run:
+Por ejemplo, para iniciar los servicios requeridos en contenedores Docker, ejecuta:
 
 ```
 docker compose -f src/main/docker/services.yml up -d
 ```
 
-To stop and remove the containers, run:
+Para detener y remover los contenedores, ejecuta:
 
 ```
 docker compose -f src/main/docker/services.yml down
 ```
 
-[Spring Docker Compose Integration](https://docs.spring.io/spring-boot/reference/features/dev-services.html) is enabled by default. It's possible to disable it in application.yml:
+[Spring Docker Compose Integration](https://docs.spring.io/spring-boot/reference/features/dev-services.html) está habilitado por defecto. Es posible deshabilitarlo en application.yml:
 
 ```yaml
 spring:
@@ -736,46 +736,46 @@ spring:
       enabled: false
 ```
 
-You can also fully dockerize your application and all the services that it depends on.
-To achieve this, first build a Docker image of your app by running:
+También puedes dockerizar completamente tu aplicación y todos los servicios de los que depende.
+Para lograr esto, primero construye una imagen Docker de tu aplicación ejecutando:
 
 ```sh
 npm run java:docker
 ```
 
-Or build a arm64 Docker image when using an arm64 processor os like MacOS with M1 processor family running:
+O construye una imagen Docker arm64 cuando uses un procesador arm64 como MacOS con familia de procesadores M1 ejecutando:
 
 ```sh
 npm run java:docker:arm64
 ```
 
-Then run:
+Luego ejecuta:
 
 ```sh
 docker compose -f src/main/docker/app.yml up -d
 ```
 
-For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
+Para más información consulta [Using Docker and Docker-Compose][], esta página también contiene información sobre el sub-generador Docker Compose (`jhipster docker-compose`), que puede generar configuraciones Docker para una o varias aplicaciones JHipster.
 
-#### Email Testing with MailHog
+#### Testing de Email con MailHog
 
-For **local development**, the application uses MailHog (or MailDev) running on `localhost:1025` to capture emails. To start MailHog locally:
+Para **desarrollo local**, la aplicación usa MailHog (o MailDev) corriendo en `localhost:1025` para capturar emails. Para iniciar MailHog localmente:
 
 ```bash
 docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog:v1.0.1
 ```
 
-Access the MailHog web interface at [http://localhost:8025](http://localhost:8025) to view captured emails.
+Accede a la interfaz web de MailHog en [http://localhost:8025](http://localhost:8025) para ver los emails capturados.
 
-For **staging environment**, MailHog is already configured in the Docker Compose setup. Users with VPN access can view emails at:
+Para **entorno de staging**, MailHog ya está configurado en el setup de Docker Compose. Los usuarios con acceso VPN pueden ver los emails en:
 
-- **Staging URL**: `192.168.0.58:8035` (via browser with VPN)
+- **URL de Staging**: `192.168.0.58:8035` (vía navegador con VPN)
 
-All emails sent by the application (user activation, password reset, etc.) are automatically captured and can be viewed through this interface. No real email server or credentials are required.
+Todos los emails enviados por la aplicación (activación de usuario, reset de contraseña, etc.) son automáticamente capturados y pueden verse a través de esta interfaz. No se requiere servidor de email real ni credenciales.
 
-## Continuous Integration (optional)
+## Integración Continua (opcional)
 
-To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
+Para configurar CI para tu proyecto, ejecuta el sub-generador ci-cd (`jhipster ci-cd`), esto te permitirá generar archivos de configuración para varios sistemas de Integración Continua. Consulta la página [Setting up Continuous Integration][] para más información.
 
 [JHipster Homepage and latest documentation]: https://www.jhipster.tech
 [JHipster 8.11.0 archive]: https://www.jhipster.tech/documentation-archive/v8.11.0
