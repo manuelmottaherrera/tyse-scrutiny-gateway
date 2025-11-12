@@ -417,3 +417,81 @@ jhipster entity <entity-name>
 ```
 
 This generates backend (domain, repository, service, REST) and frontend (React components, reducers).
+
+## Git Push con Validación CI
+
+### Problema con Pre-push Hooks
+
+Los hooks de git tienen limitaciones de tiempo debido a timeouts de SSH (~5-7 minutos). Ejecutar CI completo (con E2E) en un pre-push hook causaba:
+
+- Timeout de SSH ("Connection to github.com closed by remote host")
+- Push incompleto o bloqueado
+- Experiencia de desarrollo frustrante
+
+### Solución: Script `push.sh`
+
+El pre-push hook ha sido **desactivado**. En su lugar, usa el script `push.sh` que:
+
+1. ✅ Ejecuta CI completo (backend + frontend + E2E) ANTES de abrir conexión SSH
+2. ✅ Solo hace `git push` si todos los tests pasan
+3. ✅ No tiene timeout porque CI y push son operaciones separadas
+
+**Uso básico:**
+
+```bash
+# Push con validación CI completa (recomendado)
+./scripts/push.sh
+
+# Push a rama específica
+./scripts/push.sh origin develop
+
+# Push sin CI (no recomendado)
+./scripts/push.sh --skip-ci
+```
+
+**Flujo de trabajo:**
+
+```
+./scripts/push.sh
+  ↓
+[Pre-flight] Limpia ambiente CI (~2s)
+  ↓
+[Job 1/3] Backend tests (~1-2 min)
+  ↓
+[Job 2/3] Frontend tests (~2-3 min)
+  ↓
+[Job 3/3] E2E tests (~2-3 min)
+  ↓
+[Post-flight] Limpia procesos (~1s)
+  ↓
+✅ CI Passed
+  ↓
+git push origin develop
+  ↓
+✅ Push exitoso (sin timeout!)
+```
+
+**Validación manual sin push:**
+
+```bash
+# Solo backend + frontend (rápido)
+./scripts/ci-local.sh
+
+# Backend + frontend + E2E (completo)
+./scripts/ci-local.sh --with-e2e
+```
+
+**Push directo sin validación:**
+
+```bash
+# Solo si estás 100% seguro (no recomendado)
+git push origin develop
+```
+
+**Ventajas:**
+
+- ✅ No hay timeout de SSH
+- ✅ CI completo con E2E tests
+- ✅ Control total sobre cuándo validar
+- ✅ Feedback claro de errores antes del push
+- ✅ Opción de skip para emergencias
