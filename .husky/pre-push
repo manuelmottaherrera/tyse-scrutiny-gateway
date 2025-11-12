@@ -1,11 +1,13 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/bash
 
 ################################################################################
-# Pre-push Hook
+# Pre-push Hook (Husky v9)
 #
 # Este hook ejecuta el CI local completo (con E2E) antes de permitir push a main/develop
 # Solo permite el push si todos los tests pasan exitosamente.
+#
+# IMPORTANTE: Redirige stdin desde /dev/null para evitar que el script
+# consuma el stdin de git, lo cual causaría que el push falle silenciosamente.
 ################################################################################
 
 # Colors
@@ -31,7 +33,8 @@ if [ "$current_branch" = "main" ] || [ "$current_branch" = "develop" ]; then
     echo ""
 
     # Run the CI script WITH E2E tests (complete validation)
-    if ./scripts/ci-local.sh --with-e2e; then
+    # Redirect stdin from /dev/null to prevent consuming git's stdin
+    if ./scripts/ci-local.sh --with-e2e </dev/null; then
         echo ""
         echo -e "${GREEN}✅ Pre-push validation passed!${NC}"
         echo -e "${GREEN}Proceeding with push to ${current_branch}...${NC}"
@@ -59,3 +62,6 @@ else
     echo -e "${BLUE}Pre-push CI validation is only enforced for main/develop${NC}"
     echo ""
 fi
+
+# Ensure proper exit for branches other than main/develop
+exit 0

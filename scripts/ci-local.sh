@@ -6,6 +6,13 @@
 # Este script replica localmente el workflow "Gateway - CI Pipeline" (ci.yml)
 # Ejecuta los mismos comandos que se ejecutan en GitHub Actions.
 #
+# IMPORTANTE: Este script limpia el ambiente CI antes de ejecutar los tests
+# para garantizar condiciones iniciales consistentes. Esto incluye:
+#   - Eliminar directorio target/
+#   - Limpiar cachés de node_modules y webpack
+#   - Detener contenedores Docker de ejecuciones anteriores
+#   - Matar procesos Java/Node remanentes en puertos 8080/9000
+#
 # Uso:
 #   ./scripts/ci-local.sh [--with-e2e]
 #
@@ -37,10 +44,67 @@ echo -e "${BLUE}================================${NC}"
 echo ""
 
 ################################################################################
+# Pre-flight: Clean Environment
+################################################################################
+
+echo -e "${YELLOW}[Pre-flight] Cleaning CI environment...${NC}"
+CLEAN_START=$(date +%s)
+
+# 1. Detener y limpiar contenedores Docker de ejecuciones anteriores
+echo "  → Stopping and removing Docker containers from previous runs..."
+docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
+
+# 2. Limpiar directorio target/ (artefactos de Maven)
+if [ -d "target/" ]; then
+    echo "  → Removing target/ directory..."
+    rm -rf target/
+fi
+
+# 3. Limpiar cachés de node_modules (webpack, babel, etc.)
+if [ -d "node_modules/.cache" ]; then
+    echo "  → Removing node_modules/.cache/..."
+    rm -rf node_modules/.cache/
+fi
+
+# 4. Limpiar cachés de Cypress
+if [ -d "$HOME/.cache/Cypress/cy" ]; then
+    echo "  → Removing Cypress runtime cache..."
+    rm -rf "$HOME/.cache/Cypress/cy" || true
+fi
+
+# 5. Limpiar archivos temporales de build
+echo "  → Removing temporary build files..."
+rm -rf .tsbuildinfo 2>/dev/null || true
+rm -rf build/ 2>/dev/null || true
+
+# 6. Matar procesos Java remanentes (del puerto 8080)
+JAVA_PID=$(lsof -ti:8080 2>/dev/null || true)
+if [ -n "$JAVA_PID" ]; then
+    echo "  → Killing Java process on port 8080 (PID: $JAVA_PID)..."
+    kill -9 $JAVA_PID 2>/dev/null || true
+    sleep 2
+fi
+
+# 7. Matar procesos Node remanentes (del puerto 9000 - webpack dev server)
+NODE_PID=$(lsof -ti:9000 2>/dev/null || true)
+if [ -n "$NODE_PID" ]; then
+    echo "  → Killing Node process on port 9000 (PID: $NODE_PID)..."
+    kill -9 $NODE_PID 2>/dev/null || true
+    sleep 2
+fi
+
+CLEAN_END=$(date +%s)
+CLEAN_TIME=$((CLEAN_END - CLEAN_START))
+
+echo -e "${GREEN}✓ Environment cleaned${NC} (${CLEAN_TIME}s)"
+echo ""
+
+################################################################################
 # Job 1: Backend Tests
 ################################################################################
 
-echo -e "${YELLOW}[1/3] Starting Backend Tests...${NC}"
+echo -e "${YELLOW}[Job 1/3] Starting Backend Tests...${NC}"
 BACKEND_START=$(date +%s)
 
 echo "  → Running Maven verify with error-level logging..."
@@ -68,7 +132,7 @@ echo ""
 # Job 2: Frontend Tests
 ################################################################################
 
-echo -e "${YELLOW}[2/3] Starting Frontend Tests...${NC}"
+echo -e "${YELLOW}[Job 2/3] Starting Frontend Tests...${NC}"
 FRONTEND_START=$(date +%s)
 
 echo "  → Installing dependencies..."
@@ -104,7 +168,7 @@ echo ""
 
 E2E_TIME=0
 if [ "$RUN_E2E" = true ]; then
-    echo -e "${YELLOW}[3/3] Starting E2E Tests...${NC}"
+    echo -e "${YELLOW}[Job 3/3] Starting E2E Tests...${NC}"
     E2E_START=$(date +%s)
 
     echo "  → Building E2E package..."
@@ -137,7 +201,7 @@ if [ "$RUN_E2E" = true ]; then
     fi
     echo ""
 else
-    echo -e "${BLUE}[3/3] E2E Tests skipped${NC} (use --with-e2e to run)"
+    echo -e "${BLUE}[Job 3/3] E2E Tests skipped${NC} (use --with-e2e to run)"
     echo ""
 fi
 
@@ -171,14 +235,31 @@ echo -e "${GREEN}✅ CI Pipeline Passed${NC}"
 echo -e "${GREEN}================================${NC}"
 echo ""
 echo "Timing Summary:"
-echo "  Backend Tests:   ${BACKEND_TIME}s"
-echo "  Frontend Tests:  ${FRONTEND_TIME}s"
+echo "  Environment Cleanup: ${CLEAN_TIME}s"
+echo "  Backend Tests:       ${BACKEND_TIME}s"
+echo "  Frontend Tests:      ${FRONTEND_TIME}s"
 if [ "$RUN_E2E" = true ]; then
-    echo "  E2E Tests:       ${E2E_TIME}s"
+    echo "  E2E Tests:           ${E2E_TIME}s"
 fi
-echo "  ─────────────────────"
-echo "  Total:           ${TOTAL_TIME}s"
+echo "  ─────────────────────────────"
+echo "  Total:               ${TOTAL_TIME}s"
 echo ""
 echo "All checks passed! ✓"
 echo "The code is ready to be pushed to GitHub."
 echo ""
+
+################################################################################
+# Post-flight: Cleanup Background Processes
+################################################################################
+
+# Wait for any background jobs to finish
+wait
+
+# Ensure no orphaned Java processes are running
+JAVA_PID=$(lsof -ti:8080 2>/dev/null || true)
+if [ -n "$JAVA_PID" ]; then
+    kill -9 $JAVA_PID 2>/dev/null || true
+fi
+
+# Explicit exit to ensure proper return to calling process (git push hook)
+exit 0
