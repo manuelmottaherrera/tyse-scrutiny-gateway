@@ -17,16 +17,16 @@ Esta carpeta contiene toda la documentación relacionada con el **Sistema de Aut
 ### Para Administradores del Sistema
 
 - **[Manual de Usuario](user-manual/AUTHORIZATION_ADMIN_GUIDE.md)** - Guía completa para gestionar roles, permisos y usuarios
-- **[FAQ](FAQ.md)** - Preguntas frecuentes sobre el sistema de autorización
-- **[Troubleshooting](TROUBLESHOOTING.md)** - Solución de problemas comunes
+- **[Preguntas Frecuentes](FAQ.md)** - Dudas comunes sobre el sistema de autorización
+- **[Solución de Problemas](TROUBLESHOOTING.md)** - Guía de troubleshooting y resolución de errores
 
 ### Para Ingenieros de Operaciones (DevOps/SRE)
 
-- **[Guía de Operaciones](operations/AUTHORIZATION_OPS_GUIDE.md)** - Despliegue, monitoreo, backup, escalabilidad
+- **[Guía de Operaciones](operations/AUTHORIZATION_OPS_GUIDE.md)** - Despliegue, monitoreo, respaldos y escalabilidad
 
 ### Para Desarrolladores
 
-- **[API Reference](api/AUTHORIZATION_API_REFERENCE.md)** - Documentación completa de todos los endpoints REST
+- **[Referencia de API](api/AUTHORIZATION_API_REFERENCE.md)** - Documentación completa de todos los endpoints REST
 - **[Permisos de Módulos de Aplicación](api/APP_MODULES_PERMISSIONS.md)** - API específica de permisos por módulos
 
 ### Diagramas Técnicos
@@ -64,12 +64,12 @@ docs/authorization/
 ### Como Administrador
 
 1. Leer el **[Manual de Usuario](user-manual/AUTHORIZATION_ADMIN_GUIDE.md)** (sección 1: Introducción)
-2. Acceder al dashboard: `/admin/authorization-dashboard`
-3. Consultar **[FAQ](FAQ.md)** para conceptos clave
+2. Acceder al tablero: `/admin/authorization-dashboard`
+3. Consultar **[Preguntas Frecuentes](FAQ.md)** para conceptos clave
 
 ### Como Desarrollador
 
-1. Revisar **[API Reference](api/AUTHORIZATION_API_REFERENCE.md)** para conocer los endpoints disponibles
+1. Revisar **[Referencia de API](api/AUTHORIZATION_API_REFERENCE.md)** para conocer los endpoints disponibles
 2. Estudiar **[Arquitectura de Componentes](diagrams/component-architecture.md)** para entender la estructura
 3. Ver **[Diagrama ER](diagrams/database-er-diagram.md)** para comprender el modelo de datos
 
@@ -77,7 +77,7 @@ docs/authorization/
 
 1. Leer **[Guía de Operaciones](operations/AUTHORIZATION_OPS_GUIDE.md)** completa
 2. Configurar monitoreo siguiendo sección 4: Monitoreo y Métricas
-3. Establecer backup siguiendo sección 6: Backup y Restore
+3. Establecer respaldos siguiendo sección 6: Respaldos y Restauración
 
 ---
 
@@ -88,9 +88,9 @@ docs/authorization/
 ✅ **Asignaciones Temporales** - Roles con expiración automática
 ✅ **Permisos Directos** - Bypass de roles para casos excepcionales
 ✅ **Auditoría Completa** - Trazabilidad total de cambios con IP, User-Agent, timestamps
-✅ **Dashboard Interactivo** - Métricas en tiempo real, alertas de expiración
+✅ **Tablero Interactivo** - Métricas en tiempo real, alertas de expiración
 ✅ **Roles de Sistema Protegidos** - ROLE_ADMIN y ROLE_USER no modificables
-✅ **Cleanup Automático** - Job programado para roles expirados
+✅ **Limpieza Automática** - Tarea programada para roles expirados
 
 ---
 
@@ -98,16 +98,16 @@ docs/authorization/
 
 **Backend:**
 
-- Spring Boot 3.4.5 con Spring WebFlux (reactive)
-- Spring Security con JWT authentication
+- Spring Boot 3.4.5 con Spring WebFlux (reactivo)
+- Spring Security con autenticación JWT
 - R2DBC para acceso reactivo a PostgreSQL
-- Liquibase para migraciones de BD
+- Liquibase para migraciones de base de datos
 
 **Frontend:**
 
 - React 18 con TypeScript
 - Redux Toolkit para gestión de estado
-- Recharts para visualizaciones
+- Recharts para gráficos y visualizaciones
 
 **Base de Datos:**
 
@@ -119,12 +119,12 @@ docs/authorization/
 
 **Para reportar problemas:**
 
-- Crear issue en el repositorio del proyecto
+- Crear incidencia en el repositorio del proyecto
 - Etiqueta: `authorization`
 
 **Documentación adicional:**
 
-- Ver carpeta `docs/ci-cd/` para CI/CD general del proyecto
+- Ver carpeta `docs/ci-cd/` para integración y despliegue continuo del proyecto
 - Consultar `CLAUDE.md` en raíz del proyecto para guías de desarrollo
 
 ---
