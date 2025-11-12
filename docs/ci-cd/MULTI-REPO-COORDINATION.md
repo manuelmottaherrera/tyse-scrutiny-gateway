@@ -1,276 +1,276 @@
-# Multi-Repository Coordination Guide
+# Guía de Coordinación Multi-Repositorio
 
-This document explains how the two separate repositories (Gateway and Divipol) work together in the CI/CD pipeline.
+Este documento explica cómo los dos repositorios separados (Gateway y Divipol) trabajan juntos en el pipeline CI/CD.
 
-## Repository Architecture
+## Arquitectura de Repositorios
 
-### Why Two Repositories?
+### ¿Por Qué Dos Repositorios?
 
-Tyse Scrutiny uses a **multi-repository** architecture where each microservice is independently developed and versioned:
+Tyse Scrutiny usa una arquitectura **multi-repositorio** donde cada microservicio se desarrolla y versiona de forma independiente:
 
-**Benefits**:
+**Beneficios**:
 
-- ✅ Independent versioning and release cycles
-- ✅ Smaller codebase per repository (easier to navigate)
-- ✅ Independent CI pipelines (faster feedback)
-- ✅ Clear ownership and responsibilities
-- ✅ Flexibility to deploy services independently
+- ✅ Versionado independiente y ciclos de release
+- ✅ Código base más pequeño por repositorio (más fácil de navegar)
+- ✅ Pipelines CI independientes (feedback más rápido)
+- ✅ Propiedad y responsabilidades claras
+- ✅ Flexibilidad para desplegar servicios independientemente
 
-**Trade-offs**:
+**Compromisos**:
 
-- ⚠️ Deployment requires coordination
-- ⚠️ Need to manage versions across repositories
-- ⚠️ Shared infrastructure managed by Gateway
+- ⚠️ El despliegue requiere coordinación
+- ⚠️ Necesidad de gestionar versiones entre repositorios
+- ⚠️ Infraestructura compartida gestionada por Gateway
 
 ---
 
-## Repository Responsibilities
+## Responsabilidades de los Repositorios
 
-### Gateway Repository
+### Repositorio Gateway
 
-**Location**: `github.com/manuelmottaherrera/tyse-scrutiny-gateway`
+**Ubicación**: `github.com/manuelmottaherrera/tyse-scrutiny-gateway`
 
-**Owns**:
+**Posee**:
 
-- React frontend application
-- Spring Boot Gateway backend
-- API Gateway routing configuration
-- User authentication and management
-- **Shared infrastructure** (Consul, Kafka, Zookeeper)
-- **Deployment orchestration** for all services
+- Aplicación frontend React
+- Backend Spring Boot Gateway
+- Configuración de enrutamiento del API Gateway
+- Autenticación y gestión de usuarios
+- **Infraestructura compartida** (Consul, Kafka, Zookeeper)
+- **Orquestación de despliegue** para todos los servicios
 
 **CI/CD**:
 
 - Tests: Backend + Frontend + E2E
-- Builds: Gateway Docker image
-- Deploys: Both Gateway and Divipol services
+- Construye: Imagen Docker de Gateway
+- Despliega: Ambos servicios Gateway y Divipol
 
-### Divipol Repository
+### Repositorio Divipol
 
-**Location**: `github.com/manuelmottaherrera/tyse-scrutiny-micro-divipol`
+**Ubicación**: `github.com/manuelmottaherrera/tyse-scrutiny-micro-divipol`
 
-**Owns**:
+**Posee**:
 
-- Spring Boot microservice
-- Division política data (18,016 records)
-- Geolocation services
-- API endpoints for Colombian geographic data
+- Microservicio Spring Boot
+- Datos de división política (18,016 registros)
+- Servicios de geolocalización
+- Endpoints API para datos geográficos de Colombia
 
 **CI/CD**:
 
-- Tests: Backend only
-- Builds: Divipol Docker image
-- Deploys: **No deployment workflow** (handled by Gateway)
+- Tests: Solo backend
+- Construye: Imagen Docker de Divipol
+- Despliega: **Sin workflow de despliegue** (manejado por Gateway)
 
 ---
 
-## CI/CD Coordination Strategy
+## Estrategia de Coordinación CI/CD
 
-### Independent Build, Coordinated Deploy
+### Construcción Independiente, Despliegue Coordinado
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                    INDEPENDENT CI/BUILD                           │
+│                    CI/BUILD INDEPENDIENTE                         │
 └──────────────────────────────────────────────────────────────────┘
 
-Gateway Repo                          Divipol Repo
-─────────────                         ────────────
-Developer Push                        Developer Push
+Repo Gateway                          Repo Divipol
+────────────                          ────────────
+Push del Desarrollador                Push del Desarrollador
      ↓                                     ↓
 CI (15 min)                           CI (10 min)
-  - Backend Tests                       - Backend Tests
-  - Frontend Tests                      - Quality Gate
-  - E2E Tests
+  - Tests Backend                       - Tests Backend
+  - Tests Frontend                      - Quality Gate
+  - Tests E2E
      ↓                                     ↓
 Build (5 min)                         Build (5 min)
-  - Maven JAR                            - Maven JAR
-  - Docker Image                         - Docker Image
+  - JAR Maven                            - JAR Maven
+  - Imagen Docker                        - Imagen Docker
      ↓                                     ↓
-Push to GHCR                          Push to GHCR
+Push a GHCR                           Push a GHCR
   ghcr.io/.../gateway:develop           ghcr.io/.../divipol:develop
 
 ┌──────────────────────────────────────────────────────────────────┐
-│                    COORDINATED DEPLOYMENT                         │
+│                    DESPLIEGUE COORDINADO                          │
 └──────────────────────────────────────────────────────────────────┘
 
-               Manual Trigger (from Gateway repo)
+            Disparador Manual (desde repo Gateway)
                               ↓
-                 Pull BOTH Docker Images
+              Descargar AMBAS Imágenes Docker
                    (Gateway + Divipol)
                               ↓
-                    Deploy to Server
-                  (Docker Compose Stack)
+                  Desplegar en el Servidor
+                  (Stack Docker Compose)
                               ↓
-                     Health Checks
-                (Verify both services)
+                  Verificaciones de Salud
+                (Verificar ambos servicios)
                               ↓
-                       ✅ Success
+                       ✅ Éxito
 ```
 
 ---
 
-## Deployment Coordination
+## Coordinación de Despliegue
 
-### How It Works
+### Cómo Funciona
 
-The **Gateway repository** contains the `deploy-staging.yml` workflow that:
+El **repositorio Gateway** contiene el workflow `deploy-staging.yml` que:
 
-1. Accepts two parameters:
+1. Acepta dos parámetros:
 
-   - `gateway_tag`: Which Gateway image to deploy
-   - `divipol_tag`: Which Divipol image to deploy
+   - `gateway_tag`: Qué imagen de Gateway desplegar
+   - `divipol_tag`: Qué imagen de Divipol desplegar
 
-2. Pulls both images from GitHub Container Registry
+2. Descarga ambas imágenes desde GitHub Container Registry
 
-3. Updates the deployment configuration
+3. Actualiza la configuración del despliegue
 
-4. Deploys the complete stack (Gateway + Divipol + Infrastructure)
+4. Despliega el stack completo (Gateway + Divipol + Infraestructura)
 
-5. Verifies both services are healthy
+5. Verifica que ambos servicios estén saludables
 
-### Why Gateway Handles Deployment?
+### ¿Por Qué Gateway Maneja el Despliegue?
 
-The Gateway repository manages deployment because:
+El repositorio Gateway gestiona el despliegue porque:
 
-- It owns the shared infrastructure (Consul, Kafka)
-- It has the docker-compose orchestration file
-- It needs to ensure all services start in the correct order
-- It provides the deployment scripts and health checks
+- Posee la infraestructura compartida (Consul, Kafka)
+- Tiene el archivo de orquestación docker-compose
+- Necesita asegurar que todos los servicios inicien en el orden correcto
+- Proporciona los scripts de despliegue y verificaciones de salud
 
 ---
 
-## Working Across Repositories
+## Trabajando Entre Repositorios
 
-### Scenario 1: Feature in Single Repository
+### Escenario 1: Feature en un Solo Repositorio
 
-**Example**: Adding a new dashboard widget to Gateway
+**Ejemplo**: Agregando un nuevo widget de dashboard a Gateway
 
 ```bash
-# 1. Work in Gateway repo
+# 1. Trabajar en el repo Gateway
 cd tyse-scrutiny-gateway
 git checkout -b feature/dashboard-widget
 
-# 2. Develop, test, commit
+# 2. Desarrollar, probar, commit
 git add .
 git commit -m "feat(dashboard): add new metrics widget"
 git push origin feature/dashboard-widget
 
-# 3. Create PR to develop
-# CI runs automatically
+# 3. Crear PR a develop
+# CI se ejecuta automáticamente
 
-# 4. After merge to develop
-# Build creates new image: ghcr.io/.../gateway:develop
+# 4. Después del merge a develop
+# Build crea nueva imagen: ghcr.io/.../gateway:develop
 
-# 5. Deploy
-# Go to Actions → Deploy to Staging → Run workflow
+# 5. Desplegar
+# Ir a Actions → Deploy to Staging → Run workflow
 # gateway_tag: develop
-# divipol_tag: develop (unchanged)
+# divipol_tag: develop (sin cambios)
 ```
 
-### Scenario 2: Feature Spanning Both Repositories
+### Escenario 2: Feature que Abarca Ambos Repositorios
 
-**Example**: Gateway needs to call new Divipol endpoint
+**Ejemplo**: Gateway necesita llamar a un nuevo endpoint de Divipol
 
-#### Step 1: Develop Divipol Endpoint
+#### Paso 1: Desarrollar Endpoint de Divipol
 
 ```bash
 cd tyse-scrutiny-micro-divipol
 git checkout -b feature/new-geo-endpoint
 
-# Implement endpoint
-# Write tests
+# Implementar endpoint
+# Escribir tests
 git commit -m "feat(geo): add municipality search endpoint"
 git push origin feature/new-geo-endpoint
 
-# Create PR, merge to develop
-# Build creates: ghcr.io/.../divipol:develop
+# Crear PR, mergear a develop
+# Build crea: ghcr.io/.../divipol:develop
 ```
 
-#### Step 2: Develop Gateway Integration
+#### Paso 2: Desarrollar Integración en Gateway
 
 ```bash
 cd tyse-scrutiny-gateway
 git checkout -b feature/use-new-geo-endpoint
 
-# Update service to call new Divipol endpoint
-# Write tests
+# Actualizar servicio para llamar al nuevo endpoint de Divipol
+# Escribir tests
 git commit -m "feat(geo): integrate municipality search"
 git push origin feature/use-new-geo-endpoint
 
-# Create PR, merge to develop
-# Build creates: ghcr.io/.../gateway:develop
+# Crear PR, mergear a develop
+# Build crea: ghcr.io/.../gateway:develop
 ```
 
-#### Step 3: Deploy Both
+#### Paso 3: Desplegar Ambos
 
 ```bash
-# Both images are now ready
-# Deploy from Gateway repo:
+# Ambas imágenes están listas
+# Desplegar desde el repo Gateway:
 # Actions → Deploy to Staging → Run workflow
 # gateway_tag: develop
 # divipol_tag: develop
 ```
 
-### Scenario 3: Hotfix in Production
+### Escenario 3: Hotfix en Producción
 
-**Example**: Critical bug in Divipol, Gateway is stable
+**Ejemplo**: Bug crítico en Divipol, Gateway está estable
 
 ```bash
-# 1. Fix bug in Divipol
+# 1. Corregir bug en Divipol
 cd tyse-scrutiny-micro-divipol
 git checkout -b hotfix/critical-bug
-# Fix, test, commit
+# Corregir, probar, commit
 git push origin hotfix/critical-bug
 
-# Merge to main
-# Build creates: ghcr.io/.../divipol:main
+# Mergear a main
+# Build crea: ghcr.io/.../divipol:main
 
-# 2. Deploy ONLY Divipol update
+# 2. Desplegar SOLO actualización de Divipol
 cd tyse-scrutiny-gateway
 # Actions → Deploy to Staging → Run workflow
-# gateway_tag: main (unchanged)
-# divipol_tag: main (updated)
+# gateway_tag: main (sin cambios)
+# divipol_tag: main (actualizado)
 ```
 
 ---
 
-## Version Management
+## Gestión de Versiones
 
-### Image Tagging Strategy
+### Estrategia de Etiquetado de Imágenes
 
-Both repositories use the same tagging strategy:
+Ambos repositorios usan la misma estrategia de etiquetado:
 
-| Trigger           | Tags Created                        | Example           |
-| ----------------- | ----------------------------------- | ----------------- |
-| Push to `develop` | `develop`, `develop-sha-abc123`     | Deploy staging    |
-| Push to `main`    | `main`, `main-sha-abc123`, `latest` | Deploy production |
-| Tag `v1.2.3`      | `v1.2.3`, `1.2`, `latest`           | Semantic release  |
+| Disparador       | Tags Creados                        | Ejemplo              |
+| ---------------- | ----------------------------------- | -------------------- |
+| Push a `develop` | `develop`, `develop-sha-abc123`     | Desplegar staging    |
+| Push a `main`    | `main`, `main-sha-abc123`, `latest` | Desplegar producción |
+| Tag `v1.2.3`     | `v1.2.3`, `1.2`, `latest`           | Release semántico    |
 
-### Tracking Deployed Versions
+### Rastreo de Versiones Desplegadas
 
-#### Option 1: Environment File
+#### Opción 1: Archivo de Entorno
 
-On the server, `.env.staging` tracks current versions:
+En el servidor, `.env.staging` rastrea las versiones actuales:
 
 ```bash
 IMAGE_TAG_GATEWAY=develop-sha-abc123
 IMAGE_TAG_DIVIPOL=develop-sha-def456
 ```
 
-#### Option 2: Docker Inspect
+#### Opción 2: Docker Inspect
 
 ```bash
-# SSH to server
-ssh your-user@your-server
+# SSH al servidor
+ssh tu-usuario@tu-servidor
 
-# Check current images
+# Verificar imágenes actuales
 docker inspect tyse-gateway-staging | grep Image
 docker inspect tyse-divipol-staging | grep Image
 ```
 
-#### Option 3: Deployment Logs
+#### Opción 3: Logs de Despliegue
 
-GitHub Actions deployment logs show which versions were deployed:
+Los logs de despliegue de GitHub Actions muestran qué versiones fueron desplegadas:
 
 ```
 Gateway → Actions → Deploy to Staging → Latest run
@@ -278,44 +278,44 @@ Gateway → Actions → Deploy to Staging → Latest run
 
 ---
 
-## Dependency Management
+## Gestión de Dependencias
 
-### Breaking Changes
+### Cambios Incompatibles (Breaking Changes)
 
-When Divipol introduces a **breaking API change**:
+Cuando Divipol introduce un **cambio incompatible en la API**:
 
-1. **Version the API** (e.g., `/api/v2/municipalities`)
-2. **Keep old endpoint** temporarily for backward compatibility
-3. **Update Gateway** to use new endpoint
-4. **Deploy both** simultaneously
-5. **Deprecate old endpoint** after Gateway is updated
+1. **Versionar la API** (ej: `/api/v2/municipalities`)
+2. **Mantener endpoint antiguo** temporalmente para compatibilidad hacia atrás
+3. **Actualizar Gateway** para usar el nuevo endpoint
+4. **Desplegar ambos** simultáneamente
+5. **Deprecar endpoint antiguo** después de actualizar Gateway
 
-### Database Migrations
+### Migraciones de Base de Datos
 
-#### Gateway Database
+#### Base de Datos Gateway
 
-- Managed by Gateway repository
-- Liquibase changelog in `tyse-scrutiny-gateway/src/main/resources/config/liquibase/`
-- Runs automatically on Gateway startup
+- Gestionada por el repositorio Gateway
+- Changelog Liquibase en `tyse-scrutiny-gateway/src/main/resources/config/liquibase/`
+- Se ejecuta automáticamente al iniciar Gateway
 
-#### Divipol Database
+#### Base de Datos Divipol
 
-- Managed by Divipol repository
-- Liquibase changelog in `tyse-scrutiny-micro-divipol/src/main/resources/config/liquibase/`
-- Runs automatically on Divipol startup
+- Gestionada por el repositorio Divipol
+- Changelog Liquibase en `tyse-scrutiny-micro-divipol/src/main/resources/config/liquibase/`
+- Se ejecuta automáticamente al iniciar Divipol
 
-**Important**: Both databases are separate (different ports: 5432 vs 5433)
+**Importante**: Ambas bases de datos son separadas (puertos diferentes: 5432 vs 5433)
 
 ---
 
-## Communication Patterns
+## Patrones de Comunicación
 
 ### Gateway → Divipol
 
-**Method**: HTTP REST calls via Consul service discovery
+**Método**: Llamadas HTTP REST via service discovery de Consul
 
 ```java
-// Gateway calling Divipol
+// Gateway llamando a Divipol
 @Service
 public class DivipolClient {
 
@@ -328,14 +328,14 @@ public class DivipolClient {
 
 ```
 
-Service name `tysescrutinymicrodivipol` is resolved by Consul.
+El nombre de servicio `tysescrutinymicrodivipol` es resuelto por Consul.
 
 ### Divipol → Gateway
 
-**Method**: Kafka events (asynchronous)
+**Método**: Eventos Kafka (asíncrono)
 
 ```java
-// Divipol publishing event
+// Divipol publicando evento
 @Service
 public class DivipolEventPublisher {
 
@@ -349,46 +349,46 @@ public class DivipolEventPublisher {
 
 ```
 
-Gateway subscribes to `divipol-updates` topic.
+Gateway se suscribe al topic `divipol-updates`.
 
 ---
 
-## Testing Across Repositories
+## Testing Entre Repositorios
 
-### Unit Tests
+### Tests Unitarios
 
-- Run independently in each repository
-- Mock dependencies from other services
+- Se ejecutan independientemente en cada repositorio
+- Mockear dependencias de otros servicios
 
-### Integration Tests
+### Tests de Integración
 
-- Each repository tests its own integration with external dependencies (DB, Kafka)
-- Use Testcontainers for isolated testing
+- Cada repositorio prueba su propia integración con dependencias externas (BD, Kafka)
+- Usar Testcontainers para testing aislado
 
-### Contract Tests
+### Tests de Contrato
 
-**Recommended** (not yet implemented):
+**Recomendado** (aún no implementado):
 
-Use Spring Cloud Contract or Pact for API contract testing:
+Usar Spring Cloud Contract o Pact para testing de contratos de API:
 
-1. Divipol publishes API contract
-2. Gateway tests against contract
-3. CI fails if contract is broken
+1. Divipol publica el contrato de API
+2. Gateway hace tests contra el contrato
+3. CI falla si el contrato se rompe
 
-### E2E Tests
+### Tests E2E
 
-- Run in **Gateway repository** only
-- Test full application flow (UI → Gateway → Divipol → DB)
-- Requires both services running
+- Se ejecutan en el **repositorio Gateway** únicamente
+- Prueban el flujo completo de la aplicación (UI → Gateway → Divipol → BD)
+- Requieren que ambos servicios estén corriendo
 
 ---
 
-## Deployment Best Practices
+## Mejores Prácticas de Despliegue
 
-### 1. Always Test Before Deploying
+### 1. Siempre Probar Antes de Desplegar
 
 ```bash
-# Run tests locally before pushing
+# Ejecutar tests localmente antes de hacer push
 cd tyse-scrutiny-gateway
 ./mvnw verify
 npm run test-ci
@@ -397,169 +397,169 @@ cd tyse-scrutiny-micro-divipol
 ./mvnw verify
 ```
 
-### 2. Deploy During Low-Traffic Hours
+### 2. Desplegar Durante Horas de Bajo Tráfico
 
-- Schedule deployments for off-peak hours
-- Notify team before deployment
+- Programar despliegues para horarios no pico
+- Notificar al equipo antes del despliegue
 
-### 3. Monitor After Deployment
+### 3. Monitorear Después del Despliegue
 
 ```bash
-# Check logs immediately after deploy
-ssh your-server
+# Verificar logs inmediatamente después del despliegue
+ssh tu-servidor
 docker logs -f tyse-gateway-staging
 docker logs -f tyse-divipol-staging
 
-# Monitor health
+# Monitorear salud
 watch curl http://localhost:8090/management/health
 watch curl http://localhost:8091/management/health
 ```
 
-### 4. Have a Rollback Plan
+### 4. Tener un Plan de Rollback
 
 ```bash
-# Quick rollback: deploy previous tags
+# Rollback rápido: desplegar tags anteriores
 # Actions → Deploy to Staging → Run workflow
-# gateway_tag: develop-sha-previous
-# divipol_tag: develop-sha-previous
+# gateway_tag: develop-sha-anterior
+# divipol_tag: develop-sha-anterior
 ```
 
-### 5. Document Breaking Changes
+### 5. Documentar Cambios Incompatibles
 
-When making breaking changes:
+Cuando se hacen cambios incompatibles:
 
-- Update API documentation
-- Add migration guide
-- Notify team via PR description
-- Coordinate deployment
+- Actualizar documentación de API
+- Agregar guía de migración
+- Notificar al equipo via descripción del PR
+- Coordinar el despliegue
 
 ---
 
-## Troubleshooting Multi-Repo Issues
+## Resolución de Problemas Multi-Repo
 
-### Issue: Gateway Can't Reach Divipol
+### Problema: Gateway No Puede Alcanzar a Divipol
 
-**Symptoms**:
+**Síntomas**:
 
-- Gateway logs show connection refused
-- `404 Not Found` for Divipol endpoints
+- Los logs de Gateway muestran conexión rechazada
+- `404 Not Found` para endpoints de Divipol
 
-**Check**:
+**Verificar**:
 
 ```bash
-# 1. Is Divipol running?
+# 1. ¿Está corriendo Divipol?
 docker ps | grep tyse-divipol
 
-# 2. Is Divipol registered in Consul?
+# 2. ¿Está Divipol registrado en Consul?
 curl http://localhost:8510/v1/catalog/services | grep divipol
 
-# 3. Can Gateway reach Divipol?
+# 3. ¿Puede Gateway alcanzar a Divipol?
 docker exec tyse-gateway-staging curl http://divipol:8081/management/health
 ```
 
-**Solution**:
+**Solución**:
 
-- Ensure both services are on same Docker network
-- Check Consul configuration
-- Verify service names match
+- Asegurar que ambos servicios están en la misma red Docker
+- Verificar configuración de Consul
+- Verificar que los nombres de servicio coincidan
 
-### Issue: Version Mismatch After Deployment
+### Problema: Desajuste de Versión Después del Despliegue
 
-**Symptoms**:
+**Síntomas**:
 
-- Old Divipol code running despite new deployment
-- API returns old response format
+- Código antiguo de Divipol corriendo a pesar del nuevo despliegue
+- API retorna formato de respuesta antiguo
 
-**Check**:
+**Verificar**:
 
 ```bash
-# Check deployed image tag
+# Verificar tag de imagen desplegada
 docker inspect tyse-divipol-staging | grep -A 5 "Image"
 ```
 
-**Solution**:
+**Solución**:
 
-- Verify correct image tag in deployment workflow
-- Force pull latest image: `docker compose pull divipol`
-- Redeploy
+- Verificar tag de imagen correcto en el workflow de despliegue
+- Forzar descarga de última imagen: `docker compose pull divipol`
+- Re-desplegar
 
-### Issue: Breaking Change Breaks Production
+### Problema: Cambio Incompatible Rompe Producción
 
-**Prevention**:
+**Prevención**:
 
-1. Use feature flags
-2. Version your APIs (`/api/v1`, `/api/v2`)
-3. Maintain backward compatibility
-4. Deploy to staging first
+1. Usar feature flags
+2. Versionar tus APIs (`/api/v1`, `/api/v2`)
+3. Mantener compatibilidad hacia atrás
+4. Desplegar a staging primero
 
-**Recovery**:
+**Recuperación**:
 
 ```bash
-# Rollback to last known good versions
-# Check git tags for stable versions
+# Rollback a últimas versiones buenas conocidas
+# Verificar tags de git para versiones estables
 git tag -l
 
-# Deploy stable versions
+# Desplegar versiones estables
 # gateway_tag: v1.2.3
 # divipol_tag: v1.1.5
 ```
 
 ---
 
-## Future Improvements
+## Mejoras Futuras
 
-### Potential Enhancements
+### Mejoras Potenciales
 
-1. **Automated Deployment Triggers**
+1. **Disparadores de Despliegue Automatizados**
 
-   - Deploy automatically when both images are ready
-   - Use GitHub repository_dispatch API
+   - Desplegar automáticamente cuando ambas imágenes estén listas
+   - Usar API repository_dispatch de GitHub
 
-2. **Contract Testing**
+2. **Testing de Contratos**
 
-   - Implement Spring Cloud Contract
-   - Verify API compatibility in CI
+   - Implementar Spring Cloud Contract
+   - Verificar compatibilidad de API en CI
 
-3. **Shared Configuration Repo**
+3. **Repositorio de Configuración Compartida**
 
-   - Store common configs (JWT secret, DB passwords)
-   - Use Git submodules or separate config repo
+   - Almacenar configuraciones comunes (JWT secret, contraseñas de BD)
+   - Usar submódulos Git o repositorio de configuración separado
 
-4. **Monorepo Consideration**
+4. **Consideración de Monorepo**
 
-   - Evaluate moving to monorepo if coordination becomes complex
-   - Tools: Nx, Turborepo, Lerna
+   - Evaluar cambio a monorepo si la coordinación se vuelve compleja
+   - Herramientas: Nx, Turborepo, Lerna
 
 5. **Service Mesh**
-   - Implement Istio or Linkerd for service communication
-   - Better observability and traffic management
+   - Implementar Istio o Linkerd para comunicación de servicios
+   - Mejor observabilidad y gestión de tráfico
 
 ---
 
-## Summary
+## Resumen
 
-**Key Points**:
+**Puntos Clave**:
 
-- ✅ Two independent repositories for flexibility
-- ✅ Independent CI/Build, coordinated deployment
-- ✅ Gateway owns infrastructure and deployment
-- ✅ Use semantic versioning and tagging
-- ✅ Deploy both services together via Gateway workflow
-- ✅ Monitor both services after deployment
-- ✅ Have rollback plan ready
+- ✅ Dos repositorios independientes para flexibilidad
+- ✅ CI/Build independiente, despliegue coordinado
+- ✅ Gateway posee infraestructura y despliegue
+- ✅ Usar versionado semántico y etiquetado
+- ✅ Desplegar ambos servicios juntos via workflow de Gateway
+- ✅ Monitorear ambos servicios después del despliegue
+- ✅ Tener plan de rollback listo
 
-**Workflow Checklist**:
+**Checklist del Flujo de Trabajo**:
 
-- [ ] Develop feature in appropriate repo
-- [ ] Write tests
-- [ ] Create PR and get approval
-- [ ] Merge to develop
-- [ ] Wait for build to complete
-- [ ] Deploy via Gateway workflow
-- [ ] Verify both services healthy
-- [ ] Monitor logs
+- [ ] Desarrollar feature en el repo apropiado
+- [ ] Escribir tests
+- [ ] Crear PR y obtener aprobación
+- [ ] Mergear a develop
+- [ ] Esperar a que el build se complete
+- [ ] Desplegar via workflow de Gateway
+- [ ] Verificar que ambos servicios estén saludables
+- [ ] Monitorear logs
 
 ---
 
-**Last Updated**: 2025-01-04
-**Maintained by**: Gateway Repository
+**Última Actualización**: 2025-01-04
+**Mantenido por**: Repositorio Gateway

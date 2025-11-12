@@ -1,22 +1,22 @@
-# CI/CD Pipeline - Tyse Scrutiny (Multi-Repository)
+# Pipeline CI/CD - Tyse Scrutiny (Multi-Repositorio)
 
-Complete Continuous Integration and Continuous Deployment pipeline for Tyse Scrutiny microservices platform.
+Pipeline completo de Integración Continua y Despliegue Continuo para la plataforma de microservicios Tyse Scrutiny.
 
-## Architecture Overview
+## Resumen de la Arquitectura
 
-Tyse Scrutiny consists of **two separate GitHub repositories**:
+Tyse Scrutiny está compuesto por **dos repositorios GitHub separados**:
 
-1. **Gateway Repository** (`tyse-scrutiny-gateway`)
+1. **Repositorio Gateway** (`tyse-scrutiny-gateway`)
 
-   - Contains: React frontend + Spring Boot backend
-   - Manages: Shared infrastructure (Consul, Kafka)
-   - Handles: Deployment orchestration for both services
+   - Contiene: Frontend React + Backend Spring Boot
+   - Gestiona: Infraestructura compartida (Consul, Kafka)
+   - Maneja: Orquestación del despliegue de ambos servicios
 
-2. **Divipol Repository** (`tyse-scrutiny-micro-divipol`)
-   - Contains: Spring Boot microservice (API only)
-   - Provides: Division política data for Colombia
+2. **Repositorio Divipol** (`tyse-scrutiny-micro-divipol`)
+   - Contiene: Microservicio Spring Boot (solo API)
+   - Proporciona: Datos de división política de Colombia
 
-## Repository Structure
+## Estructura de Repositorios
 
 ```
 GitHub:
@@ -41,281 +41,281 @@ GitHub:
 
 ---
 
-## Quick Start
+## Inicio Rápido
 
-### For Developers
+### Para Desarrolladores
 
-#### Working on Gateway
+#### Trabajando en Gateway
 
 ```bash
-# Clone Gateway repository
+# Clonar repositorio Gateway
 git clone git@github.com:manuelmottaherrera/tyse-scrutiny-gateway.git
 cd tyse-scrutiny-gateway
 
-# Create feature branch
+# Crear rama de feature
 git checkout -b feature/my-feature
 
-# Make changes, commit, push
+# Hacer cambios, commit, push
 git add .
 git commit -m "feat: add new feature"
 git push origin feature/my-feature
 
-# CI automatically runs:
-# ✅ Backend tests
-# ✅ Frontend tests
-# ✅ Code quality checks
+# CI se ejecuta automáticamente:
+# ✅ Tests backend
+# ✅ Tests frontend
+# ✅ Verificaciones de calidad de código
 ```
 
-#### Working on Divipol
+#### Trabajando en Divipol
 
 ```bash
-# Clone Divipol repository
+# Clonar repositorio Divipol
 git clone git@github.com:manuelmottaherrera/tyse-scrutiny-micro-divipol.git
 cd tyse-scrutiny-micro-divipol
 
-# Create feature branch
+# Crear rama de feature
 git checkout -b feature/my-feature
 
-# Make changes, commit, push
+# Hacer cambios, commit, push
 git add .
 git commit -m "feat: add divipol feature"
 git push origin feature/my-feature
 
-# CI automatically runs:
-# ✅ Backend tests
-# ✅ Code quality checks
+# CI se ejecuta automáticamente:
+# ✅ Tests backend
+# ✅ Verificaciones de calidad de código
 ```
 
-### Deployment Flow
+### Flujo de Despliegue
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    SEPARATE REPOSITORIES                         │
+│                    REPOSITORIOS SEPARADOS                        │
 └─────────────────────────────────────────────────────────────────┘
 
-Gateway Repo:                          Divipol Repo:
-  Push to develop                        Push to develop
+Repo Gateway:                          Repo Divipol:
+  Push a develop                         Push a develop
        ↓                                      ↓
-  CI Tests (15 min)                      CI Tests (10 min)
+  Tests CI (15 min)                      Tests CI (10 min)
        ↓                                      ↓
-  Build Image                            Build Image
+  Construir Imagen                       Construir Imagen
        ↓                                      ↓
-  Push to GHCR                           Push to GHCR
+  Push a GHCR                            Push a GHCR
        ↓                                      ↓
        └──────────────┬────────────────────────┘
                       ↓
-             Manual Deploy Trigger
-          (Gateway repo workflow_dispatch)
+         Disparador Manual de Despliegue
+          (workflow_dispatch del repo Gateway)
                       ↓
-            Deploy Both Services
+          Desplegar Ambos Servicios
                       ↓
-              Health Checks
+          Verificaciones de Salud
                       ↓
-              ✅ Staging Live
+              ✅ Staging Activo
 ```
 
 ---
 
-## Workflows Explained
+## Explicación de los Workflows
 
-### Gateway Repository Workflows
+### Workflows del Repositorio Gateway
 
-#### 1. CI Pipeline (`ci.yml`)
+#### 1. Pipeline CI (`ci.yml`)
 
-**Trigger**: Every push/PR to main or develop
+**Disparador**: Cada push/PR a main o develop
 
 **Jobs**:
 
-- ✅ Backend Tests (Maven + JUnit + Testcontainers)
-- ✅ Frontend Tests (Jest + ESLint + Prettier)
-- ✅ E2E Tests (Cypress - only main/develop)
+- ✅ Tests Backend (Maven + JUnit + Testcontainers)
+- ✅ Tests Frontend (Jest + ESLint + Prettier)
+- ✅ Tests E2E (Cypress - solo main/develop)
 - ✅ Quality Gate
 
-**Duration**: ~15 minutes
+**Duración**: ~15 minutos
 
 #### 2. Build (`build.yml`)
 
-**Trigger**: After CI success on main/develop
+**Disparador**: Después del éxito del CI en main/develop
 
 **Jobs**:
 
-- 🏗️ Build production JAR
-- 🐳 Create Docker image
-- 📦 Push to GitHub Container Registry (`ghcr.io/manuelmottaherrera/tyse-scrutiny-gateway`)
+- 🏗️ Construir JAR de producción
+- 🐳 Crear imagen Docker
+- 📦 Push a GitHub Container Registry (`ghcr.io/manuelmottaherrera/tyse-scrutiny-gateway`)
 
-**Tags**: `develop`, `main`, `develop-sha-abc123`, `latest` (main only)
+**Tags**: `develop`, `main`, `develop-sha-abc123`, `latest` (solo main)
 
-**Duration**: ~5-8 minutes
+**Duración**: ~5-8 minutos
 
 #### 3. Deploy Staging (`deploy-staging.yml`)
 
-**Trigger**: Manual (`workflow_dispatch`)
+**Disparador**: Manual (`workflow_dispatch`)
 
-**What it does**:
+**Qué hace**:
 
-- Pulls latest images for **both** Gateway and Divipol
-- SSH to staging server
-- Runs deployment script (backup, stop, start, health check)
-- Verifies both services are healthy
+- Descarga las últimas imágenes de **ambos** Gateway y Divipol
+- SSH al servidor de staging
+- Ejecuta script de despliegue (backup, stop, start, verificación de salud)
+- Verifica que ambos servicios estén saludables
 
-**Parameters**:
+**Parámetros**:
 
-- `gateway_tag`: Gateway image tag (default: `develop`)
-- `divipol_tag`: Divipol image tag (default: `develop`)
+- `gateway_tag`: Tag de imagen Gateway (por defecto: `develop`)
+- `divipol_tag`: Tag de imagen Divipol (por defecto: `develop`)
 
-**Duration**: ~3-5 minutes
+**Duración**: ~3-5 minutos
 
 #### 4. SonarCloud (`sonarcloud.yml`)
 
-**Trigger**: Every push/PR (parallel with CI)
+**Disparador**: Cada push/PR (en paralelo con CI)
 
-**Analyzes**:
+**Analiza**:
 
-- Java backend code
-- TypeScript/React frontend code
-- Test coverage
-- Security vulnerabilities
+- Código backend Java
+- Código frontend TypeScript/React
+- Cobertura de tests
+- Vulnerabilidades de seguridad
 
-**Duration**: ~8-10 minutes
+**Duración**: ~8-10 minutos
 
 ---
 
-### Divipol Repository Workflows
+### Workflows del Repositorio Divipol
 
-#### 1. CI Pipeline (`ci.yml`)
+#### 1. Pipeline CI (`ci.yml`)
 
-**Trigger**: Every push/PR to main or develop
+**Disparador**: Cada push/PR a main o develop
 
 **Jobs**:
 
-- ✅ Backend Tests (Maven + JUnit)
+- ✅ Tests Backend (Maven + JUnit)
 - ✅ Quality Gate
 
-**Duration**: ~10 minutes
+**Duración**: ~10 minutos
 
 #### 2. Build (`build.yml`)
 
-**Trigger**: After CI success on main/develop
+**Disparador**: Después del éxito del CI en main/develop
 
 **Jobs**:
 
-- 🏗️ Build production JAR
-- 🐳 Create Docker image
-- 📦 Push to GitHub Container Registry (`ghcr.io/manuelmottaherrera/tyse-scrutiny-micro-divipol`)
+- 🏗️ Construir JAR de producción
+- 🐳 Crear imagen Docker
+- 📦 Push a GitHub Container Registry (`ghcr.io/manuelmottaherrera/tyse-scrutiny-micro-divipol`)
 
-**Tags**: `develop`, `main`, `develop-sha-abc123`, `latest` (main only)
+**Tags**: `develop`, `main`, `develop-sha-abc123`, `latest` (solo main)
 
-**Duration**: ~5 minutes
+**Duración**: ~5 minutos
 
 #### 3. SonarCloud (`sonarcloud.yml`)
 
-**Trigger**: Every push/PR (parallel with CI)
+**Disparador**: Cada push/PR (en paralelo con CI)
 
-**Analyzes**:
+**Analiza**:
 
-- Java backend code
-- Test coverage
-- Security vulnerabilities
+- Código backend Java
+- Cobertura de tests
+- Vulnerabilidades de seguridad
 
-**Duration**: ~5-8 minutes
+**Duración**: ~5-8 minutos
 
 ---
 
-## How to Deploy
+## Cómo Desplegar
 
-### Automatic Flow (Recommended)
+### Flujo Automático (Recomendado)
 
-1. **Merge Gateway PR to develop**:
+1. **Mergear PR de Gateway a develop**:
 
    ```bash
-   # CI runs → Build creates image
+   # CI se ejecuta → Build crea imagen
    ```
 
-2. **Merge Divipol PR to develop**:
+2. **Mergear PR de Divipol a develop**:
 
    ```bash
-   # CI runs → Build creates image
+   # CI se ejecuta → Build crea imagen
    ```
 
-3. **Deploy from Gateway repo**:
-   - Go to Gateway repository on GitHub
-   - Click **Actions** → **Deploy to Staging**
-   - Click **Run workflow**
-   - Leave tags as `develop` (or specify custom tags)
-   - Click **Run workflow**
+3. **Desplegar desde el repo Gateway**:
+   - Ir al repositorio Gateway en GitHub
+   - Hacer clic en **Actions** → **Deploy to Staging**
+   - Hacer clic en **Run workflow**
+   - Dejar los tags como `develop` (o especificar tags personalizados)
+   - Hacer clic en **Run workflow**
 
-### Manual Deployment with Specific Versions
+### Despliegue Manual con Versiones Específicas
 
-If you want to deploy specific versions (e.g., testing a hotfix):
+Si deseas desplegar versiones específicas (ej: probar un hotfix):
 
-1. Go to **Gateway** repository → **Actions** → **Deploy to Staging**
-2. Click **Run workflow**
-3. Enter custom tags:
-   - `gateway_tag`: `develop-sha-abc123` (or any tag)
-   - `divipol_tag`: `develop-sha-def456` (or any tag)
-4. Click **Run workflow**
-
----
-
-## Access Deployed Services
-
-After successful deployment:
-
-- **Gateway UI**: http://your-server:8090
-- **Gateway API Docs**: http://your-server:8090/swagger-ui.html
-- **Divipol API**: http://your-server:8091/swagger-ui.html
-- **Consul UI**: http://your-server:8510
-- **Health Checks**:
-  - Gateway: http://your-server:8090/management/health
-  - Divipol: http://your-server:8091/management/health
+1. Ir al repositorio **Gateway** → **Actions** → **Deploy to Staging**
+2. Hacer clic en **Run workflow**
+3. Ingresar tags personalizados:
+   - `gateway_tag`: `develop-sha-abc123` (o cualquier tag)
+   - `divipol_tag`: `develop-sha-def456` (o cualquier tag)
+4. Hacer clic en **Run workflow**
 
 ---
 
-## Required GitHub Secrets
+## Acceso a Servicios Desplegados
 
-### Gateway Repository
+Después de un despliegue exitoso:
 
-| Secret                      | Description         | Example                 |
-| --------------------------- | ------------------- | ----------------------- |
-| `SSH_HOST`                  | Staging server IP   | `192.168.1.50`          |
-| `SSH_USER`                  | SSH username        | `deploy`                |
-| `SSH_PRIVATE_KEY`           | SSH private key     | `-----BEGIN RSA...`     |
-| `STAGING_HOST`              | Same as SSH_HOST    | `192.168.1.50`          |
-| `SONAR_TOKEN`               | SonarCloud token    | `squ_abc123...`         |
-| `SONAR_ORGANIZATION`        | SonarCloud org      | `manuelmottaherrera`    |
-| `SONAR_PROJECT_KEY_GATEWAY` | Gateway project key | `tyse-scrutiny-gateway` |
-
-### Divipol Repository
-
-| Secret                      | Description         | Example                       |
-| --------------------------- | ------------------- | ----------------------------- |
-| `SONAR_TOKEN`               | SonarCloud token    | `squ_abc123...`               |
-| `SONAR_ORGANIZATION`        | SonarCloud org      | `manuelmottaherrera`          |
-| `SONAR_PROJECT_KEY_DIVIPOL` | Divipol project key | `tyse-scrutiny-micro-divipol` |
+- **Gateway UI**: http://tu-servidor:8090
+- **Gateway API Docs**: http://tu-servidor:8090/swagger-ui.html
+- **Divipol API**: http://tu-servidor:8091/swagger-ui.html
+- **Consul UI**: http://tu-servidor:8510
+- **Verificaciones de Salud**:
+  - Gateway: http://tu-servidor:8090/management/health
+  - Divipol: http://tu-servidor:8091/management/health
 
 ---
 
-## Server Configuration
+## Secrets de GitHub Requeridos
 
-All deployment files are in the **Gateway repository** under `deployment/`:
+### Repositorio Gateway
 
-### On Staging Server
+| Secret                      | Descripción          | Ejemplo                 |
+| --------------------------- | -------------------- | ----------------------- |
+| `SSH_HOST`                  | IP servidor staging  | `192.168.1.50`          |
+| `SSH_USER`                  | Usuario SSH          | `deploy`                |
+| `SSH_PRIVATE_KEY`           | Clave privada SSH    | `-----BEGIN RSA...`     |
+| `STAGING_HOST`              | Igual a SSH_HOST     | `192.168.1.50`          |
+| `SONAR_TOKEN`               | Token SonarCloud     | `squ_abc123...`         |
+| `SONAR_ORGANIZATION`        | Org SonarCloud       | `manuelmottaherrera`    |
+| `SONAR_PROJECT_KEY_GATEWAY` | Key proyecto Gateway | `tyse-scrutiny-gateway` |
 
-**Location**: `/opt/tyse-scrutiny/`
+### Repositorio Divipol
+
+| Secret                      | Descripción          | Ejemplo                       |
+| --------------------------- | -------------------- | ----------------------------- |
+| `SONAR_TOKEN`               | Token SonarCloud     | `squ_abc123...`               |
+| `SONAR_ORGANIZATION`        | Org SonarCloud       | `manuelmottaherrera`          |
+| `SONAR_PROJECT_KEY_DIVIPOL` | Key proyecto Divipol | `tyse-scrutiny-micro-divipol` |
+
+---
+
+## Configuración del Servidor
+
+Todos los archivos de despliegue están en el **repositorio Gateway** bajo `deployment/`:
+
+### En el Servidor de Staging
+
+**Ubicación**: `/opt/tyse-scrutiny/`
 
 ```
 /opt/tyse-scrutiny/
 ├── docker-compose.staging.yml
-├── .env.staging              # Your configuration (not in git)
+├── .env.staging              # Tu configuración (no en git)
 ├── scripts/
-│   ├── deploy.sh            # Deployment script
-│   └── health-check.sh      # Health verification
-└── backups/                  # Automatic backups
+│   ├── deploy.sh            # Script de despliegue
+│   └── health-check.sh      # Verificación de salud
+└── backups/                  # Backups automáticos
 ```
 
-### Environment File (`.env.staging`)
+### Archivo de Entorno (`.env.staging`)
 
-Copy from template:
+Copiar desde la plantilla:
 
 ```bash
 cd /opt/tyse-scrutiny
@@ -323,71 +323,71 @@ cp .env.staging.example .env.staging
 nano .env.staging
 ```
 
-**Key variables**:
+**Variables clave**:
 
 ```bash
-# Image configuration (separate repos!)
+# Configuración de imágenes (repos separados!)
 REGISTRY=ghcr.io
 GATEWAY_IMAGE=manuelmottaherrera/tyse-scrutiny-gateway
 DIVIPOL_IMAGE=manuelmottaherrera/tyse-scrutiny-micro-divipol
 IMAGE_TAG_GATEWAY=develop
 IMAGE_TAG_DIVIPOL=develop
 
-# Ports (customize to avoid conflicts)
+# Puertos (personalizar para evitar conflictos)
 GATEWAY_PORT=8090
 DIVIPOL_PORT=8091
 CONSUL_PORT=8510
 KAFKA_PORT=9102
 
-# Database (your database server)
-DB_HOST=your-db-server-ip
-GATEWAY_DB_PASSWORD=your-password
-DIVIPOL_DB_PASSWORD=your-password
+# Base de datos (tu servidor de base de datos)
+DB_HOST=tu-ip-servidor-bd
+GATEWAY_DB_PASSWORD=tu-contraseña
+DIVIPOL_DB_PASSWORD=tu-contraseña
 
-# Security
-JWT_SECRET=your-jwt-secret-base64
+# Seguridad
+JWT_SECRET=tu-jwt-secret-base64
 ```
 
 ---
 
-## Common Tasks
+## Tareas Comunes
 
-### Check Deployment Status
+### Verificar Estado del Despliegue
 
 ```bash
-# SSH to server
-ssh your-user@your-server
+# SSH al servidor
+ssh tu-usuario@tu-servidor
 
-# Check running containers
+# Verificar contenedores corriendo
 docker ps | grep tyse
 
-# View logs
+# Ver logs
 docker logs tyse-gateway-staging
 docker logs tyse-divipol-staging
 
-# Run health check
+# Ejecutar verificación de salud
 cd /opt/tyse-scrutiny
 ./scripts/health-check.sh
 ```
 
-### Rollback Deployment
+### Rollback del Despliegue
 
 ```bash
-# SSH to server
-ssh your-user@your-server
+# SSH al servidor
+ssh tu-usuario@tu-servidor
 cd /opt/tyse-scrutiny
 
-# List backups
+# Listar backups
 ls -lh backups/
 
-# Restore (replace TIMESTAMP)
+# Restaurar (reemplazar TIMESTAMP)
 cp backups/.env.staging.TIMESTAMP .env.staging
 
-# Redeploy
+# Re-desplegar
 ./scripts/deploy.sh
 ```
 
-### View Pipeline Status
+### Ver Estado del Pipeline
 
 **Gateway**:
 
@@ -399,114 +399,114 @@ cp backups/.env.staging.TIMESTAMP .env.staging
 
 ---
 
-## Troubleshooting
+## Resolución de Problemas
 
-### CI Fails in One Repository
+### CI Falla en un Repositorio
 
-**Problem**: Tests fail in GitHub Actions
+**Problema**: Los tests fallan en GitHub Actions
 
-**Solution**:
+**Solución**:
 
 ```bash
-# Run tests locally
+# Ejecutar tests localmente
 ./mvnw clean verify
-npm run test-ci  # Gateway only
+npm run test-ci  # Solo Gateway
 ```
 
-### Build Fails
+### Falla el Build
 
-**Problem**: Docker image build fails
+**Problema**: Falla la construcción de la imagen Docker
 
-**Solution**:
+**Solución**:
 
-- Check Dockerfile is present in `src/main/docker/`
-- Ensure production JAR builds: `./mvnw -Pprod clean verify -DskipTests`
-- Check GitHub Actions logs for specific error
+- Verificar que el Dockerfile esté presente en `src/main/docker/`
+- Asegurar que el JAR de producción se construye: `./mvnw -Pprod clean verify -DskipTests`
+- Revisar logs de GitHub Actions para ver el error específico
 
-### Deployment Fails
+### Falla el Despliegue
 
-**Problem**: Deployment workflow fails
+**Problema**: Falla el workflow de despliegue
 
-**Check**:
+**Verificar**:
 
-1. SSH connection: `ssh your-user@your-server`
-2. Docker login works: `docker login ghcr.io`
-3. Images exist:
+1. Conexión SSH: `ssh tu-usuario@tu-servidor`
+2. Docker login funciona: `docker login ghcr.io`
+3. Las imágenes existen:
    - `ghcr.io/manuelmottaherrera/tyse-scrutiny-gateway:develop`
    - `ghcr.io/manuelmottaherrera/tyse-scrutiny-micro-divipol:develop`
-4. Environment file is correct: `/opt/tyse-scrutiny/.env.staging`
+4. El archivo de entorno es correcto: `/opt/tyse-scrutiny/.env.staging`
 
-### Services Not Healthy
+### Servicios No Saludables
 
-**Check**:
+**Verificar**:
 
 ```bash
-# Server logs
+# Logs del servidor
 docker logs tyse-gateway-staging
 docker logs tyse-divipol-staging
 
-# Database connectivity
-psql -h db-server -U tysescrutinygateway -d tysescrutinygateway
-psql -h db-server -U tysescrutinymicrodivipol -d tysescrutinymicrodivipol
+# Conectividad de base de datos
+psql -h servidor-bd -U tysescrutinygateway -d tysescrutinygateway
+psql -h servidor-bd -U tysescrutinymicrodivipol -d tysescrutinymicrodivipol
 
-# Port conflicts
+# Conflictos de puerto
 sudo netstat -tuln | grep -E '8090|8091'
 ```
 
 ---
 
-## Documentation
+## Documentación
 
-- **[SETUP.md](./SETUP.md)** - Complete setup guide (servers, databases, GitHub)
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture details
-- **[MULTI-REPO-COORDINATION.md](./MULTI-REPO-COORDINATION.md)** - Multi-repo workflow guide
+- **[SETUP.md](./SETUP.md)** - Guía completa de configuración (servidores, bases de datos, GitHub)
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detalles técnicos de la arquitectura
+- **[MULTI-REPO-COORDINATION.md](./MULTI-REPO-COORDINATION.md)** - Guía de flujo de trabajo multi-repo
 
 ---
 
-## Branch Strategy
+## Estrategia de Ramas
 
-### Both Repositories
+### Ambos Repositorios
 
-| Branch      | CI  | Build     | Deploy |
+| Rama        | CI  | Build     | Deploy |
 | ----------- | --- | --------- | ------ |
 | `feature/*` | ✅  | ❌        | ❌     |
 | `develop`   | ✅  | ✅ (auto) | Manual |
 | `main`      | ✅  | ✅ (auto) | Manual |
 
-**Recommended Workflow**:
+**Flujo de Trabajo Recomendado**:
 
-1. Create feature branch
-2. Develop and push (CI runs)
-3. Create PR to `develop`
-4. Merge after approval
-5. Build happens automatically
-6. Deploy manually from Gateway repo
-
----
-
-## Performance
-
-| Task                      | Duration   |
-| ------------------------- | ---------- |
-| Gateway CI                | ~15 min    |
-| Gateway Build             | ~5-8 min   |
-| Divipol CI                | ~10 min    |
-| Divipol Build             | ~5 min     |
-| Deployment                | ~3-5 min   |
-| **Total (both + deploy)** | ~25-30 min |
+1. Crear rama de feature
+2. Desarrollar y hacer push (CI se ejecuta)
+3. Crear PR a `develop`
+4. Mergear después de la aprobación
+5. Build ocurre automáticamente
+6. Desplegar manualmente desde el repo Gateway
 
 ---
 
-## Support
+## Rendimiento
 
-For issues or questions:
-
-1. Check this documentation
-2. Review GitHub Actions logs
-3. Check server logs: `docker logs container-name`
-4. Create issue in respective repository
+| Tarea                      | Duración   |
+| -------------------------- | ---------- |
+| CI Gateway                 | ~15 min    |
+| Build Gateway              | ~5-8 min   |
+| CI Divipol                 | ~10 min    |
+| Build Divipol              | ~5 min     |
+| Despliegue                 | ~3-5 min   |
+| **Total (ambos + deploy)** | ~25-30 min |
 
 ---
 
-**Last Updated**: 2025-01-04
-**Repository**: manuelmottaherrera/tyse-scrutiny-gateway
+## Soporte
+
+Para problemas o preguntas:
+
+1. Consultar esta documentación
+2. Revisar logs de GitHub Actions
+3. Verificar logs del servidor: `docker logs nombre-contenedor`
+4. Crear issue en el repositorio correspondiente
+
+---
+
+**Última Actualización**: 2025-01-04
+**Repositorio**: manuelmottaherrera/tyse-scrutiny-gateway
