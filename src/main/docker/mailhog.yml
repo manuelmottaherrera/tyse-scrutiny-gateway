@@ -1,0 +1,15 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+name: tysescrutinygateway
+services:
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 127.0.0.1:1025:1025 # SMTP server
+      - 127.0.0.1:8025:8025 # Web UI
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8025']
+      interval: 5s
+      timeout: 5s
+      retries: 10

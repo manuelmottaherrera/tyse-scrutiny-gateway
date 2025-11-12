@@ -17,3 +17,7 @@ services:
     extends:
       file: ./kafka.yml
       service: kafka
+  mailhog:
+    extends:
+      file: ./mailhog.yml
+      service: mailhog
