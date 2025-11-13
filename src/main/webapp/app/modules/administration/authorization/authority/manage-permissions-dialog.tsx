@@ -198,7 +198,7 @@ export const ManagePermissionsDialog: React.FC<ManagePermissionsDialogProps> = (
       </ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={onClose}>
-          <FontAwesomeIcon icon="times" />
+          <FontAwesomeIcon icon="xmark" />
           &nbsp;
           <Translate contentKey="entity.action.close">Close</Translate>
         </Button>
