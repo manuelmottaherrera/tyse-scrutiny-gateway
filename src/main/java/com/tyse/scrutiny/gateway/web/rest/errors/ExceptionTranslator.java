@@ -2,16 +2,19 @@ package com.tyse.scrutiny.gateway.web.rest.errors;
 
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
+import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
@@ -62,9 +65,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
     private String applicationName;
 
     private final Environment env;
+    private final MessageSource messageSource;
 
-    public ExceptionTranslator(Environment env) {
+    public ExceptionTranslator(Environment env, MessageSource messageSource) {
         this.env = env;
+        this.messageSource = messageSource;
     }
 
     @ExceptionHandler
@@ -137,6 +142,18 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         if (problem.getDetail() == null) {
             // higher precedence to cause
             problem.setDetail(getCustomizedErrorDetails(err));
+        }
+
+        // Translate detail for known exceptions with i18n support
+        if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage(
+                "error.authority.inactive",
+                new Object[] { inactiveAuthorityException.getAuthorityCode() },
+                problem.getDetail(),
+                locale
+            );
+            problem.setDetail(translatedDetail);
         }
 
         Map<String, Object> problemProperties = problem.getProperties();
@@ -290,5 +307,19 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             "de.",
             "com.tyse.scrutiny.gateway"
         );
+    }
+
+    /**
+     * Get locale from the Accept-Language header in the request.
+     * Defaults to English if no locale is specified.
+     *
+     * @param request the server web exchange
+     * @return the locale from the request
+     */
+    private Locale getLocaleFromRequest(ServerWebExchange request) {
+        if (request == null || request.getRequest().getHeaders().getAcceptLanguageAsLocales().isEmpty()) {
+            return Locale.ENGLISH;
+        }
+        return request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
     }
 }

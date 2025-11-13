@@ -9,6 +9,7 @@ import com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRep
 import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
 import com.tyse.scrutiny.gateway.security.SecurityUtils;
 import com.tyse.scrutiny.gateway.service.authorization.exceptions.AuthorityNotFoundException;
+import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
 import com.tyse.scrutiny.gateway.service.authorization.exceptions.PermissionDeniedException;
 import java.time.Instant;
 import org.slf4j.Logger;
@@ -260,7 +261,7 @@ public class AuthorityPermissionService {
                     return Mono.error(new IllegalStateException("Cannot modify system authority: " + authority.getCode()));
                 }
                 if (!Boolean.TRUE.equals(authority.getIsActive())) {
-                    return Mono.error(new IllegalStateException("Cannot modify inactive authority: " + authority.getCode()));
+                    return Mono.error(new InactiveAuthorityException(authority.getCode()));
                 }
                 return Mono.just(authority);
             });
