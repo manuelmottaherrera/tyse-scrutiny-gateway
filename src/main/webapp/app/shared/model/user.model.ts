@@ -21,7 +21,7 @@ export const defaultValue: Readonly<IUser> = {
   lastName: '',
   email: '',
   activated: true,
-  langKey: '',
+  langKey: 'es', // Default language (matches backend Constants.DEFAULT_LANGUAGE)
   authorities: [],
   createdBy: '',
   createdDate: null,
