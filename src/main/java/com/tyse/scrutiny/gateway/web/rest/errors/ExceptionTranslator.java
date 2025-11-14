@@ -3,6 +3,7 @@ package com.tyse.scrutiny.gateway.web.rest.errors;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
+import com.tyse.scrutiny.gateway.web.rest.errors.InvalidLocaleException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -153,6 +154,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
                 problem.getDetail(),
                 locale
             );
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof InvalidLocaleException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
             problem.setDetail(translatedDetail);
         }
 
