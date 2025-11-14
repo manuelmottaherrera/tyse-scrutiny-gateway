@@ -195,6 +195,45 @@ public class AccountResource {
     }
 
     /**
+     * {@code PATCH  /account/locale} : update the language preference of the current user.
+     *
+     * <p>This endpoint allows the user to change their preferred language (langKey) which will be used
+     * for email notifications and other i18n features. The langKey is persisted in the database.
+     *
+     * @param langKey the language key (e.g., "es" or "en").
+     * @return a {@link Mono} emitting the response.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     */
+    @Operation(
+        summary = "Actualizar preferencia de idioma del usuario",
+        description = "Actualiza el idioma preferido (langKey) del usuario autenticado. Se usa para emails y notificaciones."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "Idioma actualizado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Idioma inválido (solo 'es' o 'en' son soportados)", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Error al actualizar - usuario no encontrado", content = @Content),
+        }
+    )
+    @PatchMapping("/account/locale")
+    public Mono<Void> updateLocale(
+        @Parameter(description = "Código de idioma ('es' o 'en')", required = true) @RequestBody String langKey
+    ) {
+        // Validate langKey (only "es" or "en" are supported)
+        if (!langKey.equals("es") && !langKey.equals("en")) {
+            throw new BadRequestAlertException("Invalid language key. Only 'es' and 'en' are supported.", "user", "invalidlangkey");
+        }
+
+        return SecurityUtils.getCurrentUserLogin()
+            .switchIfEmpty(Mono.error(new AccountResourceException("Current user login not found")))
+            .flatMap(userRepository::findOneByLogin)
+            .switchIfEmpty(Mono.error(new AccountResourceException("User could not be found")))
+            .flatMap(user ->
+                userService.updateUser(user.getFirstName(), user.getLastName(), user.getEmail(), langKey, user.getImageUrl())
+            );
+    }
+
+    /**
      * {@code POST  /account/change-password} : changes the current user's password.
      *
      * @param passwordChangeDto current and new password.
