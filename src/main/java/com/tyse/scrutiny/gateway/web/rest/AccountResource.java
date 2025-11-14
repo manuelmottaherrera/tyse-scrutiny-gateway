@@ -221,7 +221,7 @@ public class AccountResource {
     ) {
         // Validate langKey (only "es" or "en" are supported)
         if (!langKey.equals("es") && !langKey.equals("en")) {
-            throw new BadRequestAlertException("Invalid language key. Only 'es' and 'en' are supported.", "user", "invalidlangkey");
+            throw new InvalidLocaleException();
         }
 
         return SecurityUtils.getCurrentUserLogin()
