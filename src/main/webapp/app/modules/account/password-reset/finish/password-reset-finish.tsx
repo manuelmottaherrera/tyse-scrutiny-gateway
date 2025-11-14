@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
-import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
+import { Storage, Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { useSearchParams } from 'react-router-dom';
 
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { setLocale } from 'app/shared/reducers/locale';
 import { handlePasswordResetFinish, reset } from '../password-reset.reducer';
 
 export const PasswordResetFinishPage = () => {
@@ -12,15 +13,21 @@ export const PasswordResetFinishPage = () => {
 
   const [searchParams] = useSearchParams();
   const key = searchParams.get('key');
+  const lang = searchParams.get('lang');
 
   const [password, setPassword] = useState('');
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // Set locale from URL parameter if provided (e.g., from creation email)
+    if (lang && (lang === 'es' || lang === 'en')) {
+      Storage.session.set('locale', lang);
+      dispatch(setLocale(lang));
+    }
+
+    return () => {
       dispatch(reset());
-    },
-    [],
-  );
+    };
+  }, []);
 
   const handleValidSubmit = ({ newPassword }) => dispatch(handlePasswordResetFinish({ key, newPassword }));
 
