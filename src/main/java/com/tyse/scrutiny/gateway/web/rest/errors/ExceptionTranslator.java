@@ -159,7 +159,10 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
         if (err instanceof InvalidLocaleException) {
             Locale locale = getLocaleFromRequest(request);
+            LOG.debug("InvalidLocaleException - Locale obtenido: {}", locale);
+            LOG.debug("InvalidLocaleException - Detail original: {}", problem.getDetail());
             String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
+            LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
             problem.setDetail(translatedDetail);
         }
 
@@ -331,21 +334,28 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
      */
     private Locale getLocaleFromRequest(ServerWebExchange request) {
         if (request == null) {
+            LOG.debug("Request is null, using default locale: es");
             return new Locale("es");
         }
 
         // 1st priority: X-Locale header (user's app preference)
         String xLocale = request.getRequest().getHeaders().getFirst("X-Locale");
+        LOG.debug("X-Locale header value: {}", xLocale);
         if (xLocale != null && !xLocale.isEmpty()) {
-            return Locale.forLanguageTag(xLocale);
+            Locale locale = Locale.forLanguageTag(xLocale);
+            LOG.debug("Using X-Locale header: {}", locale);
+            return locale;
         }
 
         // 2nd priority: Accept-Language header (browser default)
         if (!request.getRequest().getHeaders().getAcceptLanguageAsLocales().isEmpty()) {
-            return request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
+            Locale locale = request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
+            LOG.debug("Using Accept-Language header: {}", locale);
+            return locale;
         }
 
         // 3rd priority: Spanish (default for Hispanic target audience)
+        LOG.debug("No headers found, using default locale: es");
         return new Locale("es");
     }
 }
