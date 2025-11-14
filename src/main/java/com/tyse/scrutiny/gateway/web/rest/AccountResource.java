@@ -224,8 +224,9 @@ public class AccountResource {
         String sanitizedLangKey = langKey.trim().replaceAll("^\"|\"$", "");
 
         // Validate langKey (only "es" or "en" are supported)
+        // Use Mono.error() for reactive exception handling (not throw)
         if (!sanitizedLangKey.equals("es") && !sanitizedLangKey.equals("en")) {
-            throw new InvalidLocaleException();
+            return Mono.error(new InvalidLocaleException());
         }
 
         return SecurityUtils.getCurrentUserLogin()
