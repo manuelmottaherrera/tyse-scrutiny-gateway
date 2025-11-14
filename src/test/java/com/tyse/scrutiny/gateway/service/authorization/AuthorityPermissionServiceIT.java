@@ -10,6 +10,7 @@ import com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository;
 import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
 import java.time.Instant;
 import java.util.Arrays;
@@ -36,6 +37,9 @@ class AuthorityPermissionServiceIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
+
     private Authority adminAuthority;
     private Authority userAuthority;
     private Authority systemAuthority;
@@ -48,6 +52,8 @@ class AuthorityPermissionServiceIT {
     void setUp() {
         authorityPermissionRepository.deleteAll().block();
         permissionRepository.deleteAll().block();
+        // Delete user-authority relationships first to avoid foreign key constraint violations
+        userAuthorityRepository.deleteAll().block();
         authorityRepository.deleteAll().block();
 
         // Create authorities

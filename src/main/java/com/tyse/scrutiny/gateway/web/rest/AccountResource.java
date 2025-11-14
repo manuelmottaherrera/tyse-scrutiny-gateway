@@ -219,8 +219,12 @@ public class AccountResource {
     public Mono<Void> updateLocale(
         @Parameter(description = "Código de idioma ('es' o 'en')", required = true) @RequestBody String langKey
     ) {
+        // Sanitize langKey: remove quotes and trim whitespace
+        // (text/plain body may include quotes: "es" instead of es)
+        String sanitizedLangKey = langKey.trim().replaceAll("^\"|\"$", "");
+
         // Validate langKey (only "es" or "en" are supported)
-        if (!langKey.equals("es") && !langKey.equals("en")) {
+        if (!sanitizedLangKey.equals("es") && !sanitizedLangKey.equals("en")) {
             throw new InvalidLocaleException();
         }
 
@@ -229,7 +233,7 @@ public class AccountResource {
             .flatMap(userRepository::findOneByLogin)
             .switchIfEmpty(Mono.error(new AccountResourceException("User could not be found")))
             .flatMap(user ->
-                userService.updateUser(user.getFirstName(), user.getLastName(), user.getEmail(), langKey, user.getImageUrl())
+                userService.updateUser(user.getFirstName(), user.getLastName(), user.getEmail(), sanitizedLangKey, user.getImageUrl())
             );
     }
 

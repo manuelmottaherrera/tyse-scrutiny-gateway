@@ -8,6 +8,7 @@ import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository;
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
 import com.tyse.scrutiny.gateway.service.UserService;
 import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
@@ -48,6 +49,9 @@ class AccountResourceIT {
 
     @Autowired
     private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
 
     @Autowired
     private UserService userService;
@@ -103,6 +107,9 @@ class AccountResourceIT {
 
     @AfterEach
     void cleanupAndCheck() {
+        // Delete user-authority relationships first to avoid foreign key constraint violations
+        userAuthorityRepository.deleteAll().block();
+        // Now safe to delete users
         userRepository.deleteAll().block();
     }
 
