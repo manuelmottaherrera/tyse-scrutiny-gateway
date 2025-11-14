@@ -310,16 +310,35 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
     }
 
     /**
-     * Get locale from the Accept-Language header in the request.
-     * Defaults to English if no locale is specified.
+     * Get locale from the request with priority cascade.
+     *
+     * <p>Priority order:
+     * <ol>
+     *   <li>X-Locale header (user's selected preference in the app)</li>
+     *   <li>Accept-Language header (browser default)</li>
+     *   <li>Spanish (default for Hispanic target audience)</li>
+     * </ol>
      *
      * @param request the server web exchange
      * @return the locale from the request
      */
     private Locale getLocaleFromRequest(ServerWebExchange request) {
-        if (request == null || request.getRequest().getHeaders().getAcceptLanguageAsLocales().isEmpty()) {
-            return Locale.ENGLISH;
+        if (request == null) {
+            return new Locale("es");
         }
-        return request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
+
+        // 1st priority: X-Locale header (user's app preference)
+        String xLocale = request.getRequest().getHeaders().getFirst("X-Locale");
+        if (xLocale != null && !xLocale.isEmpty()) {
+            return Locale.forLanguageTag(xLocale);
+        }
+
+        // 2nd priority: Accept-Language header (browser default)
+        if (!request.getRequest().getHeaders().getAcceptLanguageAsLocales().isEmpty()) {
+            return request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
+        }
+
+        // 3rd priority: Spanish (default for Hispanic target audience)
+        return new Locale("es");
     }
 }
