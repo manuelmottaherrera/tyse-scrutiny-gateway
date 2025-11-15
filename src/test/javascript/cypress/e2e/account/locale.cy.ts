@@ -117,10 +117,13 @@ describe('Locale/i18n Functionality', () => {
       // Visit activation page with lang=es (without valid key, just to test locale)
       cy.visit('/account/activate?key=invalid-key&lang=es');
 
+      // Wait for useEffect to execute
+      cy.wait(500);
+
       // Verify session storage has Spanish locale
       cy.window().then(win => {
         const locale = win.sessionStorage.getItem('locale');
-        expect(locale).to.equal('"es"'); // sessionStorage stores as JSON string
+        expect(locale).to.equal('"es"'); // Storage.session.set uses JSON.stringify
       });
     });
 
@@ -128,10 +131,13 @@ describe('Locale/i18n Functionality', () => {
       // Visit activation page with lang=en
       cy.visit('/account/activate?key=invalid-key&lang=en');
 
+      // Wait for useEffect to execute
+      cy.wait(500);
+
       // Verify session storage has English locale
       cy.window().then(win => {
         const locale = win.sessionStorage.getItem('locale');
-        expect(locale).to.equal('"en"');
+        expect(locale).to.equal('"en"'); // Storage.session.set uses JSON.stringify
       });
     });
 
@@ -157,10 +163,13 @@ describe('Locale/i18n Functionality', () => {
       // Visit password reset page with lang=es
       cy.visit('/account/reset/finish?key=invalid-key&lang=es');
 
+      // Wait for useEffect to execute
+      cy.wait(500);
+
       // Verify session storage has Spanish locale
       cy.window().then(win => {
         const locale = win.sessionStorage.getItem('locale');
-        expect(locale).to.equal('"es"');
+        expect(locale).to.equal('"es"'); // Storage.session.set uses JSON.stringify
       });
     });
 
@@ -168,10 +177,13 @@ describe('Locale/i18n Functionality', () => {
       // Visit password reset page with lang=en
       cy.visit('/account/reset/finish?key=invalid-key&lang=en');
 
+      // Wait for useEffect to execute
+      cy.wait(500);
+
       // Verify session storage has English locale
       cy.window().then(win => {
         const locale = win.sessionStorage.getItem('locale');
-        expect(locale).to.equal('"en"');
+        expect(locale).to.equal('"en"'); // Storage.session.set uses JSON.stringify
       });
     });
 
