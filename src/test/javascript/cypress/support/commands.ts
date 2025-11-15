@@ -18,6 +18,7 @@
 export const navbarSelector = '[data-cy="navbar"]';
 export const adminMenuSelector = '[data-cy="adminMenu"]';
 export const accountMenuSelector = '[data-cy="accountMenu"]';
+export const localeMenuSelector = '[data-cy="languagesnavbar-dropdown"]';
 export const registerItemSelector = '[data-cy="register"]';
 export const settingsItemSelector = '[data-cy="settings"]';
 export const passwordItemSelector = '[data-cy="passwordItem"]';
