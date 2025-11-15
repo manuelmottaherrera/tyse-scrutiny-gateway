@@ -133,23 +133,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
 
-        // Preserve custom titles from ErrorResponseException subclasses (InvalidLocaleException, InactiveAuthorityException, etc.)
-        // Only override title if exception is NOT ErrorResponseException or if title is null
-        if (!(err instanceof ErrorResponseException)) {
-            // higher precedence to Custom/ResponseStatus types
-            String title = extractTitle(err, problem.getStatus());
-            String problemTitle = problem.getTitle();
-            if (problemTitle == null || !problemTitle.equals(title)) {
-                problem.setTitle(title);
-            }
-        }
-
-        if (problem.getDetail() == null) {
-            // higher precedence to cause
-            problem.setDetail(getCustomizedErrorDetails(err));
-        }
-
-        // Translate detail for known exceptions with i18n support
+        // Translate i18n-supported exceptions FIRST before applying default title logic
+        // This allows translation to override hardcoded titles from ErrorResponseException
         if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
             Locale locale = getLocaleFromRequest(request);
             String translatedDetail = messageSource.getMessage(
@@ -173,6 +158,22 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, problem.getTitle(), locale);
             LOG.debug("InvalidLocaleException - Title traducido: {}", translatedTitle);
             problem.setTitle(translatedTitle);
+        }
+
+        // Preserve custom titles from ErrorResponseException subclasses (but allow i18n overrides above)
+        // Only override title if exception is NOT ErrorResponseException or if title is null
+        if (!(err instanceof ErrorResponseException)) {
+            // higher precedence to Custom/ResponseStatus types
+            String title = extractTitle(err, problem.getStatus());
+            String problemTitle = problem.getTitle();
+            if (problemTitle == null || !problemTitle.equals(title)) {
+                problem.setTitle(title);
+            }
+        }
+
+        if (problem.getDetail() == null) {
+            // higher precedence to cause
+            problem.setDetail(getCustomizedErrorDetails(err));
         }
 
         Map<String, Object> problemProperties = problem.getProperties();
