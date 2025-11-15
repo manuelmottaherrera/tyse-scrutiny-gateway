@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, screen, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Storage } from 'react-jhipster';
@@ -221,6 +221,148 @@ describe('PasswordResetFinishPage', () => {
       // Password reset form should be rendered
       const newPasswordField = container.querySelector('[data-cy="resetPassword"]');
       expect(newPasswordField).toBeTruthy();
+    });
+  });
+
+  describe('Navigation after successful password reset', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    it('should navigate to home page after successful password reset', async () => {
+      // Given: Store with successMessage indicating successful password reset
+      const storeWithSuccess = mockStore({
+        passwordReset: {
+          resetPasswordSuccess: true,
+          resetPasswordFailure: false,
+          successMessage: 'reset.finish.messages.success',
+          loading: false,
+        },
+        locale: {
+          currentLocale: 'es',
+          sourcePrefixes: [],
+          lastChange: new Date().getTime(),
+          loadedKeys: [],
+          loadedLocales: ['es', 'en'],
+        },
+      });
+
+      const resetKey = 'test-reset-key';
+
+      // When: PasswordResetFinishPage is rendered with success state
+      render(
+        <Provider store={storeWithSuccess}>
+          <MemoryRouter initialEntries={[`/account/reset/finish?key=${resetKey}`]}>
+            <Routes>
+              <Route path="/account/reset/finish" element={<PasswordResetFinishPage />} />
+              <Route path="/" element={<div data-testid="home-page">Home</div>} />
+            </Routes>
+          </MemoryRouter>
+        </Provider>,
+      );
+
+      // Then: Navigation timer should be scheduled (500ms delay)
+      // Fast-forward time by 500ms using act()
+      act(() => {
+        jest.advanceTimersByTime(500);
+      });
+
+      // And: User should be navigated to home page
+      await waitFor(() => {
+        expect(screen.queryByTestId('home-page')).toBeTruthy();
+      });
+    });
+
+    it('should NOT navigate when successMessage is null', async () => {
+      // Given: Store without successMessage (no successful reset yet)
+      const storeWithoutSuccess = mockStore({
+        passwordReset: {
+          resetPasswordSuccess: false,
+          resetPasswordFailure: false,
+          successMessage: null,
+          loading: false,
+        },
+        locale: {
+          currentLocale: 'es',
+          sourcePrefixes: [],
+          lastChange: new Date().getTime(),
+          loadedKeys: [],
+          loadedLocales: ['es', 'en'],
+        },
+      });
+
+      const resetKey = 'test-reset-key';
+      const initialLocation = `/account/reset/finish?key=${resetKey}`;
+
+      // When: PasswordResetFinishPage is rendered without success state
+      const { container } = render(
+        <Provider store={storeWithoutSuccess}>
+          <MemoryRouter initialEntries={[initialLocation]}>
+            <Routes>
+              <Route path="/account/reset/finish" element={<PasswordResetFinishPage />} />
+              <Route path="/" element={<div data-testid="home-page">Home</div>} />
+            </Routes>
+          </MemoryRouter>
+        </Provider>,
+      );
+
+      // Then: User should remain on password reset page
+      // Fast-forward time to ensure no navigation occurs
+      jest.advanceTimersByTime(1000);
+
+      await waitFor(() => {
+        // Password reset form should still be visible
+        const newPasswordField = container.querySelector('[data-cy="resetPassword"]');
+        expect(newPasswordField).toBeTruthy();
+
+        // Home page should NOT be rendered
+        const homePage = container.querySelector('[data-testid="home-page"]');
+        expect(homePage).toBeFalsy();
+      });
+    });
+
+    it('should cleanup timer when component unmounts before navigation', () => {
+      // Given: Store with successMessage
+      const storeWithSuccess = mockStore({
+        passwordReset: {
+          resetPasswordSuccess: true,
+          resetPasswordFailure: false,
+          successMessage: 'reset.finish.messages.success',
+          loading: false,
+        },
+        locale: {
+          currentLocale: 'es',
+          sourcePrefixes: [],
+          lastChange: new Date().getTime(),
+          loadedKeys: [],
+          loadedLocales: ['es', 'en'],
+        },
+      });
+
+      const resetKey = 'test-reset-key';
+
+      // When: PasswordResetFinishPage is rendered and then unmounted before timer fires
+      const { unmount } = render(
+        <Provider store={storeWithSuccess}>
+          <MemoryRouter initialEntries={[`/account/reset/finish?key=${resetKey}`]}>
+            <Routes>
+              <Route path="/account/reset/finish" element={<PasswordResetFinishPage />} />
+            </Routes>
+          </MemoryRouter>
+        </Provider>,
+      );
+
+      // Unmount before timer fires (before 500ms)
+      unmount();
+
+      // Then: Timer should be cleaned up and no navigation should occur
+      // This test passes if no errors are thrown during cleanup
+      expect(jest.getTimerCount()).toBe(0); // All timers should be cleared
     });
   });
 });
