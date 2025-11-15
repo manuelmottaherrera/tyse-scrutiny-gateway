@@ -149,15 +149,20 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         if (err instanceof InvalidLocaleException) {
             Locale locale = getLocaleFromRequest(request);
             LOG.debug("InvalidLocaleException - Locale obtenido: {}", locale);
+            LOG.debug("InvalidLocaleException - Title ANTES de traducir: {}", problem.getTitle());
             LOG.debug("InvalidLocaleException - Detail original: {}", problem.getDetail());
+
             String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
             LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
             problem.setDetail(translatedDetail);
 
             // Translate title as well
-            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, problem.getTitle(), locale);
-            LOG.debug("InvalidLocaleException - Title traducido: {}", translatedTitle);
+            String originalTitle = problem.getTitle();
+            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, originalTitle, locale);
+            LOG.debug("InvalidLocaleException - Title DESPUES de messageSource.getMessage(): {}", translatedTitle);
+            LOG.debug("InvalidLocaleException - ¿Título cambió? Original='{}' vs Traducido='{}'", originalTitle, translatedTitle);
             problem.setTitle(translatedTitle);
+            LOG.debug("InvalidLocaleException - Title FINAL en problem: {}", problem.getTitle());
         }
 
         // Preserve custom titles from ErrorResponseException subclasses (but allow i18n overrides above)
