@@ -10,6 +10,8 @@ import com.tyse.scrutiny.gateway.domain.enumeration.AuthorityCategory;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository;
+import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
 import java.time.Instant;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +37,9 @@ class AuthorityPermissionServiceIT {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
+
     private Authority adminAuthority;
     private Authority userAuthority;
     private Authority systemAuthority;
@@ -47,6 +52,8 @@ class AuthorityPermissionServiceIT {
     void setUp() {
         authorityPermissionRepository.deleteAll().block();
         permissionRepository.deleteAll().block();
+        // Delete user-authority relationships first to avoid foreign key constraint violations
+        userAuthorityRepository.deleteAll().block();
         authorityRepository.deleteAll().block();
 
         // Create authorities
@@ -231,6 +238,80 @@ class AuthorityPermissionServiceIT {
         )
             // Then: 2 succeed (duplicate is skipped with warning)
             .expectNextCount(2)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldThrowInactiveAuthorityExceptionWhenAssigningToInactiveAuthority() {
+        // Given: an inactive authority
+        Authority inactiveAuthority = createAuthority("ROLE_INACTIVE_TEST", "Inactive", false, false, 100);
+
+        // When/Then: trying to assign permission throws InactiveAuthorityException
+        StepVerifier.create(authorityPermissionService.assignPermissionToAuthority(inactiveAuthority.getId(), createPermission.getId()))
+            .expectErrorMatches(error -> error instanceof InactiveAuthorityException && ((InactiveAuthorityException) error)
+                    .getAuthorityCode()
+                    .equals("ROLE_INACTIVE_TEST")
+            )
+            .verify();
+    }
+
+    @Test
+    void shouldThrowInactiveAuthorityExceptionWhenRevokingFromInactiveAuthority() {
+        // Given: an inactive authority that had a permission before being deactivated
+        Authority testAuthority = createAuthority("ROLE_REVOKE_TEST", "Revoke Test", false, true, 100);
+        authorityPermissionService.assignPermissionToAuthority(testAuthority.getId(), createPermission.getId()).block();
+
+        // Deactivate the authority
+        testAuthority.setIsActive(false);
+        authorityRepository.save(testAuthority).block();
+
+        // When/Then: trying to revoke permission from inactive authority throws InactiveAuthorityException
+        StepVerifier.create(authorityPermissionService.revokePermissionFromAuthority(testAuthority.getId(), createPermission.getId()))
+            .expectErrorMatches(error -> error instanceof InactiveAuthorityException && ((InactiveAuthorityException) error)
+                    .getAuthorityCode()
+                    .equals("ROLE_REVOKE_TEST")
+            )
+            .verify();
+    }
+
+    @Test
+    void shouldVerifyInactiveAuthorityExceptionContainsCorrectAuthorityCode() {
+        // Given: an inactive authority with specific code
+        String expectedCode = "ROLE_SPECIFIC_INACTIVE";
+        Authority inactiveAuthority = createAuthority(expectedCode, "Specific Inactive", false, false, 200);
+
+        // When/Then: exception contains the correct authority code
+        StepVerifier.create(authorityPermissionService.assignPermissionToAuthority(inactiveAuthority.getId(), readPermission.getId()))
+            .expectErrorSatisfies(error -> {
+                assertThat(error).isInstanceOf(InactiveAuthorityException.class);
+                InactiveAuthorityException exception = (InactiveAuthorityException) error;
+                assertThat(exception.getAuthorityCode()).isEqualTo(expectedCode);
+                assertThat(exception.getBody().getDetail()).contains(expectedCode);
+            })
+            .verify();
+    }
+
+    @Test
+    void shouldAllowAssigningPermissionToActiveAuthorityAfterReactivation() {
+        // Given: an authority that was inactive but now is active
+        Authority reactivatedAuthority = createAuthority("ROLE_REACTIVATED", "Reactivated", false, false, 150);
+
+        // First attempt fails
+        StepVerifier.create(authorityPermissionService.assignPermissionToAuthority(reactivatedAuthority.getId(), createPermission.getId()))
+            .expectError(InactiveAuthorityException.class)
+            .verify();
+
+        // Reactivate the authority
+        reactivatedAuthority.setIsActive(true);
+        authorityRepository.save(reactivatedAuthority).block();
+
+        // When/Then: now assignment succeeds
+        StepVerifier.create(authorityPermissionService.assignPermissionToAuthority(reactivatedAuthority.getId(), createPermission.getId()))
+            .assertNext(mapping -> {
+                assertThat(mapping.getId()).isNotNull();
+                assertThat(mapping.getAuthorityId()).isEqualTo(reactivatedAuthority.getId());
+                assertThat(mapping.getPermissionId()).isEqualTo(createPermission.getId());
+            })
             .verifyComplete();
     }
 

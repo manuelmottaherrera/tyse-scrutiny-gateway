@@ -149,6 +149,39 @@ describe('Notification Middleware', () => {
     },
   };
 
+  const DETAIL_AND_MESSAGE_ERROR = {
+    type: ERROR_TYPE,
+    error: {
+      isAxiosError: true,
+      response: {
+        data: {
+          type: 'https://www.jhipster.tech/problem/problem-with-message',
+          title: 'Invalid language key',
+          status: 400,
+          detail: "Only 'es' and 'en' are supported",
+          message: 'error.invalidlangkey',
+        },
+        status: 400,
+      },
+    },
+  };
+
+  const MESSAGE_ONLY_ERROR = {
+    type: ERROR_TYPE,
+    error: {
+      isAxiosError: true,
+      response: {
+        data: {
+          type: 'https://www.jhipster.tech/problem/problem-with-message',
+          title: 'Cannot modify inactive authority',
+          status: 400,
+          message: 'error.authority.inactive',
+        },
+        status: 400,
+      },
+    },
+  };
+
   const makeStore = () => applyMiddleware(notificationMiddleware)(createStore)(() => null);
 
   beforeAll(() => {
@@ -242,5 +275,28 @@ describe('Notification Middleware', () => {
     expect(store.dispatch(UNKNOWN_ERROR).error.isAxiosError).toEqual(true);
     const toastMsg = (toastify.toast as any).error.getCall(0).args[0];
     expect(toastMsg).toContain('Unknown error!');
+  });
+
+  it('should prioritize detail over message when both are present', () => {
+    // Given: error with both detail and message
+    expect(store.dispatch(DETAIL_AND_MESSAGE_ERROR).error.response.status).toEqual(400);
+
+    // When: toast is triggered
+    const toastMsg = (toastify.toast as any).error.getCall(0).args[0];
+
+    // Then: detail is shown (not message translation key)
+    expect(toastMsg).toBe("Only 'es' and 'en' are supported");
+    expect(toastMsg).not.toContain('error.invalidlangkey');
+  });
+
+  it('should use message as translation key when detail is not present', () => {
+    // Given: error with only message (no detail)
+    expect(store.dispatch(MESSAGE_ONLY_ERROR).error.response.status).toEqual(400);
+
+    // When: toast is triggered
+    const toastMsg = (toastify.toast as any).error.getCall(0).args[0];
+
+    // Then: message is used as translation key
+    expect(toastMsg).toContain('error.authority.inactive');
   });
 });

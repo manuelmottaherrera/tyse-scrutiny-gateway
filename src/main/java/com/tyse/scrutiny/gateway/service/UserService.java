@@ -240,6 +240,10 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                // Ensure authorities is not null before saving (R2DBC doesn't auto-load relationships)
+                if (user.getAuthorities() == null) {
+                    user.setAuthorities(new java.util.HashSet<>());
+                }
                 return saveUser(user);
             })
             .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))

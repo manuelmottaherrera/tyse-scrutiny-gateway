@@ -8,6 +8,7 @@ import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository;
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
 import com.tyse.scrutiny.gateway.service.UserService;
 import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
@@ -48,6 +49,9 @@ class AccountResourceIT {
 
     @Autowired
     private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
 
     @Autowired
     private UserService userService;
@@ -103,6 +107,9 @@ class AccountResourceIT {
 
     @AfterEach
     void cleanupAndCheck() {
+        // Delete user-authority relationships first to avoid foreign key constraint violations
+        userAuthorityRepository.deleteAll().block();
+        // Now safe to delete users
         userRepository.deleteAll().block();
     }
 
@@ -919,5 +926,210 @@ class AccountResourceIT {
             .exchange()
             .expectStatus()
             .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    @WithMockUser("update-locale-user-es")
+    void testUpdateLocaleToSpanish() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-user-es");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-es@example.com");
+        user.setFirstName("Update");
+        user.setLastName("Locale ES");
+        user.setLangKey("en"); // Initially English
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Update locale to Spanish
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("es")
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        // Verify locale was updated in database
+        User updatedUser = userRepository.findOneByLogin("update-locale-user-es").block();
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getLangKey()).isEqualTo("es");
+
+        userService.deleteUser("update-locale-user-es").block();
+    }
+
+    @Test
+    @WithMockUser("update-locale-user-en")
+    void testUpdateLocaleToEnglish() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-user-en");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-en@example.com");
+        user.setFirstName("Update");
+        user.setLastName("Locale EN");
+        user.setLangKey("es"); // Initially Spanish
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Update locale to English
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("en")
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        // Verify locale was updated in database
+        User updatedUser = userRepository.findOneByLogin("update-locale-user-en").block();
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getLangKey()).isEqualTo("en");
+
+        userService.deleteUser("update-locale-user-en").block();
+    }
+
+    @Test
+    @WithMockUser("update-locale-user-invalid")
+    void testUpdateLocaleWithInvalidLanguage() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-user-invalid");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-invalid@example.com");
+        user.setFirstName("Update");
+        user.setLastName("Locale Invalid");
+        user.setLangKey("es");
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Try to update locale with invalid language (French)
+        // Without X-Locale header, default is Spanish
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("fr")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody()
+            .jsonPath("$.title")
+            .isEqualTo("Clave de idioma inválida") // Title translated to Spanish (default)
+            .jsonPath("$.detail")
+            .value(org.hamcrest.Matchers.containsString("solo")); // Detail also in Spanish
+
+        // Verify locale was NOT updated in database
+        User updatedUser = userRepository.findOneByLogin("update-locale-user-invalid").block();
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getLangKey()).isEqualTo("es"); // Still Spanish
+
+        userService.deleteUser("update-locale-user-invalid").block();
+    }
+
+    @Test
+    @WithMockUser("update-locale-error-english")
+    void testUpdateLocaleWithInvalidLanguageReturnsErrorInEnglish() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-error-english");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-error-english@example.com");
+        user.setFirstName("Update");
+        user.setLastName("Locale Error English");
+        user.setLangKey("en");
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Try to update locale with invalid language (French), passing X-Locale: en
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .header("X-Locale", "en") // Request error message in English
+            .bodyValue("fr")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody()
+            .jsonPath("$.title")
+            .isEqualTo("Invalid language key") // Title in English
+            .jsonPath("$.detail")
+            .value(org.hamcrest.Matchers.containsString("Only")); // Detail in English
+
+        // Verify locale was NOT updated in database
+        User updatedUser = userRepository.findOneByLogin("update-locale-error-english").block();
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getLangKey()).isEqualTo("en"); // Still English
+
+        userService.deleteUser("update-locale-error-english").block();
+    }
+
+    @Test
+    void testUpdateLocaleWithoutAuthentication() throws Exception {
+        // Try to update locale without authentication
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("es")
+            .exchange()
+            .expectStatus()
+            .isUnauthorized();
+    }
+
+    @Test
+    @WithMockUser("update-locale-persistence")
+    void testUpdateLocalePersistence() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-persistence");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-persistence@example.com");
+        user.setFirstName("Persistence");
+        user.setLastName("Test");
+        user.setLangKey("es");
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Update locale to English
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("en")
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        // Verify change persisted by fetching user again
+        User firstFetch = userRepository.findOneByLogin("update-locale-persistence").block();
+        assertThat(firstFetch).isNotNull();
+        assertThat(firstFetch.getLangKey()).isEqualTo("en");
+
+        // Update back to Spanish
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .bodyValue("es")
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        // Verify second change also persisted
+        User secondFetch = userRepository.findOneByLogin("update-locale-persistence").block();
+        assertThat(secondFetch).isNotNull();
+        assertThat(secondFetch.getLangKey()).isEqualTo("es");
+
+        userService.deleteUser("update-locale-persistence").block();
     }
 }

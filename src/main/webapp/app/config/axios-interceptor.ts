@@ -11,6 +11,11 @@ const setupAxiosInterceptors = onUnauthenticated => {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Send user's preferred locale to backend for i18n error messages
+    const locale = Storage.session.get('locale', 'es');
+    config.headers['X-Locale'] = locale;
+
     return config;
   };
   const onResponseSuccess = response => response;

@@ -2,16 +2,20 @@ package com.tyse.scrutiny.gateway.web.rest.errors;
 
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
+import com.tyse.scrutiny.gateway.service.authorization.exceptions.InactiveAuthorityException;
+import com.tyse.scrutiny.gateway.web.rest.errors.InvalidLocaleException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
@@ -62,9 +66,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
     private String applicationName;
 
     private final Environment env;
+    private final MessageSource messageSource;
 
-    public ExceptionTranslator(Environment env) {
+    public ExceptionTranslator(Environment env, MessageSource messageSource) {
         this.env = env;
+        this.messageSource = messageSource;
     }
 
     @ExceptionHandler
@@ -127,16 +133,46 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
 
-        // higher precedence to Custom/ResponseStatus types
-        String title = extractTitle(err, problem.getStatus());
-        String problemTitle = problem.getTitle();
-        if (problemTitle == null || !problemTitle.equals(title)) {
-            problem.setTitle(title);
+        // Preserve custom titles from ErrorResponseException subclasses (InvalidLocaleException, InactiveAuthorityException, etc.)
+        // Only override title if exception is NOT ErrorResponseException or if title is null
+        if (!(err instanceof ErrorResponseException)) {
+            // higher precedence to Custom/ResponseStatus types
+            String title = extractTitle(err, problem.getStatus());
+            String problemTitle = problem.getTitle();
+            if (problemTitle == null || !problemTitle.equals(title)) {
+                problem.setTitle(title);
+            }
         }
 
         if (problem.getDetail() == null) {
             // higher precedence to cause
             problem.setDetail(getCustomizedErrorDetails(err));
+        }
+
+        // Translate detail for known exceptions with i18n support
+        if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage(
+                "error.authority.inactive",
+                new Object[] { inactiveAuthorityException.getAuthorityCode() },
+                problem.getDetail(),
+                locale
+            );
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof InvalidLocaleException) {
+            Locale locale = getLocaleFromRequest(request);
+            LOG.debug("InvalidLocaleException - Locale obtenido: {}", locale);
+            LOG.debug("InvalidLocaleException - Detail original: {}", problem.getDetail());
+            String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
+            LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
+            problem.setDetail(translatedDetail);
+
+            // Translate title as well
+            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, problem.getTitle(), locale);
+            LOG.debug("InvalidLocaleException - Title traducido: {}", translatedTitle);
+            problem.setTitle(translatedTitle);
         }
 
         Map<String, Object> problemProperties = problem.getProperties();
@@ -290,5 +326,45 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             "de.",
             "com.tyse.scrutiny.gateway"
         );
+    }
+
+    /**
+     * Get locale from the request with priority cascade.
+     *
+     * <p>Priority order:
+     * <ol>
+     *   <li>X-Locale header (user's selected preference in the app)</li>
+     *   <li>Accept-Language header (browser default)</li>
+     *   <li>Spanish (default for Hispanic target audience)</li>
+     * </ol>
+     *
+     * @param request the server web exchange
+     * @return the locale from the request
+     */
+    private Locale getLocaleFromRequest(ServerWebExchange request) {
+        if (request == null) {
+            LOG.debug("Request is null, using default locale: es");
+            return new Locale("es");
+        }
+
+        // 1st priority: X-Locale header (user's app preference)
+        String xLocale = request.getRequest().getHeaders().getFirst("X-Locale");
+        LOG.debug("X-Locale header value: {}", xLocale);
+        if (xLocale != null && !xLocale.isEmpty()) {
+            Locale locale = Locale.forLanguageTag(xLocale);
+            LOG.debug("Using X-Locale header: {}", locale);
+            return locale;
+        }
+
+        // 2nd priority: Accept-Language header (browser default)
+        if (!request.getRequest().getHeaders().getAcceptLanguageAsLocales().isEmpty()) {
+            Locale locale = request.getRequest().getHeaders().getAcceptLanguageAsLocales().get(0);
+            LOG.debug("Using Accept-Language header: {}", locale);
+            return locale;
+        }
+
+        // 3rd priority: Spanish (default for Hispanic target audience)
+        LOG.debug("No headers found, using default locale: es");
+        return new Locale("es");
     }
 }

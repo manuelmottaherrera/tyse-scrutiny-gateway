@@ -69,8 +69,11 @@ export default () => next => action => {
           if (toastError) {
             const entityName = translate(`global.menu.entities.${param}`);
             addErrorAlert({ key: toastError, data: { entityName } });
+          } else if (problem?.detail && problem?.message) {
+            // Priorizar el detalle específico sobre la traducción genérica
+            addErrorAlert({ message: problem.detail });
           } else if (problem?.message) {
-            addErrorAlert({ message: problem.detail, key: problem.message });
+            addErrorAlert({ key: problem.message });
           } else if (typeof data === 'string' && data !== '') {
             addErrorAlert({ message: data });
           } else {

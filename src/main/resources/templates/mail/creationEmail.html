@@ -151,7 +151,7 @@
         <div class="cta-container">
           <a
             class="cta-button"
-            th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})"
+            th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}&lang=${user.langKey}|})"
             th:href="${url}"
             th:text="#{email.creation.button}"
           >
@@ -161,7 +161,9 @@
 
         <div class="alternative-link">
           <p th:text="#{email.creation.alternative}">If the button doesn't work, copy and paste the following link into your browser:</p>
-          <a th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})" th:href="${url}" th:text="${url}"> Login link </a>
+          <a th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}&lang=${user.langKey}|})" th:href="${url}" th:text="${url}">
+            Login link
+          </a>
         </div>
       </div>
 

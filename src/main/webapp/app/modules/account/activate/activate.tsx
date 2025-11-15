@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Alert, Col, Row } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { Storage, Translate } from 'react-jhipster';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { setLocale } from 'app/shared/reducers/locale';
 import { activateAction, reset } from './activate.reducer';
 
 const successAlert = (
@@ -28,17 +29,23 @@ const failureAlert = (
 
 export const ActivatePage = () => {
   const dispatch = useAppDispatch();
-
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const key = searchParams.get('key');
+    const lang = searchParams.get('lang');
+
+    // Set locale from URL parameter if provided (e.g., from activation email)
+    if (lang && (lang === 'es' || lang === 'en')) {
+      Storage.session.set('locale', lang);
+      dispatch(setLocale(lang));
+    }
 
     dispatch(activateAction(key));
     return () => {
       dispatch(reset());
     };
-  }, []);
+  }, []); // Dependencies intentionally empty to run only on mount
 
   const { activationSuccess, activationFailure } = useAppSelector(state => state.activate);
 

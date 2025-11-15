@@ -675,6 +675,10 @@ Puedes ejecutar [auditorías Lighthouse](https://developers.google.com/web/tools
 Solo deberías ejecutar las auditorías cuando tu aplicación esté empaquetada con el perfil de producción.
 El reporte de lighthouse se crea en `target/cypress/lhreport.html`
 
+### Troubleshooting de Tests
+
+Si encuentras problemas ejecutando los tests (especialmente tests de integración con Testcontainers), consulta el archivo [TROUBLESHOOTING.md](TROUBLESHOOTING.md) que contiene soluciones a problemas comunes conocidos.
+
 ## Otros
 
 ### Calidad de código usando Sonar

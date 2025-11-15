@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Storage, Translate } from 'react-jhipster';
 import { Collapse, Nav, Navbar, NavbarToggler } from 'reactstrap';
 import LoadingBar from 'react-redux-loading-bar';
+import axios from 'axios';
 
 import { useAppDispatch } from 'app/config/store';
 import { setLocale } from 'app/shared/reducers/locale';
@@ -29,6 +30,17 @@ const Header = (props: IHeaderProps) => {
     const langKey = event.target.value;
     Storage.session.set('locale', langKey);
     dispatch(setLocale(langKey));
+
+    // Persist lang_key to database if user is authenticated
+    if (props.isAuthenticated) {
+      axios
+        .patch('/api/account/locale', langKey, {
+          headers: { 'Content-Type': 'text/plain' },
+        })
+        .catch(error => {
+          console.error('Failed to update language preference in database:', error);
+        });
+    }
   };
 
   const renderDevRibbon = () =>
