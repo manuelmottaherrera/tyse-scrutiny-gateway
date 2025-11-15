@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Storage } from 'react-jhipster';
 import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { thunk } from 'redux-thunk';
 
 import PasswordResetFinishPage from './password-reset-finish';
 
@@ -15,6 +15,9 @@ describe('PasswordResetFinishPage', () => {
   let store;
 
   beforeEach(() => {
+    // Clear session storage before each test
+    Storage.session.remove('locale');
+
     // Initialize mock store
     store = mockStore({
       passwordReset: {
@@ -23,6 +26,10 @@ describe('PasswordResetFinishPage', () => {
       },
       locale: {
         currentLocale: 'es',
+        sourcePrefixes: [],
+        lastChange: new Date().getTime(),
+        loadedKeys: [],
+        loadedLocales: ['es', 'en'],
       },
     });
   });
@@ -56,7 +63,7 @@ describe('PasswordResetFinishPage', () => {
     const actions = store.getActions();
     expect(actions).toContainEqual(
       expect.objectContaining({
-        type: 'locale/setLocale',
+        type: 'locale/setLocale/fulfilled',
         payload: 'es',
       }),
     );
@@ -87,7 +94,7 @@ describe('PasswordResetFinishPage', () => {
     const actions = store.getActions();
     expect(actions).toContainEqual(
       expect.objectContaining({
-        type: 'locale/setLocale',
+        type: 'locale/setLocale/fulfilled',
         payload: 'en',
       }),
     );
@@ -140,7 +147,7 @@ describe('PasswordResetFinishPage', () => {
 
     // And: setLocale action should NOT be dispatched for invalid locale
     const actions = store.getActions();
-    const setLocaleActions = actions.filter(action => action.type === 'locale/setLocale');
+    const setLocaleActions = actions.filter(action => action.type.startsWith('locale/setLocale'));
     expect(setLocaleActions).toHaveLength(0);
   });
 

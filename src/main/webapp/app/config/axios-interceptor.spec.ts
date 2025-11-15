@@ -11,7 +11,7 @@ describe('Axios Interceptor', () => {
     setupAxiosInterceptors(onUnauthenticated);
 
     it('onRequestSuccess is called on fulfilled request', () => {
-      expect((client.interceptors.request as any).handlers[0].fulfilled({ data: 'foo', url: '/test' })).toMatchObject({
+      expect((client.interceptors.request as any).handlers[0].fulfilled({ data: 'foo', url: '/test', headers: {} })).toMatchObject({
         data: 'foo',
       });
     });

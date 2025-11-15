@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Storage } from 'react-jhipster';
 import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { thunk } from 'redux-thunk';
 import axios from 'axios';
 
 import ActivatePage from './activate';
@@ -20,6 +20,9 @@ describe('ActivatePage', () => {
   let store;
 
   beforeEach(() => {
+    // Clear session storage before each test
+    Storage.session.remove('locale');
+
     // Mock axios response for activation
     mockedAxios.get = jest.fn().mockResolvedValue({ data: {} });
 
@@ -31,6 +34,10 @@ describe('ActivatePage', () => {
       },
       locale: {
         currentLocale: 'es',
+        sourcePrefixes: [],
+        lastChange: new Date().getTime(),
+        loadedKeys: [],
+        loadedLocales: ['es', 'en'],
       },
     });
   });
@@ -64,7 +71,7 @@ describe('ActivatePage', () => {
     const actions = store.getActions();
     expect(actions).toContainEqual(
       expect.objectContaining({
-        type: 'locale/setLocale',
+        type: 'locale/setLocale/fulfilled',
         payload: 'es',
       }),
     );
@@ -95,7 +102,7 @@ describe('ActivatePage', () => {
     const actions = store.getActions();
     expect(actions).toContainEqual(
       expect.objectContaining({
-        type: 'locale/setLocale',
+        type: 'locale/setLocale/fulfilled',
         payload: 'en',
       }),
     );
@@ -148,7 +155,7 @@ describe('ActivatePage', () => {
 
     // And: setLocale action should NOT be dispatched for invalid locale
     const actions = store.getActions();
-    const setLocaleActions = actions.filter(action => action.type === 'locale/setLocale');
+    const setLocaleActions = actions.filter(action => action.type.startsWith('locale/setLocale'));
     expect(setLocaleActions).toHaveLength(0);
   });
 
@@ -172,7 +179,7 @@ describe('ActivatePage', () => {
       const actions = store.getActions();
       expect(actions).toContainEqual(
         expect.objectContaining({
-          type: expect.stringContaining('activate/activateAction'),
+          type: expect.stringContaining('activate/activate_account'),
         }),
       );
     });
@@ -203,7 +210,7 @@ describe('ActivatePage', () => {
       const actions = store.getActions();
       expect(actions).toContainEqual(
         expect.objectContaining({
-          type: expect.stringContaining('activate/activateAction'),
+          type: expect.stringContaining('activate/activate_account'),
         }),
       );
     });
