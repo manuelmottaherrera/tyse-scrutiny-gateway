@@ -17,6 +17,8 @@ public class JHipsterBlockHoundIntegration implements BlockHoundIntegration {
         // Allow MessageSource to read .properties files in ExceptionTranslator (i18n error messages)
         builder.allowBlockingCallsInside("org.springframework.context.support.MessageSourceSupport", "getMessage");
         builder.allowBlockingCallsInside("org.springframework.context.support.ResourceBundleMessageSource", "getMessage");
+        // Allow ExceptionTranslator to use MessageSource for i18n (calls FileInputStream internally)
+        builder.allowBlockingCallsInside("com.tyse.scrutiny.gateway.web.rest.errors.ExceptionTranslator", "customizeProblem");
         // jhipster-needle-blockhound-integration - JHipster will add additional gradle plugins here
     }
 }
