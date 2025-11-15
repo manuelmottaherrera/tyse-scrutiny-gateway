@@ -145,10 +145,10 @@ describe('Header', () => {
       );
 
       // When: User changes locale to Spanish
-      const localeMenu = container.querySelector('[data-cy="languagesnavbar-dropdown"]') as HTMLElement;
+      const localeMenu = container.querySelector('[data-cy="languagesnavbar-dropdown"]');
       expect(localeMenu).toBeTruthy();
 
-      const spanishOption = container.querySelector('[value="es"]') as HTMLElement;
+      const spanishOption = container.querySelector('[value="es"]');
       if (spanishOption) {
         fireEvent.click(spanishOption);
       }
@@ -170,16 +170,12 @@ describe('Header', () => {
       );
 
       // When: Locale change event is triggered
-      const localeMenu = container.querySelector('select') as HTMLSelectElement;
+      const localeMenu = container.querySelector('select');
       if (localeMenu) {
         fireEvent.change(localeMenu, { target: { value: 'en' } });
 
         // Then: PATCH should be called
-        expect(mockedAxios.patch).toHaveBeenCalledWith(
-          '/api/account/locale',
-          'en',
-          { headers: { 'Content-Type': 'text/plain' } }
-        );
+        expect(mockedAxios.patch).toHaveBeenCalledWith('/api/account/locale', 'en', { headers: { 'Content-Type': 'text/plain' } });
       }
     });
 
@@ -196,7 +192,7 @@ describe('Header', () => {
       );
 
       // When: Locale change event is triggered
-      const localeMenu = container.querySelector('select') as HTMLSelectElement;
+      const localeMenu = container.querySelector('select');
       if (localeMenu) {
         fireEvent.change(localeMenu, { target: { value: 'en' } });
 
@@ -222,7 +218,7 @@ describe('Header', () => {
       );
 
       // When: Locale change triggers failed PATCH
-      const localeMenu = container.querySelector('select') as HTMLSelectElement;
+      const localeMenu = container.querySelector('select');
       if (localeMenu) {
         fireEvent.change(localeMenu, { target: { value: 'es' } });
 
