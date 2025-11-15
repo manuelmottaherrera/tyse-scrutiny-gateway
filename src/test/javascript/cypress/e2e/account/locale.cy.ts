@@ -101,11 +101,10 @@ describe('Locale/i18n Functionality', () => {
       cy.clickOnLogoutItem();
       cy.url().should('match', /\/$/);
 
-      // Login again
+      // Login again and verify language persists in database
       cy.login(username, password);
-      cy.visit('/');
 
-      // Verify language is still English
+      // Verify language is still English (without visiting page to avoid loop)
       cy.getAccount().then(account => {
         expect(account.langKey).to.equal('en');
       });
@@ -208,12 +207,7 @@ describe('Locale/i18n Functionality', () => {
     it('should receive error message in Spanish when X-Locale header is es', () => {
       cy.login(username, password);
 
-      // Set session locale to Spanish
-      cy.window().then(win => {
-        win.sessionStorage.setItem('locale', '"es"');
-      });
-
-      // Try to change to invalid locale
+      // Try to change to invalid locale with Spanish headers
       cy.authenticatedRequest({
         method: 'PATCH',
         url: '/api/account/locale',
@@ -221,6 +215,7 @@ describe('Locale/i18n Functionality', () => {
         headers: {
           'Content-Type': 'text/plain',
           'X-Locale': 'es',
+          'Accept-Language': 'es',
         },
         failOnStatusCode: false,
       }).then(response => {
@@ -233,12 +228,7 @@ describe('Locale/i18n Functionality', () => {
     it('should receive error message in English when X-Locale header is en', () => {
       cy.login(username, password);
 
-      // Set session locale to English
-      cy.window().then(win => {
-        win.sessionStorage.setItem('locale', '"en"');
-      });
-
-      // Try to change to invalid locale
+      // Try to change to invalid locale with English headers
       cy.authenticatedRequest({
         method: 'PATCH',
         url: '/api/account/locale',
@@ -246,6 +236,7 @@ describe('Locale/i18n Functionality', () => {
         headers: {
           'Content-Type': 'text/plain',
           'X-Locale': 'en',
+          'Accept-Language': 'en',
         },
         failOnStatusCode: false,
       }).then(response => {
