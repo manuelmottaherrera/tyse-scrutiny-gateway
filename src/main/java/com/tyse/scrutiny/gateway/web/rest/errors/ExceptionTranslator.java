@@ -181,6 +181,32 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             problem.setDetail(getCustomizedErrorDetails(err));
         }
 
+        // Translate detail for known exceptions with i18n support
+        if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage(
+                "error.authority.inactive",
+                new Object[] { inactiveAuthorityException.getAuthorityCode() },
+                problem.getDetail(),
+                locale
+            );
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof InvalidLocaleException) {
+            Locale locale = getLocaleFromRequest(request);
+            LOG.debug("InvalidLocaleException - Locale obtenido: {}", locale);
+            LOG.debug("InvalidLocaleException - Detail original: {}", problem.getDetail());
+            String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
+            LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
+            problem.setDetail(translatedDetail);
+
+            // Translate title as well
+            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, problem.getTitle(), locale);
+            LOG.debug("InvalidLocaleException - Title traducido: {}", translatedTitle);
+            problem.setTitle(translatedTitle);
+        }
+
         Map<String, Object> problemProperties = problem.getProperties();
         if (problemProperties == null || !problemProperties.containsKey(MESSAGE_KEY)) problem.setProperty(
             MESSAGE_KEY,
