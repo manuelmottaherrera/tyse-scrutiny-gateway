@@ -52,7 +52,7 @@ export const App = () => {
       >
         <BrowserRouter basename={baseHref}>
           <div className="app-container" style={{ paddingTop }}>
-            <ToastContainer position="top-left" className="toastify-container" toastClassName="toastify-toast" />
+            <ToastContainer position="top-left" className="toastify-container" toastClassName="toastify-toast" autoClose={30000} />
             <ErrorBoundary>
               <Header
                 isAuthenticated={isAuthenticated}

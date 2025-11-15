@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
 import { Alert, Button, Col, Row } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { handlePasswordResetInit, reset } from '../password-reset.reducer';
 
 export const PasswordResetInit = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(
     () => () => {
@@ -14,6 +16,18 @@ export const PasswordResetInit = () => {
     },
     [],
   );
+
+  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
+
+  useEffect(() => {
+    if (successMessage) {
+      // Delay navigation to allow toast notification to render
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, navigate]);
 
   const handleValidSubmit = ({ email }) => {
     dispatch(handlePasswordResetInit(email));

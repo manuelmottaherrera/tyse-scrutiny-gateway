@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { Storage, Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -10,6 +10,7 @@ import { handlePasswordResetFinish, reset } from '../password-reset.reducer';
 
 export const PasswordResetFinishPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
 
@@ -28,6 +29,18 @@ export const PasswordResetFinishPage = () => {
       dispatch(reset());
     };
   }, []); // Dependencies intentionally empty to run only on mount
+
+  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
+
+  useEffect(() => {
+    if (successMessage) {
+      // Delay navigation to allow toast notification to render
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, navigate]);
 
   const handleValidSubmit = ({ newPassword }) => dispatch(handlePasswordResetFinish({ key, newPassword }));
 

@@ -282,7 +282,7 @@ public class AccountResource {
         }
     )
     @PostMapping(path = "/account/reset-password/init")
-    public Mono<Void> requestPasswordReset(
+    public Mono<ResponseEntity<Void>> requestPasswordReset(
         @Parameter(description = "Correo electrónico del usuario", required = true) @RequestBody String mail
     ) {
         return userService
@@ -296,7 +296,11 @@ public class AccountResource {
                     LOG.warn("Password reset requested for non existing mail");
                 }
             })
-            .then();
+            .then(
+                Mono.just(
+                    ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "reset.request.messages.success", mail)).build()
+                )
+            );
     }
 
     /**
@@ -318,7 +322,7 @@ public class AccountResource {
         }
     )
     @PostMapping(path = "/account/reset-password/finish")
-    public Mono<Void> finishPasswordReset(
+    public Mono<ResponseEntity<Void>> finishPasswordReset(
         @Parameter(
             description = "Clave de restablecimiento y nueva contraseña",
             required = true
@@ -330,7 +334,9 @@ public class AccountResource {
         return userService
             .completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey())
             .switchIfEmpty(Mono.error(new AccountResourceException("No user was found for this reset key")))
-            .then();
+            .then(
+                Mono.just(ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "reset.finish.messages.success", "")).build())
+            );
     }
 
     private static boolean isPasswordLengthInvalid(String password) {
