@@ -1010,6 +1010,7 @@ class AccountResourceIT {
         userRepository.save(user).block();
 
         // Try to update locale with invalid language (French)
+        // Without X-Locale header, default is Spanish
         accountWebTestClient
             .patch()
             .uri("/api/account/locale")
@@ -1020,9 +1021,9 @@ class AccountResourceIT {
             .isBadRequest()
             .expectBody()
             .jsonPath("$.title")
-            .isEqualTo("Invalid language key")
+            .isEqualTo("Clave de idioma inválida") // Title translated to Spanish (default)
             .jsonPath("$.detail")
-            .isEqualTo("Only 'es' and 'en' are supported");
+            .value(org.hamcrest.Matchers.containsString("solo")); // Detail also in Spanish
 
         // Verify locale was NOT updated in database
         User updatedUser = userRepository.findOneByLogin("update-locale-user-invalid").block();
@@ -1030,6 +1031,45 @@ class AccountResourceIT {
         assertThat(updatedUser.getLangKey()).isEqualTo("es"); // Still Spanish
 
         userService.deleteUser("update-locale-user-invalid").block();
+    }
+
+    @Test
+    @WithMockUser("update-locale-error-english")
+    void testUpdateLocaleWithInvalidLanguageReturnsErrorInEnglish() throws Exception {
+        // Create test user
+        User user = new User();
+        user.setLogin("update-locale-error-english");
+        user.setPassword(RandomStringUtils.insecure().nextAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail("update-locale-error-english@example.com");
+        user.setFirstName("Update");
+        user.setLastName("Locale Error English");
+        user.setLangKey("en");
+        user.setCreatedBy(Constants.SYSTEM);
+        userRepository.save(user).block();
+
+        // Try to update locale with invalid language (French), passing X-Locale: en
+        accountWebTestClient
+            .patch()
+            .uri("/api/account/locale")
+            .contentType(MediaType.TEXT_PLAIN)
+            .header("X-Locale", "en") // Request error message in English
+            .bodyValue("fr")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody()
+            .jsonPath("$.title")
+            .isEqualTo("Invalid language key") // Title in English
+            .jsonPath("$.detail")
+            .value(org.hamcrest.Matchers.containsString("Only")); // Detail in English
+
+        // Verify locale was NOT updated in database
+        User updatedUser = userRepository.findOneByLogin("update-locale-error-english").block();
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getLangKey()).isEqualTo("en"); // Still English
+
+        userService.deleteUser("update-locale-error-english").block();
     }
 
     @Test

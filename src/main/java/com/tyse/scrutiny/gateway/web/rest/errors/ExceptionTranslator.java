@@ -168,6 +168,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
             String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
             LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
             problem.setDetail(translatedDetail);
+
+            // Translate title as well
+            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, problem.getTitle(), locale);
+            LOG.debug("InvalidLocaleException - Title traducido: {}", translatedTitle);
+            problem.setTitle(translatedTitle);
         }
 
         Map<String, Object> problemProperties = problem.getProperties();
