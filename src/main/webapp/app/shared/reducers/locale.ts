@@ -42,7 +42,12 @@ export const setLocale = createAsyncThunk('locale/setLocale', async (locale: str
     ).filter(Boolean);
     thunkAPI.dispatch(loaded({ keys, locale }));
   }
-  thunkAPI.dispatch(updateLocale(locale));
+
+  // Only update locale if it's actually different
+  if (currentLocale !== locale) {
+    thunkAPI.dispatch(updateLocale(locale));
+  }
+
   return locale;
 });
 
