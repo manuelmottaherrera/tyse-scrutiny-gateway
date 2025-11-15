@@ -73,6 +73,7 @@ describe('Locale/i18n Functionality', () => {
       cy.login(username, password);
 
       // Try to change locale to invalid language (French)
+      // Without X-Locale header, backend defaults to Spanish
       cy.authenticatedRequest({
         method: 'PATCH',
         url: '/api/account/locale',
@@ -81,7 +82,7 @@ describe('Locale/i18n Functionality', () => {
         failOnStatusCode: false,
       }).then(response => {
         expect(response.status).to.equal(400);
-        expect(response.body.title).to.equal('Invalid language key');
+        expect(response.body.title).to.equal('Clave de idioma inválida'); // Spanish by default
         expect(response.body.detail).to.include('es');
         expect(response.body.detail).to.include('en');
       });
@@ -220,7 +221,7 @@ describe('Locale/i18n Functionality', () => {
         }).then(response => {
           expect(response.status).to.equal(400);
           expect(response.body.title).to.equal('Clave de idioma inválida');
-          expect(response.body.detail).to.include('solo');
+          expect(response.body.detail).to.include('soportan'); // Spanish word unique to this message
         });
       });
     });
