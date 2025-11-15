@@ -1010,12 +1010,12 @@ class AccountResourceIT {
         userRepository.save(user).block();
 
         // Try to update locale with invalid language (French)
-        // Pass Accept-Language: es to get Spanish error message
+        // Pass X-Locale: es to get Spanish error message (highest priority)
         accountWebTestClient
             .patch()
             .uri("/api/account/locale")
             .contentType(MediaType.TEXT_PLAIN)
-            .header("Accept-Language", "es") // Request error message in Spanish
+            .header("X-Locale", "es") // Request error message in Spanish
             .bodyValue("fr")
             .exchange()
             .expectStatus()
