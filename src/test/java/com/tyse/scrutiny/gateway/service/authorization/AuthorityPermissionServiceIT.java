@@ -248,9 +248,10 @@ class AuthorityPermissionServiceIT {
 
         // When/Then: trying to assign permission throws InactiveAuthorityException
         StepVerifier.create(authorityPermissionService.assignPermissionToAuthority(inactiveAuthority.getId(), createPermission.getId()))
-            .expectErrorMatches(error -> error instanceof InactiveAuthorityException && ((InactiveAuthorityException) error)
-                    .getAuthorityCode()
-                    .equals("ROLE_INACTIVE_TEST")
+            .expectErrorMatches(
+                error ->
+                    error instanceof InactiveAuthorityException &&
+                    ((InactiveAuthorityException) error).getAuthorityCode().equals("ROLE_INACTIVE_TEST")
             )
             .verify();
     }
@@ -267,9 +268,10 @@ class AuthorityPermissionServiceIT {
 
         // When/Then: trying to revoke permission from inactive authority throws InactiveAuthorityException
         StepVerifier.create(authorityPermissionService.revokePermissionFromAuthority(testAuthority.getId(), createPermission.getId()))
-            .expectErrorMatches(error -> error instanceof InactiveAuthorityException && ((InactiveAuthorityException) error)
-                    .getAuthorityCode()
-                    .equals("ROLE_REVOKE_TEST")
+            .expectErrorMatches(
+                error ->
+                    error instanceof InactiveAuthorityException &&
+                    ((InactiveAuthorityException) error).getAuthorityCode().equals("ROLE_REVOKE_TEST")
             )
             .verify();
     }

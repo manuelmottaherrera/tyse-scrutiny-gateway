@@ -161,7 +161,11 @@
 
         <div class="alternative-link">
           <p th:text="#{email.activation.alternative}">If the button doesn't work, copy and paste the following link into your browser:</p>
-          <a th:with="url=(@{|${baseUrl}/account/activate?key=${user.activationKey}&lang=${user.langKey}|})" th:href="${url}" th:text="${url}">
+          <a
+            th:with="url=(@{|${baseUrl}/account/activate?key=${user.activationKey}&lang=${user.langKey}|})"
+            th:href="${url}"
+            th:text="${url}"
+          >
             Activation link
           </a>
         </div>
