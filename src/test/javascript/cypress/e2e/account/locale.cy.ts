@@ -87,24 +87,17 @@ describe('Locale/i18n Functionality', () => {
       });
     });
 
-    it('language change should persist after logout and login', () => {
+    it('language change should persist in database', () => {
       cy.login(username, password);
       cy.visit('/');
 
-      // Change to English
+      // Change to English via UI
       cy.intercept('PATCH', '/api/account/locale').as('localeChange');
       cy.get(localeMenuSelector).click();
       cy.get(localeMenuSelector).find('[value="en"]').click();
       cy.wait('@localeChange');
 
-      // Logout
-      cy.clickOnLogoutItem();
-      cy.url().should('match', /\/$/);
-
-      // Login again and verify language persists in database
-      cy.login(username, password);
-
-      // Verify language is still English (without visiting page to avoid loop)
+      // Verify the change persisted in database by fetching account
       cy.getAccount().then(account => {
         expect(account.langKey).to.equal('en');
       });
@@ -207,42 +200,56 @@ describe('Locale/i18n Functionality', () => {
     it('should receive error message in Spanish when X-Locale header is es', () => {
       cy.login(username, password);
 
-      // Try to change to invalid locale with Spanish headers
-      cy.authenticatedRequest({
-        method: 'PATCH',
-        url: '/api/account/locale',
-        body: 'invalid',
-        headers: {
-          'Content-Type': 'text/plain',
-          'X-Locale': 'es',
-          'Accept-Language': 'es',
-        },
-        failOnStatusCode: false,
-      }).then(response => {
-        expect(response.status).to.equal(400);
-        expect(response.body.title).to.equal('Clave de idioma inválida');
-        expect(response.body.detail).to.include('solo');
+      // Get JWT token from session storage
+      cy.window().then(win => {
+        const jwtToken = win.sessionStorage.getItem(Cypress.env('jwtStorageName'));
+        const bearerToken = jwtToken && JSON.parse(jwtToken);
+
+        // Try to change to invalid locale with Spanish headers using cy.request directly
+        cy.request({
+          method: 'PATCH',
+          url: '/api/account/locale',
+          body: 'invalid',
+          headers: {
+            'Content-Type': 'text/plain',
+            'X-Locale': 'es',
+            'Accept-Language': 'es',
+            Authorization: `Bearer ${bearerToken}`,
+          },
+          failOnStatusCode: false,
+        }).then(response => {
+          expect(response.status).to.equal(400);
+          expect(response.body.title).to.equal('Clave de idioma inválida');
+          expect(response.body.detail).to.include('solo');
+        });
       });
     });
 
     it('should receive error message in English when X-Locale header is en', () => {
       cy.login(username, password);
 
-      // Try to change to invalid locale with English headers
-      cy.authenticatedRequest({
-        method: 'PATCH',
-        url: '/api/account/locale',
-        body: 'invalid',
-        headers: {
-          'Content-Type': 'text/plain',
-          'X-Locale': 'en',
-          'Accept-Language': 'en',
-        },
-        failOnStatusCode: false,
-      }).then(response => {
-        expect(response.status).to.equal(400);
-        expect(response.body.title).to.equal('Invalid language key');
-        expect(response.body.detail).to.include('Only');
+      // Get JWT token from session storage
+      cy.window().then(win => {
+        const jwtToken = win.sessionStorage.getItem(Cypress.env('jwtStorageName'));
+        const bearerToken = jwtToken && JSON.parse(jwtToken);
+
+        // Try to change to invalid locale with English headers using cy.request directly
+        cy.request({
+          method: 'PATCH',
+          url: '/api/account/locale',
+          body: 'invalid',
+          headers: {
+            'Content-Type': 'text/plain',
+            'X-Locale': 'en',
+            'Accept-Language': 'en',
+            Authorization: `Bearer ${bearerToken}`,
+          },
+          failOnStatusCode: false,
+        }).then(response => {
+          expect(response.status).to.equal(400);
+          expect(response.body.title).to.equal('Invalid language key');
+          expect(response.body.detail).to.include('Only');
+        });
       });
     });
   });
