@@ -69,7 +69,7 @@ describe('ActivatePage', () => {
       expect.objectContaining({
         type: 'locale/setLocale',
         payload: 'es',
-      })
+      }),
     );
   });
 
@@ -100,7 +100,7 @@ describe('ActivatePage', () => {
       expect.objectContaining({
         type: 'locale/setLocale',
         payload: 'en',
-      })
+      }),
     );
   });
 
@@ -182,7 +182,7 @@ describe('ActivatePage', () => {
       expect(actions).toContainEqual(
         expect.objectContaining({
           type: expect.stringContaining('activate/activateAction'),
-        })
+        }),
       );
     });
   });
@@ -213,7 +213,7 @@ describe('ActivatePage', () => {
       expect(actions).toContainEqual(
         expect.objectContaining({
           type: expect.stringContaining('activate/activateAction'),
-        })
+        }),
       );
     });
   });

@@ -158,7 +158,7 @@ describe('Notification Middleware', () => {
           type: 'https://www.jhipster.tech/problem/problem-with-message',
           title: 'Invalid language key',
           status: 400,
-          detail: 'Only \'es\' and \'en\' are supported',
+          detail: "Only 'es' and 'en' are supported",
           message: 'error.invalidlangkey',
         },
         status: 400,
@@ -285,7 +285,7 @@ describe('Notification Middleware', () => {
     const toastMsg = (toastify.toast as any).error.getCall(0).args[0];
 
     // Then: detail is shown (not message translation key)
-    expect(toastMsg).toBe('Only \'es\' and \'en\' are supported');
+    expect(toastMsg).toBe("Only 'es' and 'en' are supported");
     expect(toastMsg).not.toContain('error.invalidlangkey');
   });
 

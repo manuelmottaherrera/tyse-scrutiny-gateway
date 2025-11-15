@@ -61,7 +61,7 @@ describe('PasswordResetFinishPage', () => {
       expect.objectContaining({
         type: 'locale/setLocale',
         payload: 'es',
-      })
+      }),
     );
   });
 
@@ -92,7 +92,7 @@ describe('PasswordResetFinishPage', () => {
       expect.objectContaining({
         type: 'locale/setLocale',
         payload: 'en',
-      })
+      }),
     );
   });
 
