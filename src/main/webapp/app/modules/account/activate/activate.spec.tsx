@@ -20,9 +20,6 @@ describe('ActivatePage', () => {
   let store;
 
   beforeEach(() => {
-    // Clear session storage
-    Storage.session.clear();
-
     // Mock axios response for activation
     mockedAxios.get = jest.fn().mockResolvedValue({ data: {} });
 
@@ -108,9 +105,6 @@ describe('ActivatePage', () => {
     // Given: URL without lang parameter
     const activationKey = 'test-activation-key';
 
-    // Clear storage before test
-    Storage.session.clear();
-
     // When: ActivatePage is rendered without lang parameter
     render(
       <Provider store={store}>
@@ -133,9 +127,6 @@ describe('ActivatePage', () => {
   it('should NOT set locale when ?lang parameter is invalid', async () => {
     // Given: URL with invalid lang parameter (French)
     const activationKey = 'test-activation-key';
-
-    // Clear storage before test
-    Storage.session.clear();
 
     // When: ActivatePage is rendered with lang=fr (invalid)
     render(

@@ -15,9 +15,6 @@ describe('PasswordResetFinishPage', () => {
   let store;
 
   beforeEach(() => {
-    // Clear session storage
-    Storage.session.clear();
-
     // Initialize mock store
     store = mockStore({
       passwordReset: {
@@ -100,9 +97,6 @@ describe('PasswordResetFinishPage', () => {
     // Given: URL without lang parameter
     const resetKey = 'test-reset-key';
 
-    // Clear storage before test
-    Storage.session.clear();
-
     // When: PasswordResetFinishPage is rendered without lang parameter
     render(
       <Provider store={store}>
@@ -125,9 +119,6 @@ describe('PasswordResetFinishPage', () => {
   it('should NOT set locale when ?lang parameter is invalid', async () => {
     // Given: URL with invalid lang parameter (French)
     const resetKey = 'test-reset-key';
-
-    // Clear storage before test
-    Storage.session.clear();
 
     // When: PasswordResetFinishPage is rendered with lang=fr (invalid)
     render(

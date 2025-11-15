@@ -125,9 +125,6 @@ describe('Header', () => {
       jest.clearAllMocks();
       mockedAxios.patch = jest.fn().mockResolvedValue({ data: {} });
 
-      // Clear session storage
-      Storage.session.clear();
-
       // Initialize store
       store = initStore();
     });
