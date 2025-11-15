@@ -1010,20 +1010,21 @@ class AccountResourceIT {
         userRepository.save(user).block();
 
         // Try to update locale with invalid language (French)
-        // Without X-Locale header, default is Spanish
+        // Pass X-Locale: es to get Spanish error message (highest priority)
         accountWebTestClient
             .patch()
             .uri("/api/account/locale")
             .contentType(MediaType.TEXT_PLAIN)
+            .header("X-Locale", "es") // Request error message in Spanish
             .bodyValue("fr")
             .exchange()
             .expectStatus()
             .isBadRequest()
             .expectBody()
             .jsonPath("$.title")
-            .isEqualTo("Clave de idioma inválida") // Title translated to Spanish (default)
+            .isEqualTo("Clave de idioma inválida") // Title translated to Spanish
             .jsonPath("$.detail")
-            .value(org.hamcrest.Matchers.containsString("solo")); // Detail also in Spanish
+            .value(org.hamcrest.Matchers.containsString("soportan")); // Detail also in Spanish
 
         // Verify locale was NOT updated in database
         User updatedUser = userRepository.findOneByLogin("update-locale-user-invalid").block();

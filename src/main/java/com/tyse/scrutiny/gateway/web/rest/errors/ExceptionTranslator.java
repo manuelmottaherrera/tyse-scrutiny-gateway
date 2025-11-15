@@ -133,7 +133,39 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
 
-        // Preserve custom titles from ErrorResponseException subclasses (InvalidLocaleException, InactiveAuthorityException, etc.)
+        // Translate i18n-supported exceptions FIRST before applying default title logic
+        // This allows translation to override hardcoded titles from ErrorResponseException
+        if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage(
+                "error.authority.inactive",
+                new Object[] { inactiveAuthorityException.getAuthorityCode() },
+                problem.getDetail(),
+                locale
+            );
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof InvalidLocaleException) {
+            Locale locale = getLocaleFromRequest(request);
+            LOG.debug("InvalidLocaleException - Locale obtenido: {}", locale);
+            LOG.debug("InvalidLocaleException - Title ANTES de traducir: {}", problem.getTitle());
+            LOG.debug("InvalidLocaleException - Detail original: {}", problem.getDetail());
+
+            String translatedDetail = messageSource.getMessage("error.invalidlangkey", null, problem.getDetail(), locale);
+            LOG.debug("InvalidLocaleException - Detail traducido: {}", translatedDetail);
+            problem.setDetail(translatedDetail);
+
+            // Translate title as well
+            String originalTitle = problem.getTitle();
+            String translatedTitle = messageSource.getMessage("error.invalidlangkey.title", null, originalTitle, locale);
+            LOG.debug("InvalidLocaleException - Title DESPUES de messageSource.getMessage(): {}", translatedTitle);
+            LOG.debug("InvalidLocaleException - ¿Título cambió? Original='{}' vs Traducido='{}'", originalTitle, translatedTitle);
+            problem.setTitle(translatedTitle);
+            LOG.debug("InvalidLocaleException - Title FINAL en problem: {}", problem.getTitle());
+        }
+
+        // Preserve custom titles from ErrorResponseException subclasses (but allow i18n overrides above)
         // Only override title if exception is NOT ErrorResponseException or if title is null
         if (!(err instanceof ErrorResponseException)) {
             // higher precedence to Custom/ResponseStatus types
