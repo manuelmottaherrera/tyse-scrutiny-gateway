@@ -10,14 +10,14 @@ import { handlePasswordResetFinish, reset } from '../password-reset.reducer';
 
 export const PasswordResetFinishPage = () => {
   const dispatch = useAppDispatch();
-
   const [searchParams] = useSearchParams();
-  const key = searchParams.get('key');
-  const lang = searchParams.get('lang');
-
   const [password, setPassword] = useState('');
 
+  const key = searchParams.get('key');
+
   useEffect(() => {
+    const lang = searchParams.get('lang');
+
     // Set locale from URL parameter if provided (e.g., from creation email)
     if (lang && (lang === 'es' || lang === 'en')) {
       Storage.session.set('locale', lang);
@@ -27,7 +27,7 @@ export const PasswordResetFinishPage = () => {
     return () => {
       dispatch(reset());
     };
-  }, []);
+  }, []); // Dependencies intentionally empty to run only on mount
 
   const handleValidSubmit = ({ newPassword }) => dispatch(handlePasswordResetFinish({ key, newPassword }));
 

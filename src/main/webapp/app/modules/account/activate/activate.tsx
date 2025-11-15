@@ -29,7 +29,6 @@ const failureAlert = (
 
 export const ActivatePage = () => {
   const dispatch = useAppDispatch();
-
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export const ActivatePage = () => {
     return () => {
       dispatch(reset());
     };
-  }, []);
+  }, []); // Dependencies intentionally empty to run only on mount
 
   const { activationSuccess, activationFailure } = useAppSelector(state => state.activate);
 

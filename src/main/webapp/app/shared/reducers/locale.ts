@@ -22,7 +22,13 @@ const loadLocaleAndRegisterLocaleFile = async (locale: string, prefix: string) =
 };
 
 export const setLocale = createAsyncThunk('locale/setLocale', async (locale: string, thunkAPI: any) => {
-  const { sourcePrefixes, loadedKeys, loadedLocales } = thunkAPI.getState().locale;
+  const { sourcePrefixes, loadedKeys, loadedLocales, currentLocale } = thunkAPI.getState().locale;
+
+  // Early return if already on this locale to prevent unnecessary updates
+  if (currentLocale === locale && loadedLocales.includes(locale)) {
+    return locale;
+  }
+
   if (!loadedLocales.includes(locale)) {
     const keys = (
       await Promise.all(
