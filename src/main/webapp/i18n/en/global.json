@@ -68,6 +68,12 @@
         "dontmatch": "The password and its confirmation do not match!"
       },
       "validate": {
+        "username": {
+          "required": "Username cannot be empty!"
+        },
+        "password": {
+          "required": "Password cannot be empty!"
+        },
         "newpassword": {
           "required": "Your password is required.",
           "minlength": "Your password is required to be at least 4 characters.",
