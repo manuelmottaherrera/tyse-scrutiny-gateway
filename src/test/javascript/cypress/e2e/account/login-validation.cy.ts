@@ -59,12 +59,14 @@ describe('Login Form Validation Messages (Issue #16)', () => {
     beforeEach(() => {
       // Set locale to English
       cy.window().then(win => {
-        win.localStorage.setItem('locale', 'en');
+        win.sessionStorage.setItem('locale', '"en"');
       });
       cy.reload();
-      // Wait for login link to be available (indicates page is fully loaded with translations)
-      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
+      // Wait for page to reload and navbar to be ready
+      cy.get('nav', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
+      // Wait for translations to load by checking the login title is in English
+      cy.get('[data-cy="loginTitle"]', { timeout: 10000 }).should('be.visible').invoke('text').should('include', 'Sign in');
     });
 
     it('should show username validation error in English when field is empty', () => {
@@ -111,12 +113,12 @@ describe('Login Form Validation Messages (Issue #16)', () => {
     it('should update validation messages when language is changed', () => {
       // Given: User is on login page in Spanish
       cy.window().then(win => {
-        win.localStorage.setItem('locale', 'es');
+        win.sessionStorage.setItem('locale', '"es"');
       });
       cy.reload();
-      // Wait for login link to be available (indicates page is fully loaded with translations)
-      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
+      // Wait for translations to load by checking the login title is in Spanish
+      cy.get('[data-cy="loginTitle"]', { timeout: 10000 }).should('be.visible').invoke('text').should('include', 'Iniciar la sesión');
 
       // When: User triggers validation error
       cy.get(usernameLoginSelector).focus();
@@ -125,14 +127,19 @@ describe('Login Form Validation Messages (Issue #16)', () => {
       // Then: Error should be in Spanish
       cy.get(usernameLoginSelector).closest('.mb-3').find('.invalid-feedback').should('contain', 'usuario');
 
+      // Close login modal first
+      cy.get('button.btn-close', { timeout: 5000 }).click();
+
       // When: User changes language to English
       cy.window().then(win => {
-        win.localStorage.setItem('locale', 'en');
+        win.sessionStorage.setItem('locale', '"en"');
       });
       cy.reload();
-      // Wait for login link to be available (indicates page is fully loaded with translations)
-      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
+      // Wait for page to reload and navbar to be ready
+      cy.get('nav', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
+      // Wait for translations to load by checking the login title is in English
+      cy.get('[data-cy="loginTitle"]', { timeout: 10000 }).should('be.visible').invoke('text').should('include', 'Sign in');
       cy.get(usernameLoginSelector).focus();
       cy.get(usernameLoginSelector).blur();
 
