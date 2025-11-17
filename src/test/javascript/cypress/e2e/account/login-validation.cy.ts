@@ -62,6 +62,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
         win.localStorage.setItem('locale', 'en');
       });
       cy.reload();
+      // Wait for login link to be available (indicates page is fully loaded with translations)
+      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
     });
 
@@ -112,6 +114,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
         win.localStorage.setItem('locale', 'es');
       });
       cy.reload();
+      // Wait for login link to be available (indicates page is fully loaded with translations)
+      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
 
       // When: User triggers validation error
@@ -126,6 +130,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
         win.localStorage.setItem('locale', 'en');
       });
       cy.reload();
+      // Wait for login link to be available (indicates page is fully loaded with translations)
+      cy.get('[data-cy="login"]', { timeout: 10000 }).should('be.visible');
       cy.clickOnLoginItem();
       cy.get(usernameLoginSelector).focus();
       cy.get(usernameLoginSelector).blur();

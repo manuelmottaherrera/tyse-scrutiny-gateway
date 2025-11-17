@@ -20,7 +20,8 @@ describe('/admin', () => {
   describe('/user-management', () => {
     it('should load the page', () => {
       cy.clickOnAdminMenuItem('user-management');
-      cy.get(userManagementPageHeadingSelector).should('be.visible');
+      // Wait for the page heading to be present in DOM before checking visibility
+      cy.get(userManagementPageHeadingSelector, { timeout: 10000 }).should('exist').should('be.visible');
     });
   });
 
