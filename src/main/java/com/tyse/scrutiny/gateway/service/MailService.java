@@ -53,7 +53,9 @@ public class MailService {
         Mono.defer(() -> {
             sendEmailSync(to, subject, content, isMultipart, isHtml);
             return Mono.empty();
-        }).subscribe();
+        })
+            .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+            .subscribe();
     }
 
     private void sendEmailSync(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
@@ -85,7 +87,9 @@ public class MailService {
         Mono.defer(() -> {
             sendEmailFromTemplateSync(user, templateName, titleKey);
             return Mono.empty();
-        }).subscribe();
+        })
+            .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+            .subscribe();
     }
 
     private void sendEmailFromTemplateSync(User user, String templateName, String titleKey) {
@@ -94,11 +98,18 @@ public class MailService {
             return;
         }
         Locale locale = Locale.forLanguageTag(user.getLangKey());
+
+        // Get app name from i18n properties
+        String appName = messageSource.getMessage("app.name", null, "Detinio", locale);
+
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable("appName", appName); // Make app name available to templates
         String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, null, locale);
+
+        // Pass app name as parameter for title placeholders
+        String subject = messageSource.getMessage(titleKey, new Object[] { appName }, locale);
         sendEmailSync(user.getEmail(), subject, content, false, true);
     }
 

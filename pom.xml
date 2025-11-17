@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Tyse Scrutiny Gateway</name>
-    <description>Description for Tyse Scrutiny Gateway</description>
+    <description>API Tyse Scrutiny Gateway para servir a Detinio</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>

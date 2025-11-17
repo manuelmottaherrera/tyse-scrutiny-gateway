@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Tyse Scrutiny Gateway** is a JHipster 8.11.0 microservice gateway application using:
+**Detinio** is a JHipster 8.11.0 microservice gateway application using:
 
 - Spring Boot 3.4.5 with reactive WebFlux (non-blocking architecture)
 - React 18 with TypeScript for the frontend

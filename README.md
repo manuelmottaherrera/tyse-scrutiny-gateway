@@ -1,4 +1,8 @@
-# tyseScrutinyGateway
+# Detinio
+
+**Detinio** combina "DEmocracia" + "EscruTINIO" - Sistema de escrutinio electoral desarrollado por Tecnología y Servicios Electorales.
+
+**tyseScrutinyGateway**: nombre técnico.
 
 Esta aplicación fue generada usando JHipster 8.11.0, puedes encontrar documentación y ayuda en [https://www.jhipster.tech/documentation-archive/v8.11.0](https://www.jhipster.tech/documentation-archive/v8.11.0).
 

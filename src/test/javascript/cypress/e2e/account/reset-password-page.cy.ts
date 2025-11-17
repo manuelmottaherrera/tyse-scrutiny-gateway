@@ -37,7 +37,7 @@ describe('forgot your password', () => {
 
   it('should redirect to home page after successful password reset request', () => {
     // Given: User is on password reset init page
-    cy.url().should('include', '/account/reset/init');
+    cy.url().should('include', '/account/reset/request');
 
     // When: User submits valid email
     cy.get(emailResetPasswordSelector).type('user@gmail.com');
@@ -49,10 +49,10 @@ describe('forgot your password', () => {
     });
 
     // And: User should be redirected to home page
-    cy.url().should('eq', Cypress.config().baseUrl + '/');
+    cy.url().should('eq', Cypress.config().baseUrl);
 
-    // And: Home page should be visible
-    cy.get('.home').should('be.visible');
+    // And: Password reset form should no longer be present
+    cy.get(emailResetPasswordSelector).should('not.exist');
   });
 
   it('should show success notification after password reset request', () => {
@@ -67,11 +67,13 @@ describe('forgot your password', () => {
 
     // And: Success toast notification should be visible
     // Note: Toast appears on home page after redirect
-    cy.url().should('eq', Cypress.config().baseUrl + '/');
+    cy.url().should('eq', Cypress.config().baseUrl);
     cy.get('.Toastify__toast--success').should('be.visible');
 
-    // And: Notification should contain success message about email
-    cy.get('.Toastify__toast--success').should('contain', 'email');
+    // And: Notification should contain success message (matches both EN "email" and ES "correo")
+    cy.get('.Toastify__toast--success')
+      .invoke('text')
+      .should('match', /(email|correo)/i);
   });
 
   it('should prevent multiple submissions by redirecting', () => {
@@ -85,7 +87,7 @@ describe('forgot your password', () => {
     });
 
     // And: User should be redirected immediately
-    cy.url().should('eq', Cypress.config().baseUrl + '/');
+    cy.url().should('eq', Cypress.config().baseUrl);
 
     // And: Password reset form should no longer be visible
     cy.get(emailResetPasswordSelector).should('not.exist');

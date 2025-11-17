@@ -1,7 +1,7 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
   <head>
-    <title th:text="#{email.activation.title}">Account Activation - Tyse Scrutiny</title>
+    <title th:text="#{email.activation.title}">Account Activation - Detinio</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
@@ -144,8 +144,8 @@
       <div class="content">
         <p class="greeting" th:text="#{email.activation.greeting(${user.login})}">Dear User,</p>
 
-        <p class="message" th:text="#{email.activation.text1}">
-          Your Tyse Scrutiny account has been created, please click on the button below to activate it:
+        <p class="message" th:text="#{email.activation.text1(${appName})}">
+          Your Detinio account has been created, please click on the button below to activate it:
         </p>
 
         <div class="cta-container">
