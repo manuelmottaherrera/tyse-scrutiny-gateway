@@ -1,4 +1,4 @@
-import { passwordLoginSelector, submitLoginSelector, usernameLoginSelector } from '../../support/commands';
+import { passwordLoginSelector, usernameLoginSelector } from '../../support/commands';
 
 describe('Login Form Validation Messages (Issue #16)', () => {
   beforeEach(() => {
@@ -17,7 +17,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show username validation error in Spanish when field is empty', () => {
       // When: User clicks submit without entering username
-      cy.get(usernameLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
 
       // Then: Validation message should be in Spanish
       cy.get(usernameLoginSelector)
@@ -29,7 +30,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show password validation error in Spanish when field is empty', () => {
       // When: User clicks submit without entering password
-      cy.get(passwordLoginSelector).focus().blur();
+      cy.get(passwordLoginSelector).focus();
+      cy.get(passwordLoginSelector).blur();
 
       // Then: Validation message should be in Spanish
       cy.get(passwordLoginSelector)
@@ -41,8 +43,10 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show both validation errors in Spanish', () => {
       // When: User tries to submit empty form
-      cy.get(usernameLoginSelector).focus().blur();
-      cy.get(passwordLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
+      cy.get(passwordLoginSelector).focus();
+      cy.get(passwordLoginSelector).blur();
 
       // Then: Both validation messages should be in Spanish
       cy.get(usernameLoginSelector).closest('.mb-3').find('.invalid-feedback').should('be.visible').and('contain', 'usuario');
@@ -63,7 +67,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show username validation error in English when field is empty', () => {
       // When: User clicks submit without entering username
-      cy.get(usernameLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
 
       // Then: Validation message should be in English
       cy.get(usernameLoginSelector)
@@ -75,7 +80,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show password validation error in English when field is empty', () => {
       // When: User clicks submit without entering password
-      cy.get(passwordLoginSelector).focus().blur();
+      cy.get(passwordLoginSelector).focus();
+      cy.get(passwordLoginSelector).blur();
 
       // Then: Validation message should be in English
       cy.get(passwordLoginSelector)
@@ -87,8 +93,10 @@ describe('Login Form Validation Messages (Issue #16)', () => {
 
     it('should show both validation errors in English', () => {
       // When: User tries to submit empty form
-      cy.get(usernameLoginSelector).focus().blur();
-      cy.get(passwordLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
+      cy.get(passwordLoginSelector).focus();
+      cy.get(passwordLoginSelector).blur();
 
       // Then: Both validation messages should be in English
       cy.get(usernameLoginSelector).closest('.mb-3').find('.invalid-feedback').should('be.visible').and('contain', 'Username');
@@ -107,7 +115,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
       cy.clickOnLoginItem();
 
       // When: User triggers validation error
-      cy.get(usernameLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
 
       // Then: Error should be in Spanish
       cy.get(usernameLoginSelector).closest('.mb-3').find('.invalid-feedback').should('contain', 'usuario');
@@ -118,7 +127,8 @@ describe('Login Form Validation Messages (Issue #16)', () => {
       });
       cy.reload();
       cy.clickOnLoginItem();
-      cy.get(usernameLoginSelector).focus().blur();
+      cy.get(usernameLoginSelector).focus();
+      cy.get(usernameLoginSelector).blur();
 
       // Then: Error should now be in English
       cy.get(usernameLoginSelector).closest('.mb-3').find('.invalid-feedback').should('contain', 'Username');
