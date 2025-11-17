@@ -117,7 +117,6 @@ export const UserManagementUpdate = () => {
                   },
                 }}
               />
-              <FormText>This field cannot be longer than 50 characters.</FormText>
               <ValidatedField
                 name="email"
                 label={translate('global.form.email.label')}
@@ -154,13 +153,17 @@ export const UserManagementUpdate = () => {
                   </option>
                 ))}
               </ValidatedField>
-              <ValidatedField type="select" name="authorities" multiple label={translate('userManagement.profiles')}>
+              <div className="mb-3">
+                <label className="form-label">
+                  <Translate contentKey="userManagement.profiles._">Profiles</Translate>
+                </label>
+                <FormText className="mb-2 d-block">
+                  <Translate contentKey="userManagement.profiles.help">Select one or more roles for this user</Translate>
+                </FormText>
                 {authorities.map(role => (
-                  <option value={role} key={role}>
-                    {role}
-                  </option>
+                  <ValidatedField key={role} type="checkbox" name="authorities" value={role} check label={role} id={`authority-${role}`} />
                 ))}
-              </ValidatedField>
+              </div>
               <Button tag={Link} to="/admin/user-management" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

@@ -246,6 +246,37 @@ input.form-control {
   }
 }
 
+// Fix para la flecha del select en dark mode
+// IMPORTANTE: Solo aplicar flecha a selects de opción única (no multiple)
+.form-select:not([multiple]),
+select.form-control:not([multiple]) {
+  // SVG arrow icon con color de texto oscuro (usa variable $gray-darker: #6c757d)
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+
+// Flecha blanca para tema oscuro (usa variable $color-white-full: #ffffff)
+[data-theme='dark'],
+.theme-dark {
+  .form-select:not([multiple]),
+  select.form-control:not([multiple]) {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+}
+
+// Dark mode automático del sistema
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    .form-select:not([multiple]),
+    select.form-control:not([multiple]) {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    }
+  }
+}
+
 // Asegurar que los selects deshabilitados usen los colores correctos
 select:disabled,
 select[disabled],

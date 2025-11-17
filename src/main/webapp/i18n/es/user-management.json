@@ -21,7 +21,10 @@
     "email": "Email",
     "activated": "Activado",
     "deactivated": "Desactivado",
-    "profiles": "Perfiles",
+    "profiles": {
+      "_": "Perfiles",
+      "help": "Seleccione uno o más roles para este usuario"
+    },
     "langKey": "Idioma",
     "createdBy": "Creado por",
     "createdDate": "Fecha de creación",
