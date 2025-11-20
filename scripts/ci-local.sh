@@ -136,7 +136,28 @@ echo -e "${YELLOW}[Job 2/3] Starting Frontend Tests...${NC}"
 FRONTEND_START=$(date +%s)
 
 echo "  → Installing dependencies..."
-npm ci --silent
+echo "     (Logging to: logs/npm-ci.log)"
+mkdir -p logs
+npm ci > logs/npm-ci.log 2>&1 &
+NPM_PID=$!
+
+# Monitor npm ci progress
+while kill -0 $NPM_PID 2>/dev/null; do
+    sleep 5
+    if [ -f logs/npm-ci.log ]; then
+        tail -n 3 logs/npm-ci.log | sed 's/^/     /'
+    fi
+done
+
+# Wait for npm ci to complete and check exit code
+wait $NPM_PID
+NPM_EXIT_CODE=$?
+if [ $NPM_EXIT_CODE -ne 0 ]; then
+    echo -e "${RED}✗ npm ci failed${NC}"
+    echo "Last 20 lines of logs/npm-ci.log:"
+    tail -n 20 logs/npm-ci.log
+    exit 1
+fi
 
 echo "  → Checking code formatting..."
 npm run prettier:check
