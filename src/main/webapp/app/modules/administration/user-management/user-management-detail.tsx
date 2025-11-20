@@ -80,7 +80,7 @@ export const UserManagementDetail = () => {
             ) : null}
           </dd>
           <dt>
-            <Translate contentKey="userManagement.profiles">Profiles</Translate>
+            <Translate contentKey="userManagement.profiles._">Profiles</Translate>
           </dt>
           <dd>
             <ul className="list-unstyled">

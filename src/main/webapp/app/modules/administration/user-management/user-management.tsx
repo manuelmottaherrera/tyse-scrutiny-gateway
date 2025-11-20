@@ -125,7 +125,7 @@ export const UserManagement = () => {
               <FontAwesomeIcon icon={getSortIconByFieldName('langKey')} />
             </th>
             <th>
-              <Translate contentKey="userManagement.profiles">Profiles</Translate>
+              <Translate contentKey="userManagement.profiles._">Profiles</Translate>
             </th>
             <th className="hand" onClick={sort('createdDate')}>
               <Translate contentKey="userManagement.createdDate">Created Date</Translate>{' '}
