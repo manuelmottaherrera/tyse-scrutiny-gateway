@@ -29,9 +29,6 @@ LOG_FILE="logs/push-$(date +%Y%m%d-%H%M%S).log"
 exec > >(tee -a "$LOG_FILE")
 exec 2>&1
 
-echo "📝 Log file: $LOG_FILE"
-echo ""
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -113,6 +110,8 @@ else
         echo -e "  2. Run ${BLUE}./scripts/ci-local.sh --with-e2e${NC} to debug"
         echo -e "  3. Run ${BLUE}./scripts/push.sh --skip-ci${NC} to push without CI (not recommended)"
         echo ""
+        echo "📝 Log file: $LOG_FILE"
+        echo ""
         exit 1
     fi
 fi
@@ -135,6 +134,8 @@ if git push "$REMOTE" "$BRANCH"; then
     echo ""
     echo -e "${GREEN}Successfully pushed to ${REMOTE}/${BRANCH}${NC}"
     echo ""
+    echo "📝 Log file: $LOG_FILE"
+    echo ""
     exit 0
 else
     echo ""
@@ -144,6 +145,8 @@ else
     echo ""
     echo -e "${YELLOW}Git push encountered an error.${NC}"
     echo -e "${YELLOW}Check the error message above for details.${NC}"
+    echo ""
+    echo "📝 Log file: $LOG_FILE"
     echo ""
     exit 1
 fi
