@@ -14,9 +14,23 @@
 #
 # Opciones:
 #   --skip-ci    Saltar CI y hacer push directamente
+#
+# Logs:
+#   La salida completa se guarda en logs/push-YYYYMMDD-HHMMSS.log
 ################################################################################
 
 set -e  # Exit on error
+
+# Setup logging
+mkdir -p logs
+LOG_FILE="logs/push-$(date +%Y%m%d-%H%M%S).log"
+
+# Redirect all output to both console and log file
+exec > >(tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "📝 Log file: $LOG_FILE"
+echo ""
 
 # Colors for output
 RED='\033[0;31m'
