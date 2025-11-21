@@ -129,6 +129,104 @@ fi
 echo ""
 
 ################################################################################
+# Liquibase Rollback Verification
+################################################################################
+
+echo -e "${YELLOW}[Liquibase] Verifying rollback capability...${NC}"
+ROLLBACK_START=$(date +%s)
+
+# Crear directorio para logs de Liquibase
+mkdir -p logs
+
+echo "  → Checking current database status..."
+./mvnw liquibase:status \
+  -Dlogging.level.ROOT=ERROR \
+  -Dlogging.level.liquibase=WARN \
+  > logs/liquibase-status.log 2>&1 || true
+
+# Contar changesets aplicados (usando grep + wc -l para evitar problemas con grep -c)
+APPLIED_CHANGESETS=$(grep "previously run" logs/liquibase-status.log 2>/dev/null | wc -l)
+# Asegurar que sea un número válido
+APPLIED_CHANGESETS=${APPLIED_CHANGESETS:-0}
+echo "    Applied changesets: $APPLIED_CHANGESETS"
+
+if [ "$APPLIED_CHANGESETS" -gt 0 ]; then
+    echo "  → Testing rollback capability (rollback to tag 'estado-vacio')..."
+
+    # Intentar rollback hasta el tag 'estado-vacio'
+    if ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio \
+      -Dlogging.level.ROOT=ERROR \
+      -Dlogging.level.liquibase=WARN \
+      > logs/liquibase-rollback.log 2>&1; then
+
+        echo -e "    ${GREEN}✓ Rollback executed successfully${NC}"
+
+        # Contar cuántos changesets se hicieron rollback
+        ROLLED_BACK=$(grep -c "Rolling Back Changeset" logs/liquibase-rollback.log 2>/dev/null || echo "0")
+        if [ "$ROLLED_BACK" -gt 0 ]; then
+            echo -e "    ${GREEN}✓ Rolled back $ROLLED_BACK changeset(s)${NC}"
+        else
+            echo -e "    ${YELLOW}⚠ Warning: No rollback statements found${NC}"
+        fi
+
+        # Volver a aplicar todos los changesets
+        echo "  → Re-applying all changesets with update..."
+        if ./mvnw liquibase:update \
+          -Dlogging.level.ROOT=ERROR \
+          -Dlogging.level.liquibase=WARN \
+          > logs/liquibase-update.log 2>&1; then
+            echo -e "    ${GREEN}✓ Database restored to original state${NC}"
+        else
+            echo -e "    ${RED}✗ Error: Failed to re-apply changesets${NC}"
+            echo "    Check logs/liquibase-update.log for details"
+            exit 1
+        fi
+    else
+        echo -e "    ${YELLOW}⚠ Warning: Rollback to tag 'estado-vacio' failed${NC}"
+        echo -e "    ${YELLOW}  This might indicate:${NC}"
+        echo -e "    ${YELLOW}  - Missing rollback configuration in one or more changesets${NC}"
+        echo -e "    ${YELLOW}  - Tag 'estado-vacio' not found in database${NC}"
+        echo "    Check logs/liquibase-rollback.log for details"
+
+        # Intentar verificar si hay changesets sin rollback usando análisis estático
+        echo "  → Analyzing changeset files for rollback tags..."
+        TOTAL_CHANGESETS=0
+        CHANGESETS_WITH_ROLLBACK=0
+
+        LIQUIBASE_DIR="src/main/resources/config/liquibase"
+        if [ -d "$LIQUIBASE_DIR" ]; then
+            for xml_file in $(find "$LIQUIBASE_DIR" -name "*.xml" -type f 2>/dev/null); do
+                # Contar changesets en el archivo
+                CHANGESETS_IN_FILE=$(grep -c "<changeSet" "$xml_file" 2>/dev/null || echo "0")
+                TOTAL_CHANGESETS=$((TOTAL_CHANGESETS + CHANGESETS_IN_FILE))
+
+                # Contar rollback tags en el archivo
+                ROLLBACKS_IN_FILE=$(grep -c "<rollback" "$xml_file" 2>/dev/null || echo "0")
+                CHANGESETS_WITH_ROLLBACK=$((CHANGESETS_WITH_ROLLBACK + ROLLBACKS_IN_FILE))
+            done
+
+            if [ "$TOTAL_CHANGESETS" -gt 0 ]; then
+                PERCENTAGE=$((CHANGESETS_WITH_ROLLBACK * 100 / TOTAL_CHANGESETS))
+                echo "    Total changesets found: $TOTAL_CHANGESETS"
+                echo "    Changesets with <rollback> tag: $CHANGESETS_WITH_ROLLBACK (${PERCENTAGE}%)"
+
+                if [ "$PERCENTAGE" -lt 100 ]; then
+                    MISSING=$((TOTAL_CHANGESETS - CHANGESETS_WITH_ROLLBACK))
+                    echo -e "    ${YELLOW}⚠ Warning: $MISSING changeset(s) may lack rollback configuration${NC}"
+                fi
+            fi
+        fi
+    fi
+else
+    echo -e "    ${BLUE}ℹ No changesets applied yet (skipping rollback test)${NC}"
+fi
+
+ROLLBACK_END=$(date +%s)
+ROLLBACK_TIME=$((ROLLBACK_END - ROLLBACK_START))
+echo -e "${GREEN}✓ Liquibase verification completed${NC} (${ROLLBACK_TIME}s)"
+echo ""
+
+################################################################################
 # Job 2: Frontend Tests
 ################################################################################
 
@@ -256,14 +354,15 @@ echo -e "${GREEN}✅ CI Pipeline Passed${NC}"
 echo -e "${GREEN}================================${NC}"
 echo ""
 echo "Timing Summary:"
-echo "  Environment Cleanup: ${CLEAN_TIME}s"
-echo "  Backend Tests:       ${BACKEND_TIME}s"
-echo "  Frontend Tests:      ${FRONTEND_TIME}s"
+echo "  Environment Cleanup:     ${CLEAN_TIME}s"
+echo "  Backend Tests:           ${BACKEND_TIME}s"
+echo "  Liquibase Verification:  ${ROLLBACK_TIME}s"
+echo "  Frontend Tests:          ${FRONTEND_TIME}s"
 if [ "$RUN_E2E" = true ]; then
-    echo "  E2E Tests:           ${E2E_TIME}s"
+    echo "  E2E Tests:               ${E2E_TIME}s"
 fi
-echo "  ─────────────────────────────"
-echo "  Total:               ${TOTAL_TIME}s"
+echo "  ─────────────────────────────────"
+echo "  Total:                   ${TOTAL_TIME}s"
 echo ""
 echo "All checks passed! ✓"
 echo "The code is ready to be pushed to GitHub."

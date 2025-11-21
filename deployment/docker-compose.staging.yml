@@ -15,7 +15,7 @@ services:
       - tyse-network
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${GATEWAY_DB_USER} -d ${GATEWAY_DB_NAME}']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
       - tyse-network
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DIVIPOL_DB_USER} -d ${DIVIPOL_DB_NAME}']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 10s
       timeout: 5s
       retries: 5
