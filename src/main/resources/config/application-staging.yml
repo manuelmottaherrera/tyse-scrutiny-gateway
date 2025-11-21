@@ -67,6 +67,10 @@ server:
 # Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
+info:
+  # Override the ribbon display for staging environment
+  display-ribbon-on-profiles: 'staging'
+
 jhipster:
   gateway:
     rate-limiting:

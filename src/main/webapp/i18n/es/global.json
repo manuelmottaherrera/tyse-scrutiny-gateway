@@ -97,7 +97,8 @@
       "id": "ID"
     },
     "ribbon": {
-      "dev": "Desarrollo"
+      "dev": "Desarrollo",
+      "staging": "Pruebas"
     },
     "item-count": "Mostrando {{first}} - {{second}} de {{total}} elementos."
   },
