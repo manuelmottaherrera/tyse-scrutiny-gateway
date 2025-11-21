@@ -2,7 +2,6 @@
 // This allows standard-version to update Maven version in pom.xml
 
 const xmlParser = require('xml2js');
-const fs = require('fs');
 
 module.exports.readVersion = function (contents) {
   const parser = new xmlParser.Parser();
