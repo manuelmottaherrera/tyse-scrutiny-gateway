@@ -1,6 +1,6 @@
 {
   "name": "tyse-scrutiny-gateway",
-  "version": "0.0.1-SNAPSHOT",
+  "version": "1.0.0",
   "private": true,
   "description": "Detinio - Sistema de escrutinio electoral",
   "license": "UNLICENSED",
@@ -66,6 +66,11 @@
     "prepare": "husky",
     "prettier:check": "prettier --check \"{,src/**/,webpack/,.blueprint/**/}*.{md,json,yml,js,cjs,mjs,ts,cts,mts,java,html,tsx,css,scss}\"",
     "prettier:format": "prettier --write \"{,src/**/,webpack/,.blueprint/**/}*.{md,json,yml,js,cjs,mjs,ts,cts,mts,java,html,tsx,css,scss}\"",
+    "release": "standard-version",
+    "release:dry-run": "standard-version --dry-run",
+    "release:major": "standard-version --release-as major",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
     "services:up": "docker compose -f src/main/docker/services.yml up --wait",
     "start": "npm run webapp:dev --",
     "start-tls": "npm run webapp:dev -- --env tls",
@@ -186,6 +191,7 @@
     "sinon": "20.0.0",
     "source-map-loader": "5.0.0",
     "sourcemap-istanbul-instrumenter-loader": "0.2.0",
+    "standard-version": "^9.5.0",
     "style-loader": "4.0.0",
     "swagger-ui-dist": "5.21.0",
     "terser-webpack-plugin": "5.3.14",
@@ -200,7 +206,8 @@
     "webpack-dev-server": "5.2.1",
     "webpack-merge": "6.0.1",
     "webpack-notifier": "1.15.0",
-    "workbox-webpack-plugin": "7.3.0"
+    "workbox-webpack-plugin": "7.3.0",
+    "xml2js": "^0.6.2"
   },
   "engines": {
     "node": ">=22.15.0"

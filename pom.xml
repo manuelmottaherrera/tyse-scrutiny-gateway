@@ -5,7 +5,7 @@
 
     <groupId>com.tyse.scrutiny.gateway</groupId>
     <artifactId>tyse-scrutiny-gateway</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Tyse Scrutiny Gateway</name>
     <description>API Tyse Scrutiny Gateway para servir a Detinio</description>
