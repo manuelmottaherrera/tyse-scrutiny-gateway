@@ -1217,7 +1217,7 @@
                                 <configuration>
                                     <arguments>run webapp:prod</arguments>
                                     <environmentVariables>
-                                        <APP_VERSION>${project.version}</APP_VERSION>
+                                        <APP_VERSION>${git.commit.id.describe}</APP_VERSION>
                                     </environmentVariables>
                                     <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                                 </configuration>
