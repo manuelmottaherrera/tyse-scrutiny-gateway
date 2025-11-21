@@ -135,6 +135,30 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
 
         // Translate i18n-supported exceptions FIRST before applying default title logic
         // This allows translation to override hardcoded titles from ErrorResponseException
+        if (err instanceof EmailAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.emailexists", null, "Email is already in use!", locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof LoginAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.userexists", null, "Login name already used!", locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof com.tyse.scrutiny.gateway.service.EmailAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.emailexists", null, "Email is already in use!", locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof com.tyse.scrutiny.gateway.service.UsernameAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.userexists", null, "Login name already used!", locale);
+            problem.setDetail(translatedDetail);
+        }
+
         if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
             Locale locale = getLocaleFromRequest(request);
             String translatedDetail = messageSource.getMessage(
@@ -182,6 +206,30 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler implemen
         }
 
         // Translate detail for known exceptions with i18n support
+        if (err instanceof EmailAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.emailexists", null, problem.getDetail(), locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof LoginAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.userexists", null, problem.getDetail(), locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof com.tyse.scrutiny.gateway.service.EmailAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.emailexists", null, problem.getDetail(), locale);
+            problem.setDetail(translatedDetail);
+        }
+
+        if (err instanceof com.tyse.scrutiny.gateway.service.UsernameAlreadyUsedException) {
+            Locale locale = getLocaleFromRequest(request);
+            String translatedDetail = messageSource.getMessage("error.userexists", null, problem.getDetail(), locale);
+            problem.setDetail(translatedDetail);
+        }
+
         if (err instanceof InactiveAuthorityException inactiveAuthorityException) {
             Locale locale = getLocaleFromRequest(request);
             String translatedDetail = messageSource.getMessage(

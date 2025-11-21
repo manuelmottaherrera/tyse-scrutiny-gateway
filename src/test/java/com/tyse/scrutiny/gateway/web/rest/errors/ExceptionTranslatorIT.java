@@ -172,4 +172,148 @@ class ExceptionTranslatorIT {
             .jsonPath("$.title")
             .isEqualTo("Internal Server Error");
     }
+
+    @Test
+    void testEmailAlreadyUsedWithSpanishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/email-already-used")
+            .header("X-Locale", "es")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.emailexists")
+            .jsonPath("$.detail")
+            .isEqualTo("¡La cuenta de correo ya está en uso!");
+    }
+
+    @Test
+    void testEmailAlreadyUsedWithEnglishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/email-already-used")
+            .header("X-Locale", "en")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.emailexists")
+            .jsonPath("$.detail")
+            .isEqualTo("Email is already in use!");
+    }
+
+    @Test
+    void testLoginAlreadyUsedWithSpanishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/login-already-used")
+            .header("X-Locale", "es")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.userexists")
+            .jsonPath("$.detail")
+            .isEqualTo("¡El nombre de usuario ya existe!");
+    }
+
+    @Test
+    void testLoginAlreadyUsedWithEnglishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/login-already-used")
+            .header("X-Locale", "en")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.userexists")
+            .jsonPath("$.detail")
+            .isEqualTo("Login name already used!");
+    }
+
+    @Test
+    void testEmailAlreadyUsedServiceWithSpanishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/email-already-used-service")
+            .header("X-Locale", "es")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.emailexists")
+            .jsonPath("$.detail")
+            .isEqualTo("¡La cuenta de correo ya está en uso!");
+    }
+
+    @Test
+    void testEmailAlreadyUsedServiceWithEnglishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/email-already-used-service")
+            .header("X-Locale", "en")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.emailexists")
+            .jsonPath("$.detail")
+            .isEqualTo("Email is already in use!");
+    }
+
+    @Test
+    void testUsernameAlreadyUsedServiceWithSpanishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/username-already-used-service")
+            .header("X-Locale", "es")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.userexists")
+            .jsonPath("$.detail")
+            .isEqualTo("¡El nombre de usuario ya existe!");
+    }
+
+    @Test
+    void testUsernameAlreadyUsedServiceWithEnglishLocale() {
+        webTestClient
+            .get()
+            .uri("/api/exception-translator-test/username-already-used-service")
+            .header("X-Locale", "en")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .expectBody()
+            .jsonPath("$.message")
+            .isEqualTo("error.userexists")
+            .jsonPath("$.detail")
+            .isEqualTo("Login name already used!");
+    }
 }

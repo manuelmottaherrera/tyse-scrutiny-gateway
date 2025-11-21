@@ -52,6 +52,26 @@ public class ExceptionTranslatorTestController {
         throw new RuntimeException();
     }
 
+    @GetMapping("/email-already-used")
+    public void emailAlreadyUsed() {
+        throw new EmailAlreadyUsedException();
+    }
+
+    @GetMapping("/login-already-used")
+    public void loginAlreadyUsed() {
+        throw new LoginAlreadyUsedException();
+    }
+
+    @GetMapping("/email-already-used-service")
+    public void emailAlreadyUsedService() {
+        throw new com.tyse.scrutiny.gateway.service.EmailAlreadyUsedException();
+    }
+
+    @GetMapping("/username-already-used-service")
+    public void usernameAlreadyUsedService() {
+        throw new com.tyse.scrutiny.gateway.service.UsernameAlreadyUsedException();
+    }
+
     public static class TestDTO {
 
         @NotNull(message = "must not be null")
