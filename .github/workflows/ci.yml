@@ -13,6 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    services:
+      mailhog:
+        image: mailhog/mailhog:v1.0.1
+        ports:
+          - 1025:1025
+          - 8025:8025
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
