@@ -34,6 +34,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 # Parse arguments
@@ -117,11 +118,35 @@ else
 fi
 
 ################################################################################
-# Step 2: Git Push
+# Step 2: Validate Deployment Configuration (if pushing to develop/main)
+################################################################################
+
+if [[ "$BRANCH" == "develop" ]] || [[ "$BRANCH" == "main" ]]; then
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}Step 2: Validating Deployment Configuration${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    if [ -x "deployment/validate-config.sh" ]; then
+        echo -e "${YELLOW}Running deployment configuration checks...${NC}"
+        if deployment/validate-config.sh > /dev/null 2>&1; then
+            echo -e "${GREEN}✓ Deployment configuration valid${NC}"
+        else
+            echo -e "${YELLOW}⚠ Deployment configuration has issues (non-blocking)${NC}"
+            echo -e "${YELLOW}  Run './deployment/validate-config.sh' for details${NC}"
+        fi
+    else
+        echo -e "${GRAY}Skipping deployment validation (script not found)${NC}"
+    fi
+    echo ""
+fi
+
+################################################################################
+# Step 3: Git Push
 ################################################################################
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}Step 2: Pushing to ${REMOTE}/${BRANCH}${NC}"
+echo -e "${YELLOW}Step 3: Pushing to ${REMOTE}/${BRANCH}${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 

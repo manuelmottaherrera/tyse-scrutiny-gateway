@@ -1,4 +1,50 @@
 services:
+  # PostgreSQL Database for Gateway
+  postgres-gateway:
+    image: postgres:17.4
+    container_name: tyse-postgres-gateway-staging
+    environment:
+      POSTGRES_DB: ${GATEWAY_DB_NAME}
+      POSTGRES_USER: ${GATEWAY_DB_USER}
+      POSTGRES_PASSWORD: ${GATEWAY_DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=es_ES.UTF-8'
+    volumes:
+      - gateway_db_data:/var/lib/postgresql/data
+      - ./backup/gateway:/backup # Para facilitar backups/restore
+    networks:
+      - tyse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${GATEWAY_DB_USER} -d ${GATEWAY_DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '127.0.0.1:${DB_PORT:-5432}:5432' # Solo accesible localmente
+
+  # PostgreSQL Database for Divipol
+  postgres-divipol:
+    image: postgres:17.4
+    container_name: tyse-postgres-divipol-staging
+    environment:
+      POSTGRES_DB: ${DIVIPOL_DB_NAME}
+      POSTGRES_USER: ${DIVIPOL_DB_USER}
+      POSTGRES_PASSWORD: ${DIVIPOL_DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=es_ES.UTF-8'
+    volumes:
+      - divipol_db_data:/var/lib/postgresql/data
+      - ./backup/divipol:/backup # Para facilitar backups/restore
+    networks:
+      - tyse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DIVIPOL_DB_USER} -d ${DIVIPOL_DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '127.0.0.1:${DB_PORT_DIVIPOL:-5433}:5432' # Puerto diferente
+
   # Consul - Service Discovery
   consul:
     image: hashicorp/consul:1.21.0
@@ -81,11 +127,13 @@ services:
       - SPRING_PROFILES_ACTIVE=staging,api-docs
       - JHIPSTER_SLEEP=30
 
-      # Database Configuration (External PostgreSQL)
-      - SPRING_R2DBC_URL=r2dbc:postgresql://${DB_HOST}:${DB_PORT:-5432}/${GATEWAY_DB_NAME}
+      # Database Configuration (Dockerized PostgreSQL)
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-gateway:5432/${GATEWAY_DB_NAME}
       - SPRING_R2DBC_USERNAME=${GATEWAY_DB_USER}
       - SPRING_R2DBC_PASSWORD=${GATEWAY_DB_PASSWORD}
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT:-5432}/${GATEWAY_DB_NAME}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres-gateway:5432/${GATEWAY_DB_NAME}
+      - SPRING_LIQUIBASE_USER=${GATEWAY_DB_USER}
+      - SPRING_LIQUIBASE_PASSWORD=${GATEWAY_DB_PASSWORD}
 
       # Consul Configuration
       - SPRING_CLOUD_CONSUL_HOST=consul
@@ -119,6 +167,8 @@ services:
       - MANAGEMENT_HEALTH_MAIL_ENABLED=true
 
     depends_on:
+      postgres-gateway:
+        condition: service_healthy
       consul:
         condition: service_healthy
       kafka:
@@ -146,11 +196,13 @@ services:
       - SPRING_PROFILES_ACTIVE=prod,api-docs
       - JHIPSTER_SLEEP=30
 
-      # Database Configuration (External PostgreSQL)
-      - SPRING_R2DBC_URL=r2dbc:postgresql://${DB_HOST}:${DB_PORT_DIVIPOL:-5433}/${DIVIPOL_DB_NAME}
+      # Database Configuration (Dockerized PostgreSQL)
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-divipol:5432/${DIVIPOL_DB_NAME}
       - SPRING_R2DBC_USERNAME=${DIVIPOL_DB_USER}
       - SPRING_R2DBC_PASSWORD=${DIVIPOL_DB_PASSWORD}
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT_DIVIPOL:-5433}/${DIVIPOL_DB_NAME}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres-divipol:5432/${DIVIPOL_DB_NAME}
+      - SPRING_LIQUIBASE_USER=${DIVIPOL_DB_USER}
+      - SPRING_LIQUIBASE_PASSWORD=${DIVIPOL_DB_PASSWORD}
 
       # Consul Configuration
       - SPRING_CLOUD_CONSUL_HOST=consul
@@ -167,6 +219,8 @@ services:
       - LOGGING_LEVEL_COM_TYSE_SCRUTINY=DEBUG
 
     depends_on:
+      postgres-divipol:
+        condition: service_healthy
       consul:
         condition: service_healthy
       kafka:
@@ -185,3 +239,10 @@ networks:
   tyse-network:
     driver: bridge
     name: tyse-staging-network
+
+# Named volumes for data persistence
+volumes:
+  gateway_db_data:
+    name: tyse-gateway-db-staging
+  divipol_db_data:
+    name: tyse-divipol-db-staging
