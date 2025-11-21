@@ -2,6 +2,15 @@
 
 Pipeline completo de Integración Continua y Despliegue Continuo para la plataforma de microservicios Tyse Scrutiny.
 
+## 📚 Documentación Relacionada
+
+| Documento                                                   | Descripción                                                       |
+| ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| **[Versionado Automático](./versionado-automatico.md)**     | Sistema de versionado con standard-version y conventional commits |
+| **[Deployment a Staging](./deployment-staging.md)**         | Guía completa para deployments al ambiente de staging             |
+| **[Deployment a Producción](./deployment-produccion.md)**   | Proceso formal de releases a producción con checklists            |
+| **[Multi-Repo Coordination](./MULTI-REPO-COORDINATION.md)** | Estrategias para coordinar deployments entre repositorios         |
+
 ## Resumen de la Arquitectura
 
 Tyse Scrutiny está compuesto por **dos repositorios GitHub separados**:
