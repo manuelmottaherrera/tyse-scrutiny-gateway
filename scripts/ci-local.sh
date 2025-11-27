@@ -138,6 +138,27 @@ ROLLBACK_START=$(date +%s)
 # Crear directorio para logs de Liquibase
 mkdir -p logs
 
+# Iniciar PostgreSQL para la verificación de rollback
+echo "  → Starting PostgreSQL for rollback verification..."
+docker compose -f src/main/docker/postgresql.yml up -d > logs/postgres-start.log 2>&1
+
+# Esperar a que PostgreSQL esté listo
+echo "  → Waiting for PostgreSQL to be ready..."
+sleep 5
+
+# Aplicar changesets con liquibase:update
+echo "  → Applying changesets with liquibase:update..."
+if ./mvnw liquibase:update \
+  -Dlogging.level.ROOT=ERROR \
+  -Dlogging.level.liquibase=INFO \
+  > logs/liquibase-initial-update.log 2>&1; then
+    echo -e "    ${GREEN}✓ Changesets applied successfully${NC}"
+else
+    echo -e "    ${RED}✗ Error: Failed to apply changesets${NC}"
+    echo "    Check logs/liquibase-initial-update.log for details"
+    # No fallar aquí, continuar para ver qué pasó
+fi
+
 echo "  → Checking current database status..."
 ./mvnw liquibase:status \
   -Dlogging.level.ROOT=ERROR \
@@ -371,6 +392,10 @@ echo ""
 ################################################################################
 # Post-flight: Cleanup Background Processes
 ################################################################################
+
+# Stop PostgreSQL used for Liquibase verification
+echo -e "${YELLOW}[Post-flight] Cleaning up PostgreSQL...${NC}"
+docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
 
 # Wait for any background jobs to finish
 wait
