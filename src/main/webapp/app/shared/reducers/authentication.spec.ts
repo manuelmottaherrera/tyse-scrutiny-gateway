@@ -78,6 +78,74 @@ describe('Authentication reducer tests', () => {
         account: payload.data,
       });
     });
+
+    it('should include permissions array in account state after getAccount', () => {
+      // Given: Server returns account with permissions
+      const permissions = ['divipol.read', 'statistics.read', 'heatmap.read'];
+      const payload = {
+        data: {
+          activated: true,
+          login: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+          email: 'admin@localhost',
+          authorities: ['ROLE_ADMIN'],
+          permissions,
+        },
+      };
+
+      // When: getAccount fulfills
+      const toTest = authentication(undefined, { type: getAccount.fulfilled.type, payload });
+
+      // Then: State should contain permissions
+      expect(toTest.isAuthenticated).toBe(true);
+      expect(toTest.account).toBeDefined();
+      expect(toTest.account.permissions).toBeDefined();
+      expect(toTest.account.permissions).toEqual(permissions);
+      expect(toTest.account.permissions).toContain('divipol.read');
+      expect(toTest.account.permissions).toContain('statistics.read');
+      expect(toTest.account.permissions).toContain('heatmap.read');
+    });
+
+    it('should handle empty permissions array in account state', () => {
+      // Given: Server returns account with empty permissions
+      const payload = {
+        data: {
+          activated: true,
+          login: 'user',
+          permissions: [],
+        },
+      };
+
+      // When: getAccount fulfills
+      const toTest = authentication(undefined, { type: getAccount.fulfilled.type, payload });
+
+      // Then: State should contain empty permissions array
+      expect(toTest.isAuthenticated).toBe(true);
+      expect(toTest.account.permissions).toBeDefined();
+      expect(toTest.account.permissions).toEqual([]);
+      expect(toTest.account.permissions.length).toBe(0);
+    });
+
+    it('should handle account without permissions field', () => {
+      // Given: Server returns account without permissions (legacy compatibility)
+      const payload = {
+        data: {
+          activated: true,
+          login: 'legacyuser',
+          authorities: ['ROLE_USER'],
+        },
+      };
+
+      // When: getAccount fulfills
+      const toTest = authentication(undefined, { type: getAccount.fulfilled.type, payload });
+
+      // Then: State should still work, permissions will be undefined
+      expect(toTest.isAuthenticated).toBe(true);
+      expect(toTest.account.login).toBe('legacyuser');
+      // Component should handle undefined permissions gracefully
+      expect(toTest.account.permissions).toBeUndefined();
+    });
   });
 
   describe('Failure', () => {

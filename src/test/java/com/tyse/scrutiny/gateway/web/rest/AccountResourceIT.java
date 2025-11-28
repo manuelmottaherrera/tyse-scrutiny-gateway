@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tyse.scrutiny.gateway.IntegrationTest;
 import com.tyse.scrutiny.gateway.config.Constants;
+import com.tyse.scrutiny.gateway.domain.Authority;
 import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
@@ -167,6 +168,97 @@ class AccountResourceIT {
             .isEqualTo(AuthoritiesConstants.ADMIN);
 
         userService.deleteUser(TEST_USER_LOGIN).block();
+    }
+
+    @Test
+    @WithMockUser("test-admin-permissions")
+    void testGetExistingAccountIncludesPermissions() {
+        // Given: Create user with ADMIN role (which has all permissions via Liquibase migrations)
+        // ROLE_ADMIN has 47 permissions assigned including divipol.read, statistics.read, etc.
+        Set<String> authorities = new HashSet<>();
+        authorities.add(AuthoritiesConstants.ADMIN);
+
+        AdminUserDTO user = new AdminUserDTO();
+        user.setLogin("test-admin-permissions");
+        user.setFirstName("Admin");
+        user.setLastName("WithPermissions");
+        user.setEmail("test-admin-permissions@jhipster.com");
+        user.setLangKey("en");
+        user.setAuthorities(authorities);
+        userService.createUser(user).block();
+
+        // When: Request account information
+        // Then: Response includes permissions array with permissions from ROLE_ADMIN
+        accountWebTestClient
+            .get()
+            .uri("/api/account")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .expectBody()
+            .jsonPath("$.login")
+            .isEqualTo("test-admin-permissions")
+            .jsonPath("$.permissions")
+            .isArray()
+            .jsonPath("$.permissions")
+            .value(permissions -> {
+                @SuppressWarnings("unchecked")
+                List<String> permList = (List<String>) permissions;
+                // ROLE_ADMIN has all 47 permissions, verify some key ones
+                assertThat(permList).isNotEmpty();
+                assertThat(permList).contains("divipol.read", "statistics.read", "user.create", "user.read");
+            });
+
+        // Cleanup
+        userService.deleteUser("test-admin-permissions").block();
+    }
+
+    @Test
+    @WithMockUser("test-user-with-permissions")
+    void testGetExistingAccountUserRoleHasPermissions() {
+        // Given: Create user with USER role (which HAS some permissions assigned by Liquibase)
+        Set<String> authorities = new HashSet<>();
+        authorities.add(AuthoritiesConstants.USER);
+
+        AdminUserDTO user = new AdminUserDTO();
+        user.setLogin("test-user-with-permissions");
+        user.setFirstName("User");
+        user.setLastName("WithPermissions");
+        user.setEmail("test-user-permissions@jhipster.com");
+        user.setLangKey("en");
+        user.setAuthorities(authorities);
+        userService.createUser(user).block();
+
+        // When: Request account information
+        // Then: Response includes permissions array with the permissions from ROLE_USER
+        // Note: ROLE_USER has user.read, authority.read, permission.read assigned via Liquibase
+        accountWebTestClient
+            .get()
+            .uri("/api/account")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .expectBody()
+            .jsonPath("$.login")
+            .isEqualTo("test-user-with-permissions")
+            .jsonPath("$.permissions")
+            .isArray()
+            .jsonPath("$.permissions")
+            .value(permissions -> {
+                @SuppressWarnings("unchecked")
+                List<String> permList = (List<String>) permissions;
+                // ROLE_USER has basic read permissions
+                assertThat(permList).containsAll(List.of("user.read", "authority.read", "permission.read"));
+            });
+
+        // Cleanup
+        userService.deleteUser("test-user-with-permissions").block();
     }
 
     @Test
