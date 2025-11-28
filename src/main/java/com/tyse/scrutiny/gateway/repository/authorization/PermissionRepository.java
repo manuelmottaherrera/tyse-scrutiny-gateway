@@ -62,6 +62,12 @@ interface PermissionRepositoryInternal {
     Flux<Permission> findByUserId(Long userId);
 
     /**
+     * Find permissions for a user through their assigned roles (authorities).
+     * This queries: user -> user_authority -> authority_permission -> permission
+     */
+    Flux<Permission> findByUserRoles(Long userId);
+
+    /**
      * Check if a permission name is already in use.
      */
     Mono<Boolean> existsByName(String name);
@@ -111,6 +117,24 @@ class PermissionRepositoryInternalImpl implements PermissionRepositoryInternal {
             WHERE up.user_id = :userId
               AND up.is_active = true
               AND (up.expires_at IS NULL OR up.expires_at > CURRENT_TIMESTAMP)
+              AND p.is_active = true
+            ORDER BY p.resource, p.action
+            """;
+
+        return db.sql(sql).bind("userId", userId).map((row, metadata) -> r2dbcConverter.read(Permission.class, row, metadata)).all();
+    }
+
+    @Override
+    public Flux<Permission> findByUserRoles(Long userId) {
+        String sql =
+            """
+            SELECT DISTINCT p.*
+            FROM scr_permission p
+            INNER JOIN scr_authority_permission ap ON p.id = ap.permission_id
+            INNER JOIN scr_user_authority ua ON ap.authority_id = ua.authority_id
+            WHERE ua.user_id = :userId
+              AND ua.is_active = true
+              AND (ua.expires_at IS NULL OR ua.expires_at > CURRENT_TIMESTAMP)
               AND p.is_active = true
             ORDER BY p.resource, p.action
             """;

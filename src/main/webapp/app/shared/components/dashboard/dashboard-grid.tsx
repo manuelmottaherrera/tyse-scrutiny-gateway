@@ -3,6 +3,7 @@ import { ModuleCard } from './modules-card';
 import { moduleIcons } from './icons';
 import './dashboard-grid.scss';
 import { Translate } from 'react-jhipster';
+import { useAppSelector } from 'app/config/store';
 
 export interface Module {
   id: string;
@@ -10,7 +11,7 @@ export interface Module {
   description: string;
   icon: any;
   path: string;
-  role: string[];
+  requiredPermission: string; // Permission name (e.g., 'divipol.read')
   color?: string;
   enabled: boolean;
   disabledReasonKey?: string; // Clave i18n para la razón de deshabilitación
@@ -19,6 +20,9 @@ export interface Module {
 }
 
 export const DashboardGrid: React.FC = () => {
+  // Get user permissions from Redux store
+  const userPermissions: string[] = useAppSelector(state => state.authentication.account?.permissions || []);
+
   const modules: Module[] = [
     {
       id: 'divipol',
@@ -26,7 +30,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Management of political division and territorial configuration',
       icon: moduleIcons.divipol,
       path: '/divipol',
-      role: ['ADMIN', 'COORDINATOR', 'USER'],
+      requiredPermission: 'divipol.read',
       color: '#008cba',
       enabled: true,
       disabledReasonKey: '',
@@ -39,7 +43,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Electoral statistical reports and analyses',
       icon: moduleIcons.statistics,
       path: 'https://estadisticaselectorales.registraduria.gov.co/stage-one',
-      role: ['ADMIN', 'USER'],
+      requiredPermission: 'statistics.read',
       color: '#43ac6a',
       enabled: true,
       disabledReasonKey: '',
@@ -52,7 +56,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Geographic visualization of election results',
       icon: moduleIcons.heatMap,
       path: '/heat-map',
-      role: ['ADMIN', 'ANALYST', 'VIEWER'],
+      requiredPermission: 'heatmap.read',
       color: '#e99002',
       enabled: false,
       disabledReasonKey: 'comingSoon',
@@ -65,7 +69,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Real-time counting and scrutiny system',
       icon: moduleIcons.voteCount,
       path: 'http://186.31.4.135/CuentaVotos/',
-      role: ['ADMIN', 'USER'],
+      requiredPermission: 'votecount.read',
       color: '#f04124',
       enabled: true,
       disabledReasonKey: '',
@@ -78,7 +82,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Management and processing of electoral files',
       icon: moduleIcons.fileUpload,
       path: '/file-upload',
-      role: ['ADMIN', 'OPERATOR'],
+      requiredPermission: 'fileupload.read',
       color: '#5bc0de',
       enabled: false,
       disabledReasonKey: 'comingSoon',
@@ -91,7 +95,7 @@ export const DashboardGrid: React.FC = () => {
       description: '',
       icon: moduleIcons.votingJuries,
       path: '/voting-juries',
-      role: ['ADMIN', 'COORDINATOR'],
+      requiredPermission: 'votingjuries.read',
       color: '#6f42c1',
       enabled: false,
       disabledReasonKey: 'comingSoon',
@@ -104,7 +108,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Training programs for electoral staff',
       icon: moduleIcons.trainings,
       path: 'http://jurna.top/',
-      role: ['ADMIN', 'USER'],
+      requiredPermission: 'trainings.read',
       color: '#20c997',
       enabled: true,
       disabledReasonKey: '',
@@ -117,7 +121,7 @@ export const DashboardGrid: React.FC = () => {
       description: '',
       icon: moduleIcons.witnesses,
       path: '/witnesses',
-      role: ['ADMIN', 'COORDINATOR'],
+      requiredPermission: 'witnesses.read',
       color: '#e83e8c',
       enabled: false,
       disabledReasonKey: 'comingSoon',
@@ -130,7 +134,7 @@ export const DashboardGrid: React.FC = () => {
       description: 'Predictive analysis and electoral trends',
       icon: moduleIcons.analytics,
       path: '/analytics',
-      role: ['ADMIN', 'ANALYST'],
+      requiredPermission: 'analytics.read',
       color: '#6610f2',
       enabled: false,
       disabledReasonKey: 'comingSoon',
@@ -139,12 +143,11 @@ export const DashboardGrid: React.FC = () => {
     },
   ];
 
-  // Filtrar módulos según el rol del usuario (debes integrar con tu sistema de auth)
-  const userRoles = ['ADMIN', 'USER']; // Ejemplo - reemplazar con roles reales
+  // Filter modules based on user permissions
   const accessibleModules = modules
-    .filter(module => module.role.some(role => userRoles.includes(role)))
+    .filter(module => userPermissions.includes(module.requiredPermission))
     .sort((a, b) => {
-      // Ordenar: habilitados primero, luego deshabilitados
+      // Sort: enabled first, then disabled
       if (a.enabled === b.enabled) return 0;
       return a.enabled ? -1 : 1;
     });

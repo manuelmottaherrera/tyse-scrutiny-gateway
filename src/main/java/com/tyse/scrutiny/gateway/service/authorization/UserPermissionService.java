@@ -134,10 +134,12 @@ public class UserPermissionService {
     public Flux<Permission> getEffectivePermissions(Long userId) {
         LOG.debug("Request to get effective permissions for user {}", userId);
 
-        // Permissions from roles
-        Flux<Permission> rolePermissions = permissionRepository.findByUserId(userId);
+        // Permissions from user's roles (authorities)
+        // Query: user -> user_authority -> authority_permission -> permission
+        Flux<Permission> rolePermissions = permissionRepository.findByUserRoles(userId);
 
-        // Direct permissions
+        // Direct permissions granted to user (bypassing roles)
+        // Query: user -> user_permission -> permission
         Flux<Permission> directPermissions = userPermissionRepository
             .findValidByUserId(userId)
             .flatMap(up -> permissionRepository.findById(up.getPermissionId()));

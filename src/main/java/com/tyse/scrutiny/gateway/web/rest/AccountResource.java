@@ -1,9 +1,11 @@
 package com.tyse.scrutiny.gateway.web.rest;
 
+import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
 import com.tyse.scrutiny.gateway.security.SecurityUtils;
 import com.tyse.scrutiny.gateway.service.MailService;
 import com.tyse.scrutiny.gateway.service.UserService;
+import com.tyse.scrutiny.gateway.service.authorization.UserPermissionService;
 import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
 import com.tyse.scrutiny.gateway.service.dto.PasswordChangeDTO;
 import com.tyse.scrutiny.gateway.web.rest.errors.*;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +57,18 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final UserPermissionService userPermissionService;
+
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        UserPermissionService userPermissionService
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.userPermissionService = userPermissionService;
     }
 
     /**
@@ -142,8 +153,19 @@ public class AccountResource {
     public Mono<AdminUserDTO> getAccount() {
         return userService
             .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
-            .switchIfEmpty(Mono.error(new AccountResourceException("User could not be found")));
+            .switchIfEmpty(Mono.error(new AccountResourceException("User could not be found")))
+            .flatMap(user -> {
+                AdminUserDTO dto = new AdminUserDTO(user);
+                // Load effective permissions (from roles + direct grants)
+                return userPermissionService
+                    .getEffectivePermissions(user.getId())
+                    .map(Permission::getName)
+                    .collect(Collectors.toSet())
+                    .map(permissions -> {
+                        dto.setPermissions(permissions);
+                        return dto;
+                    });
+            });
     }
 
     /**
