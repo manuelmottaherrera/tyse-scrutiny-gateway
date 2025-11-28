@@ -1,6 +1,6 @@
 # Permisos de Módulos de Aplicación
 
-**Fecha:** 2025-11-12
+**Fecha:** 2025-11-27
 **Changelog:** `20251112000000_app_modules_permissions.xml`
 
 ---
@@ -284,7 +284,28 @@ Los permisos siguen el patrón: `{resource}.{action}`
 
 ## 7. Uso en el Frontend
 
-Para verificar permisos en los componentes React:
+### 7.1 Obtención de Permisos
+
+El endpoint `GET /api/account` retorna la información del usuario autenticado **incluyendo sus permisos efectivos**:
+
+```json
+{
+  "id": 1,
+  "login": "admin",
+  "firstName": "Administrator",
+  "lastName": "Administrator",
+  "email": "admin@localhost",
+  "authorities": ["ROLE_ADMIN"],
+  "permissions": ["divipol.read", "divipol.create", "statistics.read", "statistics.export", "heatmap.read", "..."]
+}
+```
+
+Los permisos se calculan combinando:
+
+- **Permisos de roles:** `user → user_authority → authority_permission → permission`
+- **Permisos directos:** `user → user_permission → permission`
+
+### 7.2 Verificación de Permisos en Componentes
 
 ```typescript
 import { useAppSelector } from 'app/config/store';
@@ -300,6 +321,33 @@ const canExportStatistics = useAppSelector(state =>
     <Translate contentKey="entity.action.export">Export</Translate>
   </Button>
 )}
+```
+
+### 7.3 Filtrado de Módulos en Dashboard
+
+El `DashboardGrid` filtra los módulos según los permisos del usuario:
+
+```typescript
+// dashboard-grid.tsx
+const userPermissions: string[] = useAppSelector(state => state.authentication.account?.permissions || []);
+
+const modules: Module[] = [
+  {
+    id: 'divipol',
+    title: 'Divipol',
+    requiredPermission: 'divipol.read', // Permiso requerido para ver este módulo
+    // ...
+  },
+  {
+    id: 'statistics',
+    title: 'Statistics',
+    requiredPermission: 'statistics.read',
+    // ...
+  },
+];
+
+// Solo muestra módulos para los que el usuario tiene permiso
+const accessibleModules = modules.filter(module => userPermissions.includes(module.requiredPermission));
 ```
 
 ---
