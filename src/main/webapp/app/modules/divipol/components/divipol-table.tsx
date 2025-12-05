@@ -10,9 +10,9 @@ import { useAppSelector } from 'app/config/store';
  * - codZona: 2 dígitos (ej: '02')
  * - codPuesto: 2 caracteres alfanuméricos (ej: '00', 'A1')
  * - Si no aplica, se completa con ceros
- * - Separados por espacios
+ * - Resultado: código de 9 dígitos sin espacios (ej: '010010201')
  */
-const generateDivipolCode = (
+export const generateDivipolCode = (
   codDepto?: number | string,
   codMipio?: number | string,
   codZona?: number | string,
@@ -23,7 +23,7 @@ const generateDivipolCode = (
   const formatZona = codZona != null ? String(codZona).padStart(2, '0') : '00';
   const formatPuesto = codPuesto != null ? String(codPuesto).padStart(2, '0') : '00';
 
-  return `${formatDepto} ${formatMipio} ${formatZona} ${formatPuesto}`;
+  return `${formatDepto}${formatMipio}${formatZona}${formatPuesto}`;
 };
 
 export const DivipolTable: React.FC = () => {
