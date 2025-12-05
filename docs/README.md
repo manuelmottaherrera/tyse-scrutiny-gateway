@@ -17,10 +17,11 @@ Documentación técnica del proyecto **Tyse Scrutiny Gateway**.
 
 ### Funcionalidades del Sistema
 
-| Documento                                       | Descripción                    |
-| ----------------------------------------------- | ------------------------------ |
-| **[Sistema de Autorización](./authorization/)** | Permisos enterprise granulares |
-| **[Sistema de Traducciones](./traduction/)**    | i18n backend y frontend        |
+| Documento                                       | Descripción                             |
+| ----------------------------------------------- | --------------------------------------- |
+| **[Sistema de Autorización](./authorization/)** | Permisos enterprise granulares          |
+| **[Módulo Divipol](./divipol/)**                | División política electoral de Colombia |
+| **[Sistema de Traducciones](./traduction/)**    | i18n backend y frontend                 |
 
 ### Documentación General
 
