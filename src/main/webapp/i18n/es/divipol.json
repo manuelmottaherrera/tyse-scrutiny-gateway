@@ -35,6 +35,30 @@
     },
     "export": {
       "download": "Descargar Reporte"
+    },
+    "search": {
+      "title": "Buscar",
+      "modeName": "Nombre",
+      "modeCode": "Código",
+      "placeholder": "Buscar por nombre...",
+      "searchButton": "Buscar",
+      "clearButton": "Limpiar búsqueda",
+      "searching": "Buscando...",
+      "filterWarning": "Al buscar, los filtros actuales se eliminarán.",
+      "minChars": "Mínimo {{min}} caracteres",
+      "loadingSuggestions": "Cargando...",
+      "noResults": "No se encontraron resultados.",
+      "pasteCode": "Pegar Cod. Divipol",
+      "results": {
+        "searching": "Búsqueda:",
+        "count": "{{count}} resultados",
+        "code": "Cod. Divipol",
+        "type": "Tipo",
+        "name": "Nombre",
+        "location": "Ubicación",
+        "potential": "Potencial",
+        "tables": "Mesas"
+      }
     }
   }
 }

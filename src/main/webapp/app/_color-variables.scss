@@ -17,10 +17,18 @@ $color-black-full: #000000;
 
 // Grises
 $color-border: var(--color-border); // Dinámico según tema
+$color-gray-lighter: #f8f9fa; // Fondos muy claros (headers, disabled)
+$color-gray-light: #adb5bd; // Texto secundario en tema oscuro
 $color-gray-medium: #ccc;
 $color-gray-medium-dark: #bbb;
 $color-gray-dark: #ddd;
 $color-gray-darker: #6c757d;
+
+// ==========================================================================
+// Colores Primarios
+// ==========================================================================
+
+$color-primary: #0d6efd; // Bootstrap primary blue
 
 // ==========================================================================
 // Colores de Estado
@@ -87,6 +95,7 @@ $color-dark-overlay-border: rgba(255, 255, 255, 0.15);
 
 // Colores específicos del tema oscuro
 $color-dark-background: #212529;
+$color-dark-surface: #343a40; // Superficies elevadas en tema oscuro
 
 // ==========================================================================
 // Colores de Componentes Específicos

@@ -1,13 +1,23 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import divipolService, {
   DivipolDepartamento,
   DivipolMunicipio,
   DivipolZona,
   DivipolPuesto,
   DivipolStats,
+  DivipolSearchResult,
+  SearchMode,
+  SearchParams,
 } from 'app/shared/services/divipol.service';
 
 // Estado inicial
+export interface SearchPagination {
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export interface DivipolState {
   departamentos: DivipolDepartamento[];
   municipios: DivipolMunicipio[];
@@ -22,6 +32,17 @@ export interface DivipolState {
   };
   loading: boolean;
   error: string | null;
+  // Estado de búsqueda
+  search: {
+    mode: SearchMode;
+    term: string;
+    active: boolean;
+    results: DivipolSearchResult[];
+    suggestions: DivipolSearchResult[];
+    loading: boolean;
+    suggestionsLoading: boolean;
+    pagination: SearchPagination;
+  };
 }
 
 const initialState: DivipolState = {
@@ -38,6 +59,22 @@ const initialState: DivipolState = {
   },
   loading: false,
   error: null,
+  // Estado inicial de búsqueda
+  search: {
+    mode: 'name',
+    term: '',
+    active: false,
+    results: [],
+    suggestions: [],
+    loading: false,
+    suggestionsLoading: false,
+    pagination: {
+      page: 0,
+      size: 20,
+      totalElements: 0,
+      totalPages: 0,
+    },
+  },
 };
 
 // Acciones asíncronas
@@ -81,6 +118,15 @@ export const fetchStatsByZona = createAsyncThunk(
     return await divipolService.getStatsByZona(codDepto, codMpio, codZona);
   },
 );
+
+// Acciones de búsqueda
+export const searchDivipol = createAsyncThunk('divipol/searchDivipol', async (params: SearchParams) => {
+  return await divipolService.search(params);
+});
+
+export const fetchSuggestions = createAsyncThunk('divipol/fetchSuggestions', async ({ q, mode }: { q: string; mode: SearchMode }) => {
+  return await divipolService.getSuggestions(q, mode);
+});
 
 // Slice
 export const DivipolSlice = createSlice({
@@ -127,6 +173,30 @@ export const DivipolSlice = createSlice({
     },
     clearError(state) {
       state.error = null;
+    },
+    // Acciones de búsqueda síncronas
+    setSearchMode(state, action: PayloadAction<SearchMode>) {
+      state.search.mode = action.payload;
+      state.search.term = '';
+      state.search.suggestions = [];
+    },
+    setSearchTerm(state, action: PayloadAction<string>) {
+      state.search.term = action.payload;
+    },
+    clearSearch(state) {
+      state.search.active = false;
+      state.search.term = '';
+      state.search.results = [];
+      state.search.suggestions = [];
+      state.search.pagination = {
+        page: 0,
+        size: 20,
+        totalElements: 0,
+        totalPages: 0,
+      };
+    },
+    clearSuggestions(state) {
+      state.search.suggestions = [];
     },
   },
   extraReducers(builder) {
@@ -249,9 +319,66 @@ export const DivipolSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Error al cargar estadísticas';
       });
+
+    // Search Divipol
+    builder
+      .addCase(searchDivipol.pending, state => {
+        state.search.loading = true;
+        state.error = null;
+      })
+      .addCase(searchDivipol.fulfilled, (state, action) => {
+        state.search.loading = false;
+        state.search.active = true;
+        state.search.results = action.payload.content;
+        state.search.pagination = {
+          page: action.payload.page,
+          size: action.payload.size,
+          totalElements: action.payload.totalElements,
+          totalPages: action.payload.totalPages,
+        };
+        // Limpiar filtros al buscar
+        state.filters = {
+          departamento: null,
+          municipio: null,
+          zona: null,
+          puesto: null,
+        };
+        state.municipios = [];
+        state.zonas = [];
+        state.puestos = [];
+      })
+      .addCase(searchDivipol.rejected, (state, action) => {
+        state.search.loading = false;
+        state.error = action.error.message || 'Error al buscar';
+      });
+
+    // Fetch Suggestions
+    builder
+      .addCase(fetchSuggestions.pending, state => {
+        state.search.suggestionsLoading = true;
+      })
+      .addCase(fetchSuggestions.fulfilled, (state, action) => {
+        state.search.suggestionsLoading = false;
+        state.search.suggestions = action.payload;
+      })
+      .addCase(fetchSuggestions.rejected, state => {
+        state.search.suggestionsLoading = false;
+        state.search.suggestions = [];
+      });
   },
 });
 
-export const { setFilterDepartamento, setFilterMunicipio, setFilterZona, setFilterPuesto, resetFilters, clearError } = DivipolSlice.actions;
+export const {
+  setFilterDepartamento,
+  setFilterMunicipio,
+  setFilterZona,
+  setFilterPuesto,
+  resetFilters,
+  clearError,
+  setSearchMode,
+  setSearchTerm,
+  clearSearch,
+  clearSuggestions,
+} = DivipolSlice.actions;
 
 export default DivipolSlice.reducer;

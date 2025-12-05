@@ -1,0 +1,173 @@
+@import '../../../color-variables';
+
+// Mixin para estilos del tema oscuro (soporta data-theme='dark' Y .theme-dark para modo sistema)
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+.divipol-search-results {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  overflow: hidden;
+
+  @include dark-theme {
+    background: $color-dark-background;
+    border-color: $color-gray-darker;
+  }
+
+  .search-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: $color-gray-lighter;
+    border-bottom: 1px solid $color-border;
+
+    @include dark-theme {
+      background: $color-dark-surface;
+      border-bottom-color: $color-gray-darker;
+    }
+
+    .search-info {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+      color: $color-text-secondary;
+
+      @include dark-theme {
+        color: $color-gray-light;
+      }
+    }
+
+    .clear-search-link {
+      font-size: 0.875rem;
+      padding: 0.25rem 0.5rem;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .search-loading {
+    padding: 2rem;
+  }
+
+  .search-results-table {
+    margin-bottom: 0;
+
+    @include dark-theme {
+      color: $color-white-full;
+    }
+
+    thead {
+      background: $color-gray-lighter;
+
+      @include dark-theme {
+        background: $color-dark-surface;
+      }
+
+      th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: $color-text-secondary;
+        border-bottom-width: 2px;
+        white-space: nowrap;
+        padding: 0.75rem;
+
+        @include dark-theme {
+          color: $color-gray-light;
+          border-bottom-color: $color-gray-darker;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        @include dark-theme {
+          border-color: $color-gray-darker;
+        }
+
+        &:hover {
+          background: rgba($color-success, 0.05);
+
+          @include dark-theme {
+            background: rgba($color-white, 0.05);
+          }
+        }
+
+        td {
+          padding: 0.75rem;
+          vertical-align: middle;
+
+          @include dark-theme {
+            border-color: $color-gray-darker;
+          }
+        }
+      }
+
+      .code-cell {
+        code {
+          background: $color-gray-lighter;
+          padding: 0.2rem 0.4rem;
+          border-radius: 0.25rem;
+          font-size: 0.85rem;
+
+          @include dark-theme {
+            background: $color-dark-surface;
+            color: $color-success;
+          }
+        }
+      }
+
+      .name-cell {
+        font-weight: 500;
+      }
+
+      .location-cell {
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .search-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid $color-border;
+    background: $color-gray-lighter;
+
+    @include dark-theme {
+      background: $color-dark-surface;
+      border-top-color: $color-gray-darker;
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: $color-text-secondary;
+
+      @include dark-theme {
+        color: $color-gray-light;
+      }
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      .btn {
+        min-width: 32px;
+      }
+    }
+  }
+}

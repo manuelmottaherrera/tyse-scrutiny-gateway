@@ -60,7 +60,9 @@ const AppRoutes = () => {
           path="divipol/*"
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-              <Divipol />
+              <Suspense fallback={loading}>
+                <Divipol />
+              </Suspense>
             </PrivateRoute>
           }
         />

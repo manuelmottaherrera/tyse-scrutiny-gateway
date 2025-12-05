@@ -1,0 +1,203 @@
+@import '../../../color-variables';
+
+// Mixin para estilos del tema oscuro (soporta data-theme='dark' Y .theme-dark para modo sistema)
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+.divipol-search {
+  background: $color-bg-form;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  .search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    .search-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $color-text-primary;
+
+      @include dark-theme {
+        color: $color-white-full;
+      }
+    }
+
+    .search-mode-toggle {
+      display: flex;
+      align-items: center;
+
+      .mode-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $color-text-tertiary;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.2s ease;
+
+        @include dark-theme {
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        &.active {
+          color: $color-primary;
+          font-weight: 600;
+
+          @include dark-theme {
+            color: $color-white-full;
+          }
+        }
+      }
+
+      .form-switch {
+        .form-check-input {
+          cursor: pointer;
+
+          @include dark-theme {
+            background-color: $color-gray-darker;
+            border-color: $color-gray-darker;
+
+            &:checked {
+              background-color: var(--bs-primary);
+              border-color: var(--bs-primary);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .search-warning {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .search-input-container {
+    position: relative;
+
+    .input-group {
+      .input-group-text {
+        background: $color-gray-lighter;
+        border-color: $color-border;
+
+        @include dark-theme {
+          background: $color-dark-surface;
+          border-color: $color-gray-darker;
+          color: $color-white-full;
+        }
+      }
+
+      .form-control {
+        @include dark-theme {
+          background: $color-dark-background;
+          border-color: $color-gray-darker;
+          color: $color-white-full;
+
+          &::placeholder {
+            color: $color-gray-light;
+          }
+        }
+      }
+
+      .clear-input-btn {
+        border-color: $color-border;
+        background: $color-white;
+
+        @include dark-theme {
+          background: $color-dark-background;
+          border-color: $color-gray-darker;
+          color: $color-white-full;
+        }
+
+        &:hover {
+          background: $color-gray-lighter;
+
+          @include dark-theme {
+            background: $color-dark-surface;
+          }
+        }
+      }
+    }
+
+    .suggestions-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: $color-shadow-medium;
+      border: 1px solid $color-border;
+      border-radius: 0 0 0.375rem 0.375rem;
+      background: $color-white;
+
+      @include dark-theme {
+        background: $color-dark-background;
+        border-color: $color-gray-darker;
+      }
+
+      .suggestion-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-bottom: 1px solid $color-border;
+        text-align: left;
+
+        @include dark-theme {
+          border-bottom-color: $color-gray-darker;
+          color: $color-white-full;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover,
+        &:focus {
+          background: $color-gray-lighter;
+
+          @include dark-theme {
+            background: $color-dark-surface;
+          }
+        }
+
+        .suggestion-name {
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .suggestion-code {
+          font-family: monospace;
+          font-size: 0.8rem;
+          margin-left: 0.5rem;
+        }
+      }
+
+      .suggestion-loading {
+        padding: 0.75rem;
+        text-align: center;
+        color: $color-text-tertiary;
+      }
+    }
+  }
+
+  .search-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+}

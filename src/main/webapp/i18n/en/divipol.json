@@ -35,6 +35,30 @@
     },
     "export": {
       "download": "Download Report"
+    },
+    "search": {
+      "title": "Search",
+      "modeName": "Name",
+      "modeCode": "Code",
+      "placeholder": "Search by name...",
+      "searchButton": "Search",
+      "clearButton": "Clear search",
+      "searching": "Searching...",
+      "filterWarning": "Active filters will be cleared when searching.",
+      "minChars": "Minimum {{min}} characters",
+      "loadingSuggestions": "Loading...",
+      "noResults": "No results found.",
+      "pasteCode": "Paste Divipol Code",
+      "results": {
+        "searching": "Search:",
+        "count": "{{count}} results",
+        "code": "Divipol Code",
+        "type": "Type",
+        "name": "Name",
+        "location": "Location",
+        "potential": "Potential",
+        "tables": "Tables"
+      }
     }
   }
 }

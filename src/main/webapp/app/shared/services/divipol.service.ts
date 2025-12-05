@@ -58,6 +58,40 @@ export interface DivipolStats {
   potencialTotal: number;
 }
 
+// Tipos para búsqueda
+export type SearchMode = 'name' | 'code';
+
+export type DivipolTipo = 'PAIS' | 'DEPTO' | 'MPIO' | 'ZONA' | 'PUESTO';
+
+export interface DivipolSearchResult {
+  codigoDivipol: string;
+  tipo: DivipolTipo;
+  coddepto: number;
+  codmipio: number;
+  codzona: number;
+  codpuesto: string;
+  nomdepto: string;
+  nommipio: string;
+  nompuesto: string;
+  potencialTotal: number;
+  mesas: number;
+}
+
+export interface DivipolSearchPage {
+  content: DivipolSearchResult[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface SearchParams {
+  q: string;
+  mode?: SearchMode;
+  page?: number;
+  size?: number;
+}
+
 // Base URL del microservicio divipol (a través del gateway)
 const API_BASE_URL = '/services/tysescrutinymicrodivipol/api/divipol';
 
@@ -132,6 +166,35 @@ class DivipolService {
    */
   async getStatsByZona(codDepto: number, codMpio: number, codZona: number): Promise<DivipolStats> {
     const response = await axios.get<DivipolStats>(`${API_BASE_URL}/stats/zona/${codDepto}/${codMpio}/${codZona}`);
+    return response.data;
+  }
+
+  // =====================================================
+  // Métodos de Búsqueda
+  // =====================================================
+
+  /**
+   * Busca registros de divipol por nombre o código
+   */
+  async search(params: SearchParams): Promise<DivipolSearchPage> {
+    const response = await axios.get<DivipolSearchPage>(`${API_BASE_URL}/search`, {
+      params: {
+        q: params.q,
+        mode: params.mode || 'name',
+        page: params.page || 0,
+        size: params.size || 20,
+      },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene sugerencias de autocompletado
+   */
+  async getSuggestions(q: string, mode: SearchMode = 'name'): Promise<DivipolSearchResult[]> {
+    const response = await axios.get<DivipolSearchResult[]>(`${API_BASE_URL}/search/suggestions`, {
+      params: { q, mode },
+    });
     return response.data;
   }
 }

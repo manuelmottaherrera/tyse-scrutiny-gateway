@@ -1,76 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Form, FormGroup, Label, Input, Row, Col, Button } from 'reactstrap';
-import { Translate } from 'react-jhipster';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import {
-  fetchDepartamentos,
-  fetchMunicipios,
-  fetchZonas,
-  fetchPuestos,
-  setFilterDepartamento,
-  setFilterMunicipio,
-  setFilterZona,
-  setFilterPuesto,
-  resetFilters,
-  fetchGeneralStats,
-  fetchStatsByDepartamento,
-  fetchStatsByMunicipio,
-  fetchStatsByZona,
-} from '../divipol.reducer';
+import { Translate, translate } from 'react-jhipster';
+import { useAppSelector } from 'app/config/store';
+import { useDivipolFilterParams } from '../hooks/use-divipol-filter-params';
 import './divipol-filters.scss';
 
 export const DivipolFilters: React.FC = () => {
-  const dispatch = useAppDispatch();
   const { departamentos, municipios, zonas, puestos, filters } = useAppSelector(state => state.divipol);
+  const { handleDepartamentoChange, handleMunicipioChange, handleZonaChange, handlePuestoChange, handleReset } = useDivipolFilterParams();
 
-  useEffect(() => {
-    dispatch(fetchDepartamentos());
-    dispatch(fetchGeneralStats());
-  }, []);
-
-  const handleDepartamentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onDepartamentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const codDepto = e.target.value ? Number(e.target.value) : null;
-    dispatch(setFilterDepartamento(codDepto));
-
-    if (codDepto) {
-      dispatch(fetchMunicipios(codDepto));
-      dispatch(fetchStatsByDepartamento(codDepto));
-    } else {
-      dispatch(fetchGeneralStats());
-    }
+    handleDepartamentoChange(codDepto);
   };
 
-  const handleMunicipioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onMunicipioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const codMpio = e.target.value ? Number(e.target.value) : null;
-    dispatch(setFilterMunicipio(codMpio));
-
-    if (codMpio && filters.departamento) {
-      dispatch(fetchZonas({ codDepto: filters.departamento, codMpio }));
-      dispatch(fetchStatsByMunicipio({ codDepto: filters.departamento, codMpio }));
-    } else if (filters.departamento) {
-      dispatch(fetchStatsByDepartamento(filters.departamento));
-    }
+    handleMunicipioChange(codMpio);
   };
 
-  const handleZonaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onZonaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const codZona = e.target.value ? Number(e.target.value) : null;
-    dispatch(setFilterZona(codZona));
-
-    if (codZona && filters.departamento && filters.municipio) {
-      dispatch(fetchPuestos({ codDepto: filters.departamento, codMpio: filters.municipio, codZona }));
-      dispatch(fetchStatsByZona({ codDepto: filters.departamento, codMpio: filters.municipio, codZona }));
-    } else if (filters.departamento && filters.municipio) {
-      dispatch(fetchStatsByMunicipio({ codDepto: filters.departamento, codMpio: filters.municipio }));
-    }
+    handleZonaChange(codZona);
   };
 
-  const handlePuestoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setFilterPuesto(e.target.value || null));
-  };
-
-  const handleReset = () => {
-    dispatch(resetFilters());
-    dispatch(fetchGeneralStats());
+  const onPuestoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handlePuestoChange(e.target.value || null);
   };
 
   return (
@@ -82,10 +37,8 @@ export const DivipolFilters: React.FC = () => {
               <Label for="departamento">
                 <Translate contentKey="divipol.filters.departamento">Departamento</Translate>
               </Label>
-              <Input type="select" id="departamento" value={filters.departamento || ''} onChange={handleDepartamentoChange}>
-                <option value="">
-                  <Translate contentKey="divipol.filters.selectDepartamento">Seleccione departamento</Translate>
-                </option>
+              <Input type="select" id="departamento" value={filters.departamento || ''} onChange={onDepartamentoChange}>
+                <option value="">{translate('divipol.filters.selectDepartamento')}</option>
                 {departamentos.map(dept => (
                   <option key={dept.coddepto} value={dept.coddepto}>
                     {dept.nomdepto}
@@ -103,12 +56,10 @@ export const DivipolFilters: React.FC = () => {
                 type="select"
                 id="municipio"
                 value={filters.municipio || ''}
-                onChange={handleMunicipioChange}
+                onChange={onMunicipioChange}
                 disabled={!filters.departamento}
               >
-                <option value="">
-                  <Translate contentKey="divipol.filters.selectMunicipio">Seleccione municipio</Translate>
-                </option>
+                <option value="">{translate('divipol.filters.selectMunicipio')}</option>
                 {municipios.map(mpio => (
                   <option key={mpio.codmipio} value={mpio.codmipio}>
                     {mpio.nommipio}
@@ -122,10 +73,8 @@ export const DivipolFilters: React.FC = () => {
               <Label for="zona">
                 <Translate contentKey="divipol.filters.zona">Zona</Translate>
               </Label>
-              <Input type="select" id="zona" value={filters.zona || ''} onChange={handleZonaChange} disabled={!filters.municipio}>
-                <option value="">
-                  <Translate contentKey="divipol.filters.selectZona">Seleccione zona</Translate>
-                </option>
+              <Input type="select" id="zona" value={filters.zona || ''} onChange={onZonaChange} disabled={!filters.municipio}>
+                <option value="">{translate('divipol.filters.selectZona')}</option>
                 {zonas.map(zona => (
                   <option key={zona.codzona} value={zona.codzona}>
                     Zona {zona.codzona}
