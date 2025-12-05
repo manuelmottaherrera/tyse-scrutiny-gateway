@@ -9,6 +9,12 @@ import divipol, {
   setFilterPuesto,
   resetFilters,
   clearError,
+  setSearchMode,
+  setSearchTerm,
+  clearSearch,
+  clearSuggestions,
+  searchDivipol,
+  fetchSuggestions,
   DivipolState,
 } from './divipol.reducer';
 
@@ -29,6 +35,21 @@ describe('Divipol reducer tests', () => {
         },
         loading: false,
         error: null,
+        search: {
+          mode: 'name',
+          term: '',
+          active: false,
+          results: [],
+          suggestions: [],
+          loading: false,
+          suggestionsLoading: false,
+          pagination: {
+            page: 0,
+            size: 20,
+            totalElements: 0,
+            totalPages: 0,
+          },
+        },
       };
 
       expect(divipol(undefined, { type: '' })).toEqual(expectedInitialState);
@@ -411,6 +432,191 @@ describe('Divipol reducer tests', () => {
 
       expect(result.loading).toBe(false);
       expect(result.error).toBe('Stats service unavailable');
+    });
+  });
+
+  describe('Search - Synchronous actions', () => {
+    it('should set search mode and clear term and suggestions', () => {
+      const stateWithSearch: DivipolState = {
+        ...divipol(undefined, { type: '' }),
+        search: {
+          mode: 'name',
+          term: 'MEDELLIN',
+          active: false,
+          results: [],
+          suggestions: [{ codigoDivipol: '05001', tipo: 'MPIO' }] as any,
+          loading: false,
+          suggestionsLoading: false,
+          pagination: { page: 0, size: 20, totalElements: 0, totalPages: 0 },
+        },
+      };
+
+      const result = divipol(stateWithSearch, setSearchMode('code'));
+
+      expect(result.search.mode).toBe('code');
+      expect(result.search.term).toBe('');
+      expect(result.search.suggestions).toEqual([]);
+    });
+
+    it('should set search term', () => {
+      const result = divipol(undefined, setSearchTerm('BOGOTA'));
+
+      expect(result.search.term).toBe('BOGOTA');
+    });
+
+    it('should clear search state', () => {
+      const stateWithActiveSearch: DivipolState = {
+        ...divipol(undefined, { type: '' }),
+        search: {
+          mode: 'name',
+          term: 'ANTIOQUIA',
+          active: true,
+          results: [{ codigoDivipol: '05000', tipo: 'DEPTO' }] as any,
+          suggestions: [{ codigoDivipol: '05001' }] as any,
+          loading: false,
+          suggestionsLoading: false,
+          pagination: { page: 2, size: 20, totalElements: 100, totalPages: 5 },
+        },
+      };
+
+      const result = divipol(stateWithActiveSearch, clearSearch());
+
+      expect(result.search.active).toBe(false);
+      expect(result.search.term).toBe('');
+      expect(result.search.results).toEqual([]);
+      expect(result.search.suggestions).toEqual([]);
+      expect(result.search.pagination.page).toBe(0);
+      expect(result.search.pagination.totalElements).toBe(0);
+    });
+
+    it('should clear suggestions only', () => {
+      const stateWithSuggestions: DivipolState = {
+        ...divipol(undefined, { type: '' }),
+        search: {
+          ...divipol(undefined, { type: '' }).search,
+          term: 'MED',
+          suggestions: [{ codigoDivipol: '05001' }] as any,
+        },
+      };
+
+      const result = divipol(stateWithSuggestions, clearSuggestions());
+
+      expect(result.search.suggestions).toEqual([]);
+      expect(result.search.term).toBe('MED'); // term should not be cleared
+    });
+  });
+
+  describe('Search - Async thunks', () => {
+    it('should set search loading true on searchDivipol pending', () => {
+      const result = divipol(undefined, { type: searchDivipol.pending.type });
+
+      expect(result.search.loading).toBe(true);
+      expect(result.error).toBeNull();
+    });
+
+    it('should store search results and pagination on searchDivipol fulfilled', () => {
+      const mockResponse = {
+        content: [
+          { codigoDivipol: '05001', tipo: 'MPIO', nommipio: 'Medellín' },
+          { codigoDivipol: '05002', tipo: 'MPIO', nommipio: 'Abejorral' },
+        ],
+        page: 0,
+        size: 20,
+        totalElements: 50,
+        totalPages: 3,
+      };
+
+      const result = divipol(undefined, {
+        type: searchDivipol.fulfilled.type,
+        payload: mockResponse,
+      });
+
+      expect(result.search.loading).toBe(false);
+      expect(result.search.active).toBe(true);
+      expect(result.search.results).toEqual(mockResponse.content);
+      expect(result.search.pagination.page).toBe(0);
+      expect(result.search.pagination.totalElements).toBe(50);
+      expect(result.search.pagination.totalPages).toBe(3);
+    });
+
+    it('should clear filters when search is fulfilled', () => {
+      const stateWithFilters: DivipolState = {
+        ...divipol(undefined, { type: '' }),
+        filters: {
+          departamento: 5,
+          municipio: 1,
+          zona: 1,
+          puesto: '01',
+        },
+        municipios: [{ codmipio: 1 }] as any,
+        zonas: [{ codzona: 1 }] as any,
+        puestos: [{ codpuesto: '01' }] as any,
+      };
+
+      const result = divipol(stateWithFilters, {
+        type: searchDivipol.fulfilled.type,
+        payload: { content: [], page: 0, size: 20, totalElements: 0, totalPages: 0 },
+      });
+
+      expect(result.filters.departamento).toBeNull();
+      expect(result.filters.municipio).toBeNull();
+      expect(result.filters.zona).toBeNull();
+      expect(result.filters.puesto).toBeNull();
+      expect(result.municipios).toEqual([]);
+      expect(result.zonas).toEqual([]);
+      expect(result.puestos).toEqual([]);
+    });
+
+    it('should set error on searchDivipol rejected', () => {
+      const error = { message: 'Search failed' };
+
+      const result = divipol(undefined, {
+        type: searchDivipol.rejected.type,
+        error,
+      });
+
+      expect(result.search.loading).toBe(false);
+      expect(result.error).toBe('Search failed');
+    });
+
+    it('should set suggestionsLoading true on fetchSuggestions pending', () => {
+      const result = divipol(undefined, { type: fetchSuggestions.pending.type });
+
+      expect(result.search.suggestionsLoading).toBe(true);
+    });
+
+    it('should store suggestions on fetchSuggestions fulfilled', () => {
+      const mockSuggestions = [
+        { codigoDivipol: '05001', tipo: 'MPIO', nommipio: 'Medellín' },
+        { codigoDivipol: '05002', tipo: 'MPIO', nommipio: 'Abejorral' },
+      ];
+
+      const result = divipol(undefined, {
+        type: fetchSuggestions.fulfilled.type,
+        payload: mockSuggestions,
+      });
+
+      expect(result.search.suggestionsLoading).toBe(false);
+      expect(result.search.suggestions).toEqual(mockSuggestions);
+    });
+
+    it('should clear suggestions on fetchSuggestions rejected', () => {
+      const stateWithSuggestions: DivipolState = {
+        ...divipol(undefined, { type: '' }),
+        search: {
+          ...divipol(undefined, { type: '' }).search,
+          suggestions: [{ codigoDivipol: '05001' }] as any,
+          suggestionsLoading: true,
+        },
+      };
+
+      const result = divipol(stateWithSuggestions, {
+        type: fetchSuggestions.rejected.type,
+        error: {},
+      });
+
+      expect(result.search.suggestionsLoading).toBe(false);
+      expect(result.search.suggestions).toEqual([]);
     });
   });
 });
