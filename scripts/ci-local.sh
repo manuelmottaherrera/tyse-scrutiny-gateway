@@ -53,7 +53,6 @@ CLEAN_START=$(date +%s)
 # 1. Detener y limpiar contenedores Docker de ejecuciones anteriores
 echo "  → Stopping and removing Docker containers from previous runs..."
 docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
-docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
 
 # 2. Limpiar directorio target/ (artefactos de Maven)
 if [ -d "target/" ]; then
@@ -101,6 +100,70 @@ echo -e "${GREEN}✓ Environment cleaned${NC} (${CLEAN_TIME}s)"
 echo ""
 
 ################################################################################
+# Start Docker Services (PostgreSQL, Consul, Kafka, MailHog)
+################################################################################
+
+echo -e "${YELLOW}[Services] Starting Docker services...${NC}"
+SERVICES_START=$(date +%s)
+
+mkdir -p logs
+echo "  → Starting services (PostgreSQL, Consul, Kafka, MailHog)..."
+docker compose -f src/main/docker/services.yml up -d > logs/services-start.log 2>&1
+
+# Esperar a que los servicios críticos estén healthy
+echo "  → Waiting for services to be healthy..."
+
+# PostgreSQL
+echo -n "    PostgreSQL: "
+RETRIES=30
+until docker compose -f src/main/docker/services.yml ps postgresql 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+    echo -n "."
+    sleep 2
+    RETRIES=$((RETRIES - 1))
+done
+if [ $RETRIES -gt 0 ]; then
+    echo -e " ${GREEN}healthy${NC}"
+else
+    echo -e " ${RED}timeout${NC}"
+    echo "    Check logs/services-start.log for details"
+    exit 1
+fi
+
+# MailHog
+echo -n "    MailHog: "
+RETRIES=15
+until docker compose -f src/main/docker/services.yml ps mailhog 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+    echo -n "."
+    sleep 2
+    RETRIES=$((RETRIES - 1))
+done
+if [ $RETRIES -gt 0 ]; then
+    echo -e " ${GREEN}healthy${NC}"
+else
+    echo -e " ${YELLOW}timeout (non-critical)${NC}"
+fi
+
+# Consul
+echo -n "    Consul: "
+RETRIES=15
+until docker compose -f src/main/docker/services.yml ps consul 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+    echo -n "."
+    sleep 2
+    RETRIES=$((RETRIES - 1))
+done
+if [ $RETRIES -gt 0 ]; then
+    echo -e " ${GREEN}healthy${NC}"
+else
+    echo -e " ${YELLOW}timeout (non-critical)${NC}"
+fi
+
+SERVICES_END=$(date +%s)
+SERVICES_TIME=$((SERVICES_END - SERVICES_START))
+
+echo -e "${GREEN}✓ Docker services ready${NC} (${SERVICES_TIME}s)"
+echo ""
+
+################################################################################
 # Job 1: Backend Tests
 ################################################################################
 
@@ -135,16 +198,7 @@ echo ""
 echo -e "${YELLOW}[Liquibase] Verifying rollback capability...${NC}"
 ROLLBACK_START=$(date +%s)
 
-# Crear directorio para logs de Liquibase
-mkdir -p logs
-
-# Iniciar PostgreSQL para la verificación de rollback
-echo "  → Starting PostgreSQL for rollback verification..."
-docker compose -f src/main/docker/postgresql.yml up -d > logs/postgres-start.log 2>&1
-
-# Esperar a que PostgreSQL esté listo
-echo "  → Waiting for PostgreSQL to be ready..."
-sleep 5
+# PostgreSQL ya está corriendo desde la sección [Services]
 
 # Aplicar changesets con liquibase:update
 echo "  → Applying changesets with liquibase:update..."
@@ -376,6 +430,7 @@ echo -e "${GREEN}================================${NC}"
 echo ""
 echo "Timing Summary:"
 echo "  Environment Cleanup:     ${CLEAN_TIME}s"
+echo "  Docker Services:         ${SERVICES_TIME}s"
 echo "  Backend Tests:           ${BACKEND_TIME}s"
 echo "  Liquibase Verification:  ${ROLLBACK_TIME}s"
 echo "  Frontend Tests:          ${FRONTEND_TIME}s"
@@ -393,9 +448,9 @@ echo ""
 # Post-flight: Cleanup Background Processes
 ################################################################################
 
-# Stop PostgreSQL used for Liquibase verification
-echo -e "${YELLOW}[Post-flight] Cleaning up PostgreSQL...${NC}"
-docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
+# Stop all Docker services (PostgreSQL, Consul, Kafka, MailHog)
+echo -e "${YELLOW}[Post-flight] Cleaning up Docker services...${NC}"
+docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
 
 # Wait for any background jobs to finish
 wait
