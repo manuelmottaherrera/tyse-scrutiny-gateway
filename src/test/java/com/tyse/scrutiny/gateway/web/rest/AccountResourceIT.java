@@ -7,8 +7,12 @@ import com.tyse.scrutiny.gateway.IntegrationTest;
 import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.Authority;
 import com.tyse.scrutiny.gateway.domain.User;
+import com.tyse.scrutiny.gateway.domain.authorization.AuthorityPermission;
+import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.repository.AuthorityRepository;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.AuthorityPermissionRepository;
+import com.tyse.scrutiny.gateway.repository.authorization.PermissionRepository;
 import com.tyse.scrutiny.gateway.repository.authorization.UserAuthorityRepository;
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
 import com.tyse.scrutiny.gateway.service.UserService;
@@ -55,6 +59,12 @@ class AccountResourceIT {
     private UserAuthorityRepository userAuthorityRepository;
 
     @Autowired
+    private PermissionRepository permissionRepository;
+
+    @Autowired
+    private AuthorityPermissionRepository authorityPermissionRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -66,11 +76,11 @@ class AccountResourceIT {
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
         // Ensure USER authority exists for registration tests
-        authorityRepository
+        Authority userAuth = authorityRepository
             .findByCode(AuthoritiesConstants.USER)
             .switchIfEmpty(
                 Mono.defer(() -> {
-                    com.tyse.scrutiny.gateway.domain.Authority userAuthority = new com.tyse.scrutiny.gateway.domain.Authority();
+                    Authority userAuthority = new Authority();
                     userAuthority.setName("User");
                     userAuthority.setCode(AuthoritiesConstants.USER);
                     userAuthority.setDescription("User role");
@@ -79,18 +89,18 @@ class AccountResourceIT {
                     userAuthority.setIsActive(true);
                     userAuthority.setHierarchyLevel(500);
                     userAuthority.setCreatedBy(Constants.SYSTEM);
-                    userAuthority.setCreatedDate(java.time.Instant.now());
+                    userAuthority.setCreatedDate(Instant.now());
                     return authorityRepository.save(userAuthority);
                 })
             )
             .block();
 
         // Ensure ADMIN authority exists for some tests
-        authorityRepository
+        Authority adminAuth = authorityRepository
             .findByCode(AuthoritiesConstants.ADMIN)
             .switchIfEmpty(
                 Mono.defer(() -> {
-                    com.tyse.scrutiny.gateway.domain.Authority adminAuthority = new com.tyse.scrutiny.gateway.domain.Authority();
+                    Authority adminAuthority = new Authority();
                     adminAuthority.setName("Admin");
                     adminAuthority.setCode(AuthoritiesConstants.ADMIN);
                     adminAuthority.setDescription("Admin role");
@@ -99,11 +109,78 @@ class AccountResourceIT {
                     adminAuthority.setIsActive(true);
                     adminAuthority.setHierarchyLevel(0);
                     adminAuthority.setCreatedBy(Constants.SYSTEM);
-                    adminAuthority.setCreatedDate(java.time.Instant.now());
+                    adminAuthority.setCreatedDate(Instant.now());
                     return authorityRepository.save(adminAuthority);
                 })
             )
             .block();
+
+        // Create permissions if they don't exist and assign them to authorities
+        // These permissions are needed for testGetExistingAccountIncludesPermissions and testGetExistingAccountUserRoleHasPermissions
+        ensurePermissionsExist(adminAuth, userAuth);
+    }
+
+    /**
+     * Ensures that the required permissions exist and are assigned to the appropriate authorities.
+     * This method is idempotent - it won't create duplicates if permissions already exist.
+     */
+    private void ensurePermissionsExist(Authority adminAuth, Authority userAuth) {
+        // Define permissions needed for the tests
+        String[][] permissionDefs = {
+            { "user.read", "user", "read", "View user information" },
+            { "user.create", "user", "create", "Create new users" },
+            { "authority.read", "authority", "read", "View authority information" },
+            { "permission.read", "permission", "read", "View permission information" },
+            { "divipol.read", "divipol", "read", "View divipol data" },
+            { "statistics.read", "statistics", "read", "View statistics" },
+        };
+
+        for (String[] def : permissionDefs) {
+            Permission perm = permissionRepository
+                .findByName(def[0])
+                .switchIfEmpty(
+                    Mono.defer(() -> {
+                        Permission p = new Permission();
+                        p.setName(def[0]);
+                        p.setResource(def[1]);
+                        p.setAction(def[2]);
+                        p.setDescription(def[3]);
+                        p.setIsActive(true);
+                        p.setCreatedBy(Constants.SYSTEM);
+                        p.setCreatedDate(Instant.now());
+                        return permissionRepository.save(p);
+                    })
+                )
+                .block();
+
+            // Assign all permissions to ADMIN
+            if (adminAuth != null && perm != null) {
+                assignPermissionToAuthorityIfNotExists(adminAuth.getId(), perm.getId());
+            }
+
+            // Assign user.read, authority.read, permission.read to USER
+            if (userAuth != null && perm != null) {
+                if ("user.read".equals(def[0]) || "authority.read".equals(def[0]) || "permission.read".equals(def[0])) {
+                    assignPermissionToAuthorityIfNotExists(userAuth.getId(), perm.getId());
+                }
+            }
+        }
+    }
+
+    /**
+     * Assigns a permission to an authority if the relationship doesn't already exist.
+     */
+    private void assignPermissionToAuthorityIfNotExists(Long authorityId, Long permissionId) {
+        Boolean exists = authorityPermissionRepository.existsByAuthorityIdAndPermissionId(authorityId, permissionId).block();
+
+        if (Boolean.FALSE.equals(exists)) {
+            AuthorityPermission ap = new AuthorityPermission();
+            ap.setAuthorityId(authorityId);
+            ap.setPermissionId(permissionId);
+            ap.setGrantedBy(Constants.SYSTEM);
+            ap.setGrantedDate(Instant.now());
+            authorityPermissionRepository.save(ap).block();
+        }
     }
 
     @AfterEach
