@@ -281,7 +281,8 @@ describe('Divipol Search', () => {
       cy.intercept('GET', '/services/tysescrutinymicrodivipol/api/divipol/search/suggestions*').as('suggestionsApi');
 
       // Wait for the input to be ready and type a common search term
-      cy.get('.divipol-search .form-control').should('be.visible').clear().type('BOGOTA', { delay: 100 });
+      cy.get('.divipol-search .form-control').should('be.visible').clear();
+      cy.get('.divipol-search .form-control').type('BOGOTA', { delay: 100 });
 
       // Wait for suggestions API with longer timeout
       cy.wait('@suggestionsApi', { timeout: 10000 });
@@ -296,7 +297,8 @@ describe('Divipol Search', () => {
       cy.intercept('GET', '/services/tysescrutinymicrodivipol/api/divipol/search*').as('searchApi');
 
       // Type a common search term that should have suggestions
-      cy.get('.divipol-search .form-control').should('be.visible').clear().type('MEDELLIN', { delay: 100 });
+      cy.get('.divipol-search .form-control').should('be.visible').clear();
+      cy.get('.divipol-search .form-control').type('MEDELLIN', { delay: 100 });
       cy.wait('@suggestionsApi', { timeout: 10000 });
 
       // Wait for suggestions list to appear and have items
