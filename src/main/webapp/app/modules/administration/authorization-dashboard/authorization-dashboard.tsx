@@ -48,7 +48,7 @@ export const AuthorizationDashboard = () => {
       </div>
 
       {error && (
-        <Alert color="danger" className="mb-4">
+        <Alert color="danger" className="mb-4" fade={false}>
           <FontAwesomeIcon icon="exclamation-triangle" className="me-2" />
           <Translate contentKey="dashboard.error">{error}</Translate>
         </Alert>

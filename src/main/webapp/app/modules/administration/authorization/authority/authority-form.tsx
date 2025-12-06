@@ -86,7 +86,7 @@ export const AuthorityForm = () => {
           ) : (
             <ValidatedForm defaultValues={defaultValues} onSubmit={saveEntity}>
               {errorMessage && (
-                <Alert color="danger" className="d-flex justify-content-between align-items-center">
+                <Alert color="danger" className="d-flex justify-content-between align-items-center" fade={false}>
                   <div>
                     <FontAwesomeIcon icon="exclamation-triangle" className="me-2" />
                     {errorMessage.startsWith('error.') ? <Translate contentKey={errorMessage} /> : errorMessage}

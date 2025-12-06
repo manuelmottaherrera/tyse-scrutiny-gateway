@@ -155,7 +155,7 @@ export const DivipolSearchResults: React.FC<DivipolSearchResultsProps> = ({ onPa
 
       {/* No results */}
       {!loading && results.length === 0 && (
-        <Alert color="info" className="text-center">
+        <Alert color="info" className="text-center" fade={false}>
           <FontAwesomeIcon icon="info-circle" className="me-2" />
           <Translate contentKey="divipol.search.noResults">No se encontraron resultados.</Translate>
         </Alert>

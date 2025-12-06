@@ -195,7 +195,7 @@ export const DivipolSearch: React.FC<DivipolSearchProps> = ({ hasActiveFilters, 
 
       {/* Warning si hay filtros activos */}
       {hasActiveFilters && !active && (
-        <Alert color="warning" className="search-warning mb-2">
+        <Alert color="warning" className="search-warning mb-2" fade={false}>
           <FontAwesomeIcon icon="exclamation-triangle" className="me-2" />
           <Translate contentKey="divipol.search.filterWarning">Al buscar, los filtros actuales se eliminarán.</Translate>
         </Alert>

@@ -87,7 +87,7 @@ export const ExpiringRolesWidget: React.FC<ExpiringRolesWidgetProps> = ({ expiri
             ))}
           </ListGroup>
         ) : (
-          <Alert color="success" className="m-3">
+          <Alert color="success" className="m-3" fade={false}>
             <FontAwesomeIcon icon="check-circle" className="me-2" />
             <Translate contentKey="dashboard.expiringRoles.empty">No hay roles próximos a expirar</Translate>
           </Alert>

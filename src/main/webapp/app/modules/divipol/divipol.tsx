@@ -50,7 +50,7 @@ export const DivipolPage: React.FC = () => {
       {error && (
         <Row>
           <Col>
-            <Alert color="danger">
+            <Alert color="danger" fade={false}>
               <Translate contentKey="divipol.error">Error al cargar datos</Translate>: {error}
             </Alert>
           </Col>
