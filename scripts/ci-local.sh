@@ -53,6 +53,7 @@ CLEAN_START=$(date +%s)
 # 1. Detener y limpiar contenedores Docker de ejecuciones anteriores
 echo "  → Stopping and removing Docker containers from previous runs..."
 docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+docker compose -f src/main/docker/services-e2e.yml down -v 2>/dev/null || true
 
 # 2. Limpiar directorio target/ (artefactos de Maven)
 if [ -d "target/" ]; then
@@ -164,6 +165,102 @@ echo -e "${GREEN}✓ Docker services ready${NC} (${SERVICES_TIME}s)"
 echo ""
 
 ################################################################################
+# Liquibase Verification (Update → Rollback → Update)
+################################################################################
+
+echo -e "${YELLOW}[Liquibase] Verifying migrations and rollback capability...${NC}"
+ROLLBACK_START=$(date +%s)
+
+mkdir -p logs
+
+# Compilar proyecto (necesario para que Liquibase encuentre los recursos)
+echo "  → Compiling project for Liquibase..."
+if ! ./mvnw compile -DskipTests -q > logs/liquibase-compile.log 2>&1; then
+    echo -e "    ${RED}✗ Error: Compilation failed${NC}"
+    echo "    Check logs/liquibase-compile.log for details"
+    tail -20 logs/liquibase-compile.log
+    exit 1
+fi
+
+# Paso 1: Aplicar todos los changesets
+echo "  → Step 1: Applying all changesets with liquibase:update..."
+if ./mvnw liquibase:update \
+  -Dlogging.level.ROOT=ERROR \
+  -Dlogging.level.liquibase=INFO \
+  > logs/liquibase-update-1.log 2>&1; then
+
+    # Contar changesets aplicados
+    APPLIED=$(grep -c "ChangeSet.*ran successfully" logs/liquibase-update-1.log 2>/dev/null || echo "0")
+    echo -e "    ${GREEN}✓ Applied $APPLIED changeset(s) successfully${NC}"
+else
+    echo -e "    ${RED}✗ Error: Failed to apply changesets${NC}"
+    echo "    Check logs/liquibase-update-1.log for details"
+    tail -20 logs/liquibase-update-1.log
+    exit 1
+fi
+
+# Paso 2: Rollback hasta el tag inicial
+echo "  → Step 2: Testing rollback to tag 'estado-vacio'..."
+if ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio \
+  -Dlogging.level.ROOT=ERROR \
+  -Dlogging.level.liquibase=INFO \
+  > logs/liquibase-rollback.log 2>&1; then
+
+    # Contar cuántos changesets se hicieron rollback
+    ROLLED_BACK=$(grep -c "Rolling Back Changeset" logs/liquibase-rollback.log 2>/dev/null || echo "0")
+    echo -e "    ${GREEN}✓ Rolled back $ROLLED_BACK changeset(s) successfully${NC}"
+else
+    echo -e "    ${RED}✗ Error: Rollback failed${NC}"
+    echo "    Check logs/liquibase-rollback.log for details"
+    tail -20 logs/liquibase-rollback.log
+
+    # Mostrar análisis de changesets sin rollback
+    echo ""
+    echo "  → Analyzing changeset files for missing rollback tags..."
+    TOTAL_CHANGESETS=0
+    CHANGESETS_WITH_ROLLBACK=0
+
+    LIQUIBASE_DIR="src/main/resources/config/liquibase"
+    if [ -d "$LIQUIBASE_DIR" ]; then
+        for xml_file in $(find "$LIQUIBASE_DIR" -name "*.xml" -type f 2>/dev/null); do
+            CHANGESETS_IN_FILE=$(grep -c "<changeSet" "$xml_file" 2>/dev/null || echo "0")
+            TOTAL_CHANGESETS=$((TOTAL_CHANGESETS + CHANGESETS_IN_FILE))
+            ROLLBACKS_IN_FILE=$(grep -c "<rollback" "$xml_file" 2>/dev/null || echo "0")
+            CHANGESETS_WITH_ROLLBACK=$((CHANGESETS_WITH_ROLLBACK + ROLLBACKS_IN_FILE))
+        done
+
+        if [ "$TOTAL_CHANGESETS" -gt 0 ]; then
+            MISSING=$((TOTAL_CHANGESETS - CHANGESETS_WITH_ROLLBACK))
+            echo "    Total changesets: $TOTAL_CHANGESETS"
+            echo "    With <rollback> tag: $CHANGESETS_WITH_ROLLBACK"
+            echo -e "    ${YELLOW}Missing rollback: $MISSING changeset(s)${NC}"
+        fi
+    fi
+    exit 1
+fi
+
+# Paso 3: Re-aplicar todos los changesets (dejar BD lista para tests)
+echo "  → Step 3: Re-applying all changesets..."
+if ./mvnw liquibase:update \
+  -Dlogging.level.ROOT=ERROR \
+  -Dlogging.level.liquibase=INFO \
+  > logs/liquibase-update-2.log 2>&1; then
+
+    REAPPLIED=$(grep -c "ChangeSet.*ran successfully" logs/liquibase-update-2.log 2>/dev/null || echo "0")
+    echo -e "    ${GREEN}✓ Re-applied $REAPPLIED changeset(s) - Database ready${NC}"
+else
+    echo -e "    ${RED}✗ Error: Failed to re-apply changesets${NC}"
+    echo "    Check logs/liquibase-update-2.log for details"
+    tail -20 logs/liquibase-update-2.log
+    exit 1
+fi
+
+ROLLBACK_END=$(date +%s)
+ROLLBACK_TIME=$((ROLLBACK_END - ROLLBACK_START))
+echo -e "${GREEN}✓ Liquibase verification passed${NC} (${ROLLBACK_TIME}s)"
+echo ""
+
+################################################################################
 # Job 1: Backend Tests
 ################################################################################
 
@@ -171,7 +268,7 @@ echo -e "${YELLOW}[Job 1/3] Starting Backend Tests...${NC}"
 BACKEND_START=$(date +%s)
 
 echo "  → Running Maven verify with error-level logging..."
-./mvnw clean verify \
+./mvnw verify \
   -Dlogging.level.ROOT=ERROR \
   -Dlogging.level.tech.jhipster=ERROR \
   -Dlogging.level.com.tyse.scrutiny=ERROR
@@ -189,116 +286,6 @@ fi
 if [ -d "target/site/jacoco/" ]; then
     echo "  → Coverage report: target/site/jacoco/"
 fi
-echo ""
-
-################################################################################
-# Liquibase Rollback Verification
-################################################################################
-
-echo -e "${YELLOW}[Liquibase] Verifying rollback capability...${NC}"
-ROLLBACK_START=$(date +%s)
-
-# PostgreSQL ya está corriendo desde la sección [Services]
-
-# Aplicar changesets con liquibase:update
-echo "  → Applying changesets with liquibase:update..."
-if ./mvnw liquibase:update \
-  -Dlogging.level.ROOT=ERROR \
-  -Dlogging.level.liquibase=INFO \
-  > logs/liquibase-initial-update.log 2>&1; then
-    echo -e "    ${GREEN}✓ Changesets applied successfully${NC}"
-else
-    echo -e "    ${RED}✗ Error: Failed to apply changesets${NC}"
-    echo "    Check logs/liquibase-initial-update.log for details"
-    # No fallar aquí, continuar para ver qué pasó
-fi
-
-echo "  → Checking current database status..."
-./mvnw liquibase:status \
-  -Dlogging.level.ROOT=ERROR \
-  -Dlogging.level.liquibase=WARN \
-  > logs/liquibase-status.log 2>&1 || true
-
-# Contar changesets aplicados (usando grep + wc -l para evitar problemas con grep -c)
-APPLIED_CHANGESETS=$(grep "previously run" logs/liquibase-status.log 2>/dev/null | wc -l)
-# Asegurar que sea un número válido
-APPLIED_CHANGESETS=${APPLIED_CHANGESETS:-0}
-echo "    Applied changesets: $APPLIED_CHANGESETS"
-
-if [ "$APPLIED_CHANGESETS" -gt 0 ]; then
-    echo "  → Testing rollback capability (rollback to tag 'estado-vacio')..."
-
-    # Intentar rollback hasta el tag 'estado-vacio'
-    if ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio \
-      -Dlogging.level.ROOT=ERROR \
-      -Dlogging.level.liquibase=WARN \
-      > logs/liquibase-rollback.log 2>&1; then
-
-        echo -e "    ${GREEN}✓ Rollback executed successfully${NC}"
-
-        # Contar cuántos changesets se hicieron rollback
-        ROLLED_BACK=$(grep -c "Rolling Back Changeset" logs/liquibase-rollback.log 2>/dev/null || echo "0")
-        if [ "$ROLLED_BACK" -gt 0 ]; then
-            echo -e "    ${GREEN}✓ Rolled back $ROLLED_BACK changeset(s)${NC}"
-        else
-            echo -e "    ${YELLOW}⚠ Warning: No rollback statements found${NC}"
-        fi
-
-        # Volver a aplicar todos los changesets
-        echo "  → Re-applying all changesets with update..."
-        if ./mvnw liquibase:update \
-          -Dlogging.level.ROOT=ERROR \
-          -Dlogging.level.liquibase=WARN \
-          > logs/liquibase-update.log 2>&1; then
-            echo -e "    ${GREEN}✓ Database restored to original state${NC}"
-        else
-            echo -e "    ${RED}✗ Error: Failed to re-apply changesets${NC}"
-            echo "    Check logs/liquibase-update.log for details"
-            exit 1
-        fi
-    else
-        echo -e "    ${YELLOW}⚠ Warning: Rollback to tag 'estado-vacio' failed${NC}"
-        echo -e "    ${YELLOW}  This might indicate:${NC}"
-        echo -e "    ${YELLOW}  - Missing rollback configuration in one or more changesets${NC}"
-        echo -e "    ${YELLOW}  - Tag 'estado-vacio' not found in database${NC}"
-        echo "    Check logs/liquibase-rollback.log for details"
-
-        # Intentar verificar si hay changesets sin rollback usando análisis estático
-        echo "  → Analyzing changeset files for rollback tags..."
-        TOTAL_CHANGESETS=0
-        CHANGESETS_WITH_ROLLBACK=0
-
-        LIQUIBASE_DIR="src/main/resources/config/liquibase"
-        if [ -d "$LIQUIBASE_DIR" ]; then
-            for xml_file in $(find "$LIQUIBASE_DIR" -name "*.xml" -type f 2>/dev/null); do
-                # Contar changesets en el archivo
-                CHANGESETS_IN_FILE=$(grep -c "<changeSet" "$xml_file" 2>/dev/null || echo "0")
-                TOTAL_CHANGESETS=$((TOTAL_CHANGESETS + CHANGESETS_IN_FILE))
-
-                # Contar rollback tags en el archivo
-                ROLLBACKS_IN_FILE=$(grep -c "<rollback" "$xml_file" 2>/dev/null || echo "0")
-                CHANGESETS_WITH_ROLLBACK=$((CHANGESETS_WITH_ROLLBACK + ROLLBACKS_IN_FILE))
-            done
-
-            if [ "$TOTAL_CHANGESETS" -gt 0 ]; then
-                PERCENTAGE=$((CHANGESETS_WITH_ROLLBACK * 100 / TOTAL_CHANGESETS))
-                echo "    Total changesets found: $TOTAL_CHANGESETS"
-                echo "    Changesets with <rollback> tag: $CHANGESETS_WITH_ROLLBACK (${PERCENTAGE}%)"
-
-                if [ "$PERCENTAGE" -lt 100 ]; then
-                    MISSING=$((TOTAL_CHANGESETS - CHANGESETS_WITH_ROLLBACK))
-                    echo -e "    ${YELLOW}⚠ Warning: $MISSING changeset(s) may lack rollback configuration${NC}"
-                fi
-            fi
-        fi
-    fi
-else
-    echo -e "    ${BLUE}ℹ No changesets applied yet (skipping rollback test)${NC}"
-fi
-
-ROLLBACK_END=$(date +%s)
-ROLLBACK_TIME=$((ROLLBACK_END - ROLLBACK_START))
-echo -e "${GREEN}✓ Liquibase verification completed${NC} (${ROLLBACK_TIME}s)"
 echo ""
 
 ################################################################################
@@ -365,17 +352,93 @@ if [ "$RUN_E2E" = true ]; then
     echo -e "${YELLOW}[Job 3/3] Starting E2E Tests...${NC}"
     E2E_START=$(date +%s)
 
-    echo "  → Building E2E package..."
+    # Build E2E JAR for gateway
+    echo "  → Building E2E package for gateway..."
     npm run ci:e2e:package
 
-    echo "  → Preparing E2E environment (Docker)..."
-    npm run ci:e2e:prepare:docker
+    # Build microservice divipol Docker image
+    echo "  → Building microservice divipol Docker image..."
+    MICRO_DIVIPOL_PATH="../tyse-scrutiny-micro-divipol"
+    if [ -d "$MICRO_DIVIPOL_PATH" ]; then
+        (cd "$MICRO_DIVIPOL_PATH" && ./mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild) > logs/micro-divipol-build.log 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "    ${GREEN}✓ Microservice divipol image built${NC}"
+        else
+            echo -e "    ${RED}✗ Failed to build microservice divipol image${NC}"
+            echo "    Check logs/micro-divipol-build.log for details"
+            tail -20 logs/micro-divipol-build.log
+            exit 1
+        fi
+    else
+        echo -e "    ${RED}✗ Microservice divipol not found at $MICRO_DIVIPOL_PATH${NC}"
+        echo "    E2E tests require the microservice. Please clone it first."
+        exit 1
+    fi
 
+    # Stop any existing services and start E2E services
+    echo "  → Preparing E2E environment (Docker with microservice)..."
+    docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+
+    echo "    Starting E2E services..."
+    if ! docker compose -f src/main/docker/services-e2e.yml up -d > logs/e2e-services-start.log 2>&1; then
+        echo -e "    ${RED}✗ Failed to start E2E services${NC}"
+        echo "    Check logs/e2e-services-start.log for details"
+        cat logs/e2e-services-start.log | tail -30
+        exit 1
+    fi
+
+    # Show running containers
+    echo "    Containers started:"
+    docker compose -f src/main/docker/services-e2e.yml ps --format "table {{.Name}}\t{{.Status}}" | sed 's/^/      /'
+
+    # Wait for PostgreSQL divipol to be healthy first
+    echo -n "    Waiting for postgresql-divipol: "
+    RETRIES=30
+    until docker compose -f src/main/docker/services-e2e.yml ps postgresql-divipol 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+        echo -n "."
+        sleep 2
+        RETRIES=$((RETRIES - 1))
+    done
+    if [ $RETRIES -gt 0 ]; then
+        echo -e " ${GREEN}healthy${NC}"
+    else
+        echo -e " ${RED}timeout${NC}"
+        docker compose -f src/main/docker/services-e2e.yml logs postgresql-divipol | tail -20
+        exit 1
+    fi
+
+    # Wait for microservice divipol to be healthy
+    echo -n "    Waiting for micro-divipol: "
+    RETRIES=60
+    until docker compose -f src/main/docker/services-e2e.yml ps micro-divipol 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+        echo -n "."
+        sleep 5
+        RETRIES=$((RETRIES - 1))
+    done
+    if [ $RETRIES -gt 0 ]; then
+        echo -e " ${GREEN}healthy${NC}"
+    else
+        echo -e " ${RED}timeout${NC}"
+        echo "    Microservice logs:"
+        docker compose -f src/main/docker/services-e2e.yml logs micro-divipol | tail -50
+        exit 1
+    fi
+
+    # Verify microservice is responding
+    echo -n "    Verifying micro-divipol API: "
+    if curl -sf http://localhost:8081/management/health > /dev/null 2>&1; then
+        echo -e "${GREEN}OK${NC}"
+    else
+        echo -e "${YELLOW}warning (health endpoint not responding)${NC}"
+    fi
+
+    # Run E2E tests
     echo "  → Running Cypress E2E tests..."
     npm run ci:e2e:run || E2E_FAILED=true
 
+    # Teardown E2E environment
     echo "  → Tearing down E2E environment..."
-    npm run ci:e2e:teardown:docker || true  # Don't fail on teardown
+    docker compose -f src/main/docker/services-e2e.yml down -v 2>/dev/null || true
 
     E2E_END=$(date +%s)
     E2E_TIME=$((E2E_END - E2E_START))
@@ -431,8 +494,8 @@ echo ""
 echo "Timing Summary:"
 echo "  Environment Cleanup:     ${CLEAN_TIME}s"
 echo "  Docker Services:         ${SERVICES_TIME}s"
-echo "  Backend Tests:           ${BACKEND_TIME}s"
 echo "  Liquibase Verification:  ${ROLLBACK_TIME}s"
+echo "  Backend Tests:           ${BACKEND_TIME}s"
 echo "  Frontend Tests:          ${FRONTEND_TIME}s"
 if [ "$RUN_E2E" = true ]; then
     echo "  E2E Tests:               ${E2E_TIME}s"
