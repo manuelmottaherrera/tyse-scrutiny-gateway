@@ -10,6 +10,122 @@ Esta es una aplicación "gateway" diseñada para ser parte de una arquitectura d
 
 Esta aplicación está configurada para Service Discovery y Configuration con Consul. Al iniciar, se negará a arrancar si no puede conectarse a Consul en [http://localhost:8500](http://localhost:8500). Para más información, lee nuestra documentación sobre [Service Discovery and Configuration with Consul][].
 
+## Arquitectura de Microservicios
+
+Este proyecto es parte de una arquitectura de microservicios. La estructura de carpetas recomendada es:
+
+```
+tyse/
+├── tyse-scrutiny-gateway/          # Este repositorio (Gateway + UI)
+│   ├── Puerto: 8080
+│   ├── PostgreSQL: localhost:5432
+│   └── Frontend React
+│
+├── tyse-scrutiny-micro-divipol/    # Microservicio de división política
+│   ├── Puerto: 8081
+│   ├── PostgreSQL: localhost:5433
+│   └── API REST pura (sin frontend)
+│
+└── [futuros microservicios...]
+```
+
+### Diagrama de Arquitectura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Servicios Compartidos                      │
+│  Consul (8500) │ Kafka (9092) │ JHipster Registry (7419)    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                ┌─────────────┴────────────┐
+                │                          │
+    ┌───────────▼──────────┐   ┌──────────▼──────────────┐
+    │  Gateway (8080)      │   │  Divipol Micro (8081)   │
+    │  - React Frontend    │   │  - API REST              │
+    │  - Spring Gateway    │   │  - Datos Divipol         │
+    │  - Auth JWT          │   │  - 18K registros         │
+    │  - PostgreSQL:5432   │   │  - PostgreSQL:5433       │
+    └──────────────────────┘   └─────────────────────────┘
+```
+
+### Servicios Compartidos
+
+**IMPORTANTE**: Los servicios compartidos (Consul, Kafka) se levantan **UNA SOLA VEZ** desde el gateway:
+
+```bash
+# Levantar servicios compartidos (desde el gateway)
+docker compose -f src/main/docker/services.yml up -d
+
+# Verificar que están corriendo
+docker ps | grep -E "consul|kafka"
+```
+
+### Desarrollo con Múltiples Microservicios
+
+**Terminal 1 - Servicios compartidos:**
+
+```bash
+cd tyse-scrutiny-gateway
+docker compose -f src/main/docker/services.yml up -d
+```
+
+**Terminal 2 - Gateway Backend:**
+
+```bash
+cd tyse-scrutiny-gateway
+./mvnw
+```
+
+**Terminal 3 - Gateway Frontend:**
+
+```bash
+cd tyse-scrutiny-gateway
+./npmw start
+```
+
+**Terminal 4 - Microservicio Divipol:**
+
+```bash
+cd tyse-scrutiny-micro-divipol
+docker compose -f src/main/docker/postgresql.yml up -d  # Solo su PostgreSQL
+./mvnw
+```
+
+### Tests E2E con Microservicios
+
+Para ejecutar tests E2E que requieren el microservicio divipol, usa `services-e2e.yml` que incluye todos los servicios más el microservicio dockerizado:
+
+```bash
+# Construir imagen Docker del microservicio (desde su directorio)
+cd ../tyse-scrutiny-micro-divipol
+npm run java:docker
+
+# Ejecutar tests E2E (desde el gateway)
+cd ../tyse-scrutiny-gateway
+./scripts/ci-local.sh --with-e2e
+```
+
+El archivo `services-e2e.yml` levanta:
+
+- PostgreSQL (gateway, puerto 5432)
+- PostgreSQL Divipol (puerto 5433)
+- Consul (puerto 8500)
+- Kafka con listeners duales (interno: 9093, externo: 9092)
+- MailHog (puerto 8025)
+- Microservicio Divipol dockerizado (puerto 8081)
+
+### Comunicación entre Servicios
+
+| Mecanismo     | Uso                                                            |
+| ------------- | -------------------------------------------------------------- |
+| **Consul**    | Service discovery - Los servicios se registran automáticamente |
+| **Kafka**     | Mensajería asíncrona entre servicios                           |
+| **HTTP/REST** | Comunicación síncrona vía Spring Cloud Gateway                 |
+
+**Topics Kafka configurados:**
+
+- `sse-topic` - Consumer del microservicio divipol
+
 ## Estructura del Proyecto
 
 Node es requerido para la generación y recomendado para desarrollo. `package.json` siempre se genera para una mejor experiencia de desarrollo con prettier, commit hooks, scripts y más.
