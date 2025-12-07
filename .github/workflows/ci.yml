@@ -6,8 +6,74 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  JAVA_VERSION: '17'
+  NODE_VERSION: '22.15.0'
+
 jobs:
-  # Backend Tests
+  # ============================================================================
+  # Job 1: Liquibase Verification
+  # Verifica que las migraciones funcionan correctamente (update → rollback → update)
+  # ============================================================================
+  liquibase-verification:
+    name: Liquibase Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgresql:
+        image: postgres:17.4
+        env:
+          POSTGRES_DB: tyseScrutinyGateway
+          POSTGRES_USER: tyseScrutinyGateway
+          POSTGRES_PASSWORD: ''
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compile project
+        run: |
+          chmod +x mvnw
+          ./mvnw compile -DskipTests -q
+
+      - name: Step 1 - Apply all changesets
+        run: |
+          ./mvnw liquibase:update \
+            -Dlogging.level.ROOT=ERROR \
+            -Dlogging.level.liquibase=INFO
+
+      - name: Step 2 - Rollback to initial state
+        run: |
+          ./mvnw liquibase:rollback -Dliquibase.rollbackTag=estado-vacio \
+            -Dlogging.level.ROOT=ERROR \
+            -Dlogging.level.liquibase=INFO
+
+      - name: Step 3 - Re-apply all changesets
+        run: |
+          ./mvnw liquibase:update \
+            -Dlogging.level.ROOT=ERROR \
+            -Dlogging.level.liquibase=INFO
+
+  # ============================================================================
+  # Job 2: Backend Tests
+  # Ejecuta unit tests e integration tests con Testcontainers
+  # ============================================================================
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
@@ -24,10 +90,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'maven'
 
@@ -39,6 +105,9 @@ jobs:
           restore-keys: ${{ runner.os }}-m2-gateway
 
       - name: Run Backend Tests
+        env:
+          # Fix Testcontainers hostname resolution in GitHub Actions
+          TESTCONTAINERS_HOST_OVERRIDE: localhost
         run: |
           chmod +x mvnw
           ./mvnw clean verify \
@@ -62,7 +131,10 @@ jobs:
           path: target/site/jacoco/
           retention-days: 7
 
-  # Frontend Tests
+  # ============================================================================
+  # Job 3: Frontend Tests
+  # Ejecuta tests de Jest y verifica linting
+  # ============================================================================
   frontend-tests:
     name: Frontend Tests
     runs-on: ubuntu-latest
@@ -72,17 +144,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: '22.15.0'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Check code formatting
-        run: npm run prettier:check
 
       - name: Run ESLint
         run: npm run lint
@@ -106,7 +175,45 @@ jobs:
           path: target/test-results/jest/coverage/
           retention-days: 7
 
-  # E2E Tests (optional - only on main/develop)
+  # ============================================================================
+  # Job 4: Code Quality
+  # Verifica formatting y reglas de código
+  # ============================================================================
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Check Prettier formatting
+        run: npm run prettier:check
+
+      - name: Check nohttp (detect http:// URLs)
+        run: npm run backend:nohttp:test
+
+  # ============================================================================
+  # Job 5: E2E Tests (optional - only on push to main/develop)
+  # Ejecuta tests end-to-end con Cypress
+  # ============================================================================
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -118,16 +225,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: '22.15.0'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -154,23 +261,30 @@ jobs:
           path: target/cypress/
           retention-days: 7
 
+  # ============================================================================
   # Quality Gate
+  # Verifica que todos los jobs pasaron
+  # ============================================================================
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests]
+    needs: [liquibase-verification, backend-tests, frontend-tests, code-quality]
     if: always()
 
     steps:
-      - name: Check test results
+      - name: Check all job results
         run: |
+          echo "Liquibase Verification: ${{ needs.liquibase-verification.result }}"
           echo "Backend Tests: ${{ needs.backend-tests.result }}"
           echo "Frontend Tests: ${{ needs.frontend-tests.result }}"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
 
-          if [ "${{ needs.backend-tests.result }}" != "success" ] || \
-             [ "${{ needs.frontend-tests.result }}" != "success" ]; then
-            echo "❌ CI Pipeline Failed - One or more test suites failed"
+          if [ "${{ needs.liquibase-verification.result }}" != "success" ] || \
+             [ "${{ needs.backend-tests.result }}" != "success" ] || \
+             [ "${{ needs.frontend-tests.result }}" != "success" ] || \
+             [ "${{ needs.code-quality.result }}" != "success" ]; then
+            echo "❌ CI Pipeline Failed - One or more jobs failed"
             exit 1
           fi
 
-          echo "✅ CI Pipeline Passed - All tests successful"
+          echo "✅ CI Pipeline Passed - All jobs successful"
