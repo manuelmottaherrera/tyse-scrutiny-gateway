@@ -1,0 +1,84 @@
+# Docker Compose for E2E testing environment
+# Includes all services needed for full end-to-end testing including the divipol microservice
+name: tysescrutinygateway-e2e
+services:
+  # Gateway services
+  postgresql:
+    extends:
+      file: ./postgresql.yml
+      service: postgresql
+  consul:
+    extends:
+      file: ./consul.yml
+      service: consul
+  consul-config-loader:
+    extends:
+      file: ./consul.yml
+      service: consul-config-loader
+  # Kafka with listeners configured for both internal (docker) and external (localhost) access
+  kafka:
+    image: apache/kafka-native:4.0.0
+    ports:
+      - 127.0.0.1:9092:9092
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      # INTERNAL for docker network, EXTERNAL for localhost
+      KAFKA_LISTENERS: INTERNAL://:9093,EXTERNAL://:9092,CONTROLLER://:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9093,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9094
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    labels:
+      org.springframework.boot.ignore: true
+  mailhog:
+    extends:
+      file: ./mailhog.yml
+      service: mailhog
+
+  # Microservice Divipol - PostgreSQL (port 5433)
+  postgresql-divipol:
+    image: postgres:17.4
+    environment:
+      - POSTGRES_USER=tyseScrutinyMicroDivipol
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 127.0.0.1:5433:5432
+
+  # Microservice Divipol - Application (port 8081)
+  micro-divipol:
+    image: tysescrutinymicrodivipol:latest
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgresql-divipol:5432/tyseScrutinyMicroDivipol
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql-divipol:5432/tyseScrutinyMicroDivipol
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:9093
+    ports:
+      - 127.0.0.1:8081:8081
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8081/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    depends_on:
+      postgresql-divipol:
+        condition: service_healthy
+      consul:
+        condition: service_started
+      kafka:
+        condition: service_started
