@@ -12,22 +12,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Check if CI passed
-  check-ci:
-    name: Check CI Status
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run'
-    steps:
-      - name: Check CI Pipeline Result
-        if: github.event.workflow_run.conclusion != 'success'
-        run: |
-          echo "CI Pipeline failed - skipping build"
-          exit 1
-
-  # Build Docker Image
+  # Build Docker Image - only if CI passed or manual trigger
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    # Solo ejecutar si: 1) es manual, o 2) CI terminó exitosamente
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
