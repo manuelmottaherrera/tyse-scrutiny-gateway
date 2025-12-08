@@ -268,6 +268,16 @@ jobs:
       - name: Prepare E2E environment
         run: npm run ci:e2e:prepare:docker
 
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          echo "=== Docker containers status ==="
+          docker ps -a
+          echo "=== Microservice divipol logs ==="
+          docker logs tysescrutinygateway-e2e-micro-divipol-1 2>&1 | tail -200 || true
+          echo "=== PostgreSQL divipol logs ==="
+          docker logs tysescrutinygateway-e2e-postgresql-divipol-1 2>&1 | tail -50 || true
+
       - name: Run E2E tests
         run: npm run ci:e2e:run
 

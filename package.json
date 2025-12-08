@@ -71,7 +71,7 @@
     "release:major": "standard-version --release-as major",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
-    "services:e2e:await": "echo 'Waiting for microservice divipol...' && wait-on -t 180000 http-get://127.0.0.1:8081/management/health && echo 'Microservice divipol is ready'",
+    "services:e2e:await": "echo 'Waiting for microservice divipol (up to 5 min)...' && wait-on -t 300000 http-get://127.0.0.1:8081/management/health && echo 'Microservice divipol is ready'",
     "services:e2e:up": "docker compose -f src/main/docker/services-e2e.yml up -d",
     "services:up": "docker compose -f src/main/docker/services.yml up --wait",
     "start": "npm run webapp:dev --",
