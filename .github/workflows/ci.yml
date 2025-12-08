@@ -223,13 +223,20 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     needs: [backend-tests, frontend-tests]
 
     steps:
-      - name: Checkout code
+      - name: Checkout gateway code
         uses: actions/checkout@v4
+
+      - name: Checkout microservice divipol
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/tyse-scrutiny-micro-divipol
+          path: micro-divipol
+          ref: ${{ github.ref_name }}
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -243,7 +250,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Build microservice divipol Docker image
+        working-directory: micro-divipol
+        run: |
+          chmod +x mvnw
+          ./mvnw -ntp package -DskipTests jib:dockerBuild
+
+      - name: Verify divipol image exists
+        run: docker images tysescrutinymicrodivipol:latest
+
+      - name: Install gateway dependencies
         run: npm ci
 
       - name: Build E2E package
