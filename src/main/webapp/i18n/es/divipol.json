@@ -34,7 +34,16 @@
       "noData": "No hay datos para mostrar. Seleccione filtros para visualizar información."
     },
     "export": {
-      "download": "Descargar Reporte"
+      "download": "Descargar Reporte",
+      "modalTitle": "Exportar Reporte",
+      "format": "Formato",
+      "scope": "Alcance de la exportación",
+      "currentPage": "Página actual ({{page}})",
+      "allResults": "Todos los resultados ({{total}} registros)",
+      "maxRecords": "Máximo 10,000 registros",
+      "exporting": "Exportando...",
+      "success": "Reporte descargado exitosamente",
+      "error": "Error al generar el reporte"
     },
     "search": {
       "title": "Buscar",

@@ -197,6 +197,64 @@ class DivipolService {
     });
     return response.data;
   }
+
+  // =====================================================
+  // Métodos de Exportación
+  // =====================================================
+
+  /**
+   * Exporta datos del modo filtros a CSV o PDF
+   */
+  async exportFilters(format: ExportFormat, params: FilterExportParams): Promise<Blob> {
+    const endpoint = `${API_BASE_URL}/export/filters/${format}`;
+    const response = await axios.get(endpoint, {
+      params: {
+        codDepto: params.codDepto,
+        codMpio: params.codMpio,
+        codZona: params.codZona,
+      },
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+
+  /**
+   * Exporta resultados del modo búsqueda a CSV o PDF
+   */
+  async exportSearch(format: ExportFormat, params: SearchExportParams): Promise<Blob> {
+    const endpoint = `${API_BASE_URL}/export/search/${format}`;
+    const response = await axios.get(endpoint, {
+      params: {
+        q: params.q,
+        mode: params.mode,
+        page: params.page,
+        size: params.size,
+        exportAll: params.exportAll,
+      },
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+}
+
+// =====================================================
+// Tipos de Exportación
+// =====================================================
+
+export type ExportFormat = 'csv' | 'pdf';
+
+export interface FilterExportParams {
+  codDepto?: number;
+  codMpio?: number;
+  codZona?: number;
+}
+
+export interface SearchExportParams {
+  q: string;
+  mode: SearchMode;
+  page?: number;
+  size?: number;
+  exportAll: boolean;
 }
 
 export default new DivipolService();

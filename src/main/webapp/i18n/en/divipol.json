@@ -34,7 +34,16 @@
       "noData": "No data to display. Select filters to view information."
     },
     "export": {
-      "download": "Download Report"
+      "download": "Download Report",
+      "modalTitle": "Export Report",
+      "format": "Format",
+      "scope": "Export scope",
+      "currentPage": "Current page ({{page}})",
+      "allResults": "All results ({{total}} records)",
+      "maxRecords": "Maximum 10,000 records",
+      "exporting": "Exporting...",
+      "success": "Report downloaded successfully",
+      "error": "Error generating report"
     },
     "search": {
       "title": "Search",
