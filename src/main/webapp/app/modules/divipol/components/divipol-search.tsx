@@ -108,9 +108,9 @@ export const DivipolSearch: React.FC<DivipolSearchProps> = ({ hasActiveFilters, 
   }, [term, mode, onSearch]);
 
   const handleSuggestionClick = (suggestion: DivipolSearchResult) => {
-    // Buscar directamente con el código de la sugerencia
-    dispatch(setSearchTerm(suggestion.codigoDivipol));
+    // Primero cambiar modo (esto limpia el term), luego establecer el código
     dispatch(setSearchMode('code'));
+    dispatch(setSearchTerm(suggestion.codigoDivipol));
     onSearch({ q: suggestion.codigoDivipol, mode: 'code', page: 0, size: 20 });
     setShowSuggestions(false);
   };
