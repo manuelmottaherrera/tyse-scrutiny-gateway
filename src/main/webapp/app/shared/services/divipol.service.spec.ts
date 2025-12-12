@@ -223,4 +223,129 @@ describe('Divipol service tests', () => {
       expect(result).toEqual(mockStats);
     });
   });
+
+  describe('exportFilters', () => {
+    it('should call correct endpoint for CSV export', async () => {
+      const mockBlob = new Blob(['test'], { type: 'text/csv' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      const result = await divipolService.exportFilters('csv', { codDepto: 5 });
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/export/filters/csv', {
+          params: { codDepto: 5, codMpio: undefined, codZona: undefined },
+          responseType: 'blob',
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockBlob);
+    });
+
+    it('should call correct endpoint for PDF export', async () => {
+      const mockBlob = new Blob(['test'], { type: 'application/pdf' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      const result = await divipolService.exportFilters('pdf', {});
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/export/filters/pdf', {
+          params: { codDepto: undefined, codMpio: undefined, codZona: undefined },
+          responseType: 'blob',
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockBlob);
+    });
+
+    it('should pass all filter parameters correctly', async () => {
+      const mockBlob = new Blob(['test'], { type: 'text/csv' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      await divipolService.exportFilters('csv', { codDepto: 5, codMpio: 1, codZona: 2 });
+
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/export/filters/csv', {
+          params: { codDepto: 5, codMpio: 1, codZona: 2 },
+          responseType: 'blob',
+        }),
+      ).toBe(true);
+    });
+
+    it('should handle export errors', async () => {
+      axiosGetStub.rejects(new Error('Export failed'));
+
+      await expect(divipolService.exportFilters('csv', {})).rejects.toThrow('Export failed');
+    });
+  });
+
+  describe('exportSearch', () => {
+    it('should call correct endpoint for CSV export with search params', async () => {
+      const mockBlob = new Blob(['test'], { type: 'text/csv' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      const result = await divipolService.exportSearch('csv', {
+        q: 'BOLIVAR',
+        mode: 'name',
+        page: 0,
+        size: 20,
+        exportAll: false,
+      });
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/export/search/csv', {
+          params: { q: 'BOLIVAR', mode: 'name', page: 0, size: 20, exportAll: false },
+          responseType: 'blob',
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockBlob);
+    });
+
+    it('should call correct endpoint for PDF export', async () => {
+      const mockBlob = new Blob(['test'], { type: 'application/pdf' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      await divipolService.exportSearch('pdf', {
+        q: 'MEDELLIN',
+        mode: 'name',
+        page: 1,
+        size: 50,
+        exportAll: false,
+      });
+
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/export/search/pdf', {
+          params: { q: 'MEDELLIN', mode: 'name', page: 1, size: 50, exportAll: false },
+          responseType: 'blob',
+        }),
+      ).toBe(true);
+    });
+
+    it('should set exportAll=true when exporting all results', async () => {
+      const mockBlob = new Blob(['test'], { type: 'application/pdf' });
+      axiosGetStub.resolves({ data: mockBlob });
+
+      await divipolService.exportSearch('pdf', {
+        q: '050',
+        mode: 'code',
+        exportAll: true,
+      });
+
+      const callArgs = axiosGetStub.getCall(0).args[1];
+      expect(callArgs.params.exportAll).toBe(true);
+      expect(callArgs.params.mode).toBe('code');
+    });
+
+    it('should handle search export errors', async () => {
+      axiosGetStub.rejects(new Error('Search export failed'));
+
+      await expect(
+        divipolService.exportSearch('csv', {
+          q: 'test',
+          mode: 'name',
+          exportAll: false,
+        }),
+      ).rejects.toThrow('Search export failed');
+    });
+  });
 });
