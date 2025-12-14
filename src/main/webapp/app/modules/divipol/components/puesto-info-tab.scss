@@ -1,0 +1,75 @@
+@import '../../../color-variables';
+
+.puesto-info-tab {
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+
+    .label {
+      font-size: 0.75rem;
+      color: $color-text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .value {
+      font-size: 0.95rem;
+      color: $color-text-primary;
+    }
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    background: $color-gray-lighter;
+
+    .stat-value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $color-text-primary;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: $color-text-secondary;
+      text-transform: uppercase;
+    }
+  }
+}
+
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+@include dark-theme {
+  .puesto-info-tab {
+    .info-item {
+      .label {
+        color: $color-gray;
+      }
+
+      .value {
+        color: $color-white;
+      }
+    }
+
+    .stat-item {
+      background: $color-dark-background;
+
+      .stat-value {
+        color: $color-white;
+      }
+
+      .stat-label {
+        color: $color-gray;
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Testigo Electoral Permissions
+
+        This changelog adds granular permissions for:
+        - Puesto detail view (including additional fields like direccion, coordenadas, JAL)
+        - Jurado read access (voting jury members)
+        - Testigo electoral CRUD operations
+        - Testigo assignment/unassignment to polling stations
+
+        All permissions are assigned to ROLE_ADMIN by default.
+
+        Author: Claude Code
+        Date: 2025-12-13
+    -->
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 1: Load Testigo Electoral Permissions                          -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251213000001-load-testigo-permissions" author="claude">
+        <comment>
+            Load permissions for testigo electoral module.
+
+            Creates 8 new permissions (IDs 48-55):
+            - puesto.detail.read: View complete polling station details
+            - jurado.read: View voting jury members (read-only, external integration)
+            - testigo.read: View electoral witnesses
+            - testigo.create: Create new electoral witnesses
+            - testigo.update: Update electoral witness information
+            - testigo.delete: Delete electoral witnesses (soft delete)
+            - testigo.assign: Assign witnesses to polling stations
+            - testigo.unassign: Unassign witnesses from polling stations
+        </comment>
+
+        <!-- Load new permissions -->
+        <loadData file="config/liquibase/data/permission_testigos.csv"
+                  separator=";"
+                  tableName="scr_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_active" type="boolean"/>
+        </loadData>
+
+        <rollback>
+            <delete tableName="scr_permission">
+                <where>id BETWEEN 48 AND 55</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 2: Assign Testigo Permissions to ROLE_ADMIN                    -->
+    <!-- ========================================================================= -->
+    <changeSet id="20251213000002-assign-testigo-permissions-to-admin" author="claude">
+        <comment>
+            Assign all testigo electoral permissions to ROLE_ADMIN.
+
+            Creates 8 authority-permission mappings (IDs 51-58).
+            ROLE_ADMIN (authority_id=1) gets full access to testigo module.
+        </comment>
+
+        <!-- Load authority-permission mappings -->
+        <loadData file="config/liquibase/data/authority_permission_testigos.csv"
+                  separator=";"
+                  tableName="scr_authority_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="authority_id" type="numeric"/>
+            <column name="permission_id" type="numeric"/>
+        </loadData>
+
+        <rollback>
+            <delete tableName="scr_authority_permission">
+                <where>id BETWEEN 51 AND 58</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

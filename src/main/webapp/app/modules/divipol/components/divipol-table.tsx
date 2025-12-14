@@ -1,7 +1,9 @@
-import React from 'react';
-import { Table } from 'reactstrap';
+import React, { useState } from 'react';
+import { Table, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { useAppSelector } from 'app/config/store';
+import { PuestoDetailModal } from './puesto-detail-modal';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
 
 /**
  * Genera el código divipol concatenado según las reglas:
@@ -28,6 +30,23 @@ export const generateDivipolCode = (
 
 export const DivipolTable: React.FC = () => {
   const { departamentos, municipios, zonas, puestos, filters } = useAppSelector(state => state.divipol);
+  const authorities = useAppSelector(state => state.authentication.account.authorities);
+  const canViewDetail = hasAnyAuthority(authorities, ['puesto.detail.read', 'ROLE_ADMIN']);
+
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedPuestoId, setSelectedPuestoId] = useState<number | null>(null);
+
+  const handleShowDetail = (puestoId: number) => {
+    setSelectedPuestoId(puestoId);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseDetail = () => {
+    setShowDetailModal(false);
+    setSelectedPuestoId(null);
+  };
+
+  const showingPuestos = filters.zona && puestos.length > 0;
 
   const renderTableData = () => {
     if (filters.zona && puestos.length > 0) {
@@ -39,6 +58,13 @@ export const DivipolTable: React.FC = () => {
           <td>{puesto.potencialMasculino?.toLocaleString('es-CO')}</td>
           <td>{puesto.potencialTotal?.toLocaleString('es-CO')}</td>
           <td>{puesto.mesas}</td>
+          {canViewDetail && (
+            <td className="text-center">
+              <Button color="info" size="sm" outline onClick={() => handleShowDetail(puesto.iddivipol)} title="Ver detalle">
+                <i className="bi bi-eye"></i>
+              </Button>
+            </td>
+          )}
         </tr>
       ));
     } else if (filters.municipio && zonas.length > 0) {
@@ -111,10 +137,17 @@ export const DivipolTable: React.FC = () => {
             <th>
               <Translate contentKey="divipol.table.mesas">Mesas</Translate>
             </th>
+            {showingPuestos && canViewDetail && (
+              <th className="text-center">
+                <Translate contentKey="divipol.table.actions">Acciones</Translate>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>{renderTableData()}</tbody>
       </Table>
+
+      {selectedPuestoId && <PuestoDetailModal isOpen={showDetailModal} onClose={handleCloseDetail} puestoId={selectedPuestoId} />}
     </div>
   );
 };

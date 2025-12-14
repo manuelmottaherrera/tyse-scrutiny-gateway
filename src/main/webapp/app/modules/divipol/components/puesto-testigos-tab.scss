@@ -1,0 +1,42 @@
+@import '../../../color-variables';
+
+.puesto-testigos-tab {
+  .testigos-table {
+    font-size: 0.9rem;
+
+    th {
+      font-weight: 600;
+      color: $color-text-secondary;
+      border-bottom-width: 2px;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+  }
+}
+
+.puesto-testigos-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  margin: 0;
+}
+
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+@include dark-theme {
+  .puesto-testigos-tab {
+    .testigos-table {
+      th {
+        color: $color-gray;
+      }
+    }
+  }
+}

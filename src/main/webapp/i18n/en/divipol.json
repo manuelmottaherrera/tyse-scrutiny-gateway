@@ -3,6 +3,7 @@
     "title": "DIVIPOL - Political Division",
     "subtitle": "Management and query of Colombia's electoral political division",
     "error": "Error loading data",
+    "loading": "Loading...",
     "mallaButton": "Electoral Grid",
     "filters": {
       "departamento": "Department",
@@ -31,7 +32,67 @@
       "men": "Men",
       "total": "Total Potential",
       "mesas": "Tables",
+      "actions": "Actions",
       "noData": "No data to display. Select filters to view information."
+    },
+    "puestoDetail": {
+      "title": "Voting Station Detail",
+      "error": "Error loading voting station detail",
+      "tabs": {
+        "info": "Information",
+        "jurados": "Jury Members",
+        "testigos": "Witnesses"
+      },
+      "info": {
+        "location": "Location",
+        "departamento": "Department",
+        "municipio": "Municipality",
+        "zona": "Zone",
+        "puesto": "Voting Station",
+        "direccion": "Address",
+        "coordenadas": "Coordinates",
+        "verMapa": "View on map",
+        "sinDireccion": "Not available",
+        "sinCoordenadas": "Not available",
+        "electoral": "Electoral Data",
+        "women": "Women",
+        "men": "Men",
+        "total": "Total Potential",
+        "mesas": "Tables",
+        "additional": "Additional Information",
+        "jal": "JAL",
+        "indicador": "Indicator",
+        "expandida": "Expanded",
+        "si": "Yes",
+        "no": "No"
+      },
+      "jurados": {
+        "title": "Voting Jury Members",
+        "documento": "ID Document",
+        "nombre": "Name",
+        "empty": "No jury members assigned to this voting station"
+      },
+      "testigos": {
+        "title": "Electoral Witnesses",
+        "documento": "ID Document",
+        "nombre": "Name",
+        "telefono": "Phone",
+        "asignadoPor": "Assigned by",
+        "fechaAsignacion": "Date",
+        "acciones": "Actions",
+        "asignar": "Assign Witness",
+        "desasignar": "Unassign",
+        "empty": "No witnesses assigned to this voting station"
+      }
+    },
+    "asignarTestigo": {
+      "title": "Assign Electoral Witness",
+      "buscar": "Search witness",
+      "hint": "Enter at least 2 characters to search",
+      "noResults": "No available witnesses found to assign",
+      "seleccionado": "Selected witness:",
+      "confirmar": "Confirm Assignment",
+      "asignando": "Assigning..."
     },
     "export": {
       "download": "Download Report",

@@ -1,0 +1,75 @@
+@import '../../../color-variables';
+
+.puesto-detail-modal {
+  .modal-header {
+    border-bottom-color: $color-border;
+
+    .modal-title {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .nav-tabs {
+    border-bottom-color: $color-border;
+
+    .nav-link {
+      cursor: pointer;
+      color: $color-text-secondary;
+      border: none;
+      padding: 0.75rem 1rem;
+
+      &:hover {
+        color: $color-text-primary;
+        border-bottom: 2px solid $color-gray-light;
+      }
+
+      &.active {
+        color: $color-text-primary;
+        font-weight: 600;
+        border-bottom: 2px solid var(--bs-primary);
+        background: transparent;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .tab-content {
+    min-height: 300px;
+  }
+}
+
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+@include dark-theme {
+  .puesto-detail-modal {
+    .modal-header {
+      border-bottom-color: $color-dark-background;
+    }
+
+    .nav-tabs {
+      border-bottom-color: $color-dark-background;
+
+      .nav-link {
+        color: $color-gray-light;
+
+        &:hover {
+          color: $color-white;
+        }
+
+        &.active {
+          color: $color-white;
+        }
+      }
+    }
+  }
+}

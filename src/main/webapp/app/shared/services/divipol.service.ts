@@ -34,6 +34,7 @@ export interface DivipolZona {
 }
 
 export interface DivipolPuesto {
+  iddivipol: number;
   coddepto: number;
   codmipio: number;
   codzona: number;
@@ -85,6 +86,96 @@ export interface DivipolSearchPage {
   totalPages: number;
 }
 
+// =====================================================
+// Tipos para Detalle de Puesto
+// =====================================================
+
+export interface PuestoDetalle {
+  iddivipol: number;
+  coddepto: number;
+  codmipio: number;
+  codzona: number;
+  codpuesto: string;
+  nomdepto: string;
+  nommipio: string;
+  nompuesto: string;
+  direccion?: string;
+  latitud?: number;
+  longitud?: number;
+  jal?: number;
+  nomjal?: string;
+  indicador?: number;
+  expandida?: number;
+  nummesas: number;
+  potfemenino: number;
+  potmasculino: number;
+  pottotal: number;
+  totalJurados: number;
+  totalTestigos: number;
+}
+
+// =====================================================
+// Tipos para Jurados
+// =====================================================
+
+export interface Jurado {
+  id: number;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombres: string;
+  apellidos: string;
+}
+
+// =====================================================
+// Tipos para Testigos Electorales
+// =====================================================
+
+export interface Testigo {
+  id: number;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombres: string;
+  apellidos: string;
+  telefono?: string;
+  email?: string;
+  activo: boolean;
+  puestosAsignados: number;
+}
+
+export interface TestigoCreate {
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombres: string;
+  apellidos: string;
+  telefono?: string;
+  email?: string;
+}
+
+export interface TestigoUpdate {
+  nombres?: string;
+  apellidos?: string;
+  telefono?: string;
+  email?: string;
+}
+
+export interface TestigoAsignado {
+  testigoId: number;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombreCompleto: string;
+  telefono?: string;
+  assignedDate: string;
+  assignedBy: string;
+}
+
+export interface TestigoPage {
+  content: Testigo[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export interface SearchParams {
   q: string;
   mode?: SearchMode;
@@ -94,6 +185,7 @@ export interface SearchParams {
 
 // Base URL del microservicio divipol (a través del gateway)
 const API_BASE_URL = '/services/tysescrutinymicrodivipol/api/divipol';
+const TESTIGOS_API_URL = '/services/tysescrutinymicrodivipol/api/testigos';
 
 /**
  * Servicio para interactuar con el microservicio DIVIPOL
@@ -232,6 +324,104 @@ class DivipolService {
         exportAll: params.exportAll,
       },
       responseType: 'blob',
+    });
+    return response.data;
+  }
+
+  // =====================================================
+  // Métodos de Detalle de Puesto
+  // =====================================================
+
+  /**
+   * Obtiene el detalle completo de un puesto
+   */
+  async getPuestoDetalle(puestoId: number): Promise<PuestoDetalle> {
+    const response = await axios.get<PuestoDetalle>(`${API_BASE_URL}/puestos/${puestoId}/detalle`);
+    return response.data;
+  }
+
+  /**
+   * Obtiene los jurados asignados a un puesto (solo lectura)
+   */
+  async getJuradosByPuesto(puestoId: number): Promise<Jurado[]> {
+    const response = await axios.get<Jurado[]>(`${API_BASE_URL}/puestos/${puestoId}/jurados`);
+    return response.data;
+  }
+
+  /**
+   * Obtiene los testigos asignados a un puesto
+   */
+  async getTestigosByPuesto(puestoId: number): Promise<TestigoAsignado[]> {
+    const response = await axios.get<TestigoAsignado[]>(`${API_BASE_URL}/puestos/${puestoId}/testigos`);
+    return response.data;
+  }
+
+  /**
+   * Asigna un testigo a un puesto
+   */
+  async asignarTestigoAPuesto(puestoId: number, testigoId: number): Promise<TestigoAsignado> {
+    const response = await axios.post<TestigoAsignado>(`${API_BASE_URL}/puestos/${puestoId}/testigos/${testigoId}`);
+    return response.data;
+  }
+
+  /**
+   * Desasigna un testigo de un puesto
+   */
+  async desasignarTestigoDePuesto(puestoId: number, testigoId: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/puestos/${puestoId}/testigos/${testigoId}`);
+  }
+
+  // =====================================================
+  // Métodos de Testigos Electorales
+  // =====================================================
+
+  /**
+   * Obtiene todos los testigos paginados
+   */
+  async getAllTestigos(page = 0, size = 20): Promise<TestigoPage> {
+    const response = await axios.get<TestigoPage>(`${TESTIGOS_API_URL}`, {
+      params: { page, size },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene un testigo por ID
+   */
+  async getTestigoById(id: number): Promise<Testigo> {
+    const response = await axios.get<Testigo>(`${TESTIGOS_API_URL}/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Crea un nuevo testigo
+   */
+  async createTestigo(testigo: TestigoCreate): Promise<Testigo> {
+    const response = await axios.post<Testigo>(TESTIGOS_API_URL, testigo);
+    return response.data;
+  }
+
+  /**
+   * Actualiza un testigo existente
+   */
+  async updateTestigo(id: number, testigo: TestigoUpdate): Promise<Testigo> {
+    const response = await axios.put<Testigo>(`${TESTIGOS_API_URL}/${id}`, testigo);
+    return response.data;
+  }
+
+  /**
+   * Elimina un testigo (soft delete)
+   */
+  async deleteTestigo(id: number): Promise<void> {
+    await axios.delete(`${TESTIGOS_API_URL}/${id}`);
+  }
+
+  /**
+   * Busca testigos por nombre o documento
+   */
+  async searchTestigos(query: string, page = 0, size = 10): Promise<TestigoPage> {
+    const response = await axios.get<TestigoPage>(`${TESTIGOS_API_URL}/search`, {
+      params: { q: query, page, size },
     });
     return response.data;
   }

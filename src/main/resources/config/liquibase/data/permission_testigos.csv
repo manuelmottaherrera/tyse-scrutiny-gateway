@@ -1,0 +1,9 @@
+id;name;resource;action;description;is_active;created_by;created_date
+48;puesto.detail.read;puesto;detail.read;View complete polling station details;true;system;2025-01-01T00:00:00
+49;jurado.read;jurado;read;View voting jury members;true;system;2025-01-01T00:00:00
+50;testigo.read;testigo;read;View electoral witnesses;true;system;2025-01-01T00:00:00
+51;testigo.create;testigo;create;Create new electoral witnesses;true;system;2025-01-01T00:00:00
+52;testigo.update;testigo;update;Update electoral witness information;true;system;2025-01-01T00:00:00
+53;testigo.delete;testigo;delete;Delete electoral witnesses;true;system;2025-01-01T00:00:00
+54;testigo.assign;testigo;assign;Assign witnesses to polling stations;true;system;2025-01-01T00:00:00
+55;testigo.unassign;testigo;unassign;Unassign witnesses from polling stations;true;system;2025-01-01T00:00:00

@@ -3,6 +3,7 @@
     "title": "DIVIPOL - División Política",
     "subtitle": "Gestión y consulta de la división política electoral de Colombia",
     "error": "Error al cargar datos",
+    "loading": "Cargando...",
     "mallaButton": "Malla",
     "filters": {
       "departamento": "Departamento",
@@ -31,7 +32,67 @@
       "men": "Hombres",
       "total": "Total Potencial",
       "mesas": "Mesas",
+      "actions": "Acciones",
       "noData": "No hay datos para mostrar. Seleccione filtros para visualizar información."
+    },
+    "puestoDetail": {
+      "title": "Detalle del Puesto",
+      "error": "Error al cargar el detalle del puesto",
+      "tabs": {
+        "info": "Información",
+        "jurados": "Jurados",
+        "testigos": "Testigos"
+      },
+      "info": {
+        "location": "Ubicación",
+        "departamento": "Departamento",
+        "municipio": "Municipio",
+        "zona": "Zona",
+        "puesto": "Puesto",
+        "direccion": "Dirección",
+        "coordenadas": "Coordenadas",
+        "verMapa": "Ver en mapa",
+        "sinDireccion": "No disponible",
+        "sinCoordenadas": "No disponibles",
+        "electoral": "Datos Electorales",
+        "women": "Mujeres",
+        "men": "Hombres",
+        "total": "Total Potencial",
+        "mesas": "Mesas",
+        "additional": "Información Adicional",
+        "jal": "JAL",
+        "indicador": "Indicador",
+        "expandida": "Expandida",
+        "si": "Sí",
+        "no": "No"
+      },
+      "jurados": {
+        "title": "Jurados de Votación",
+        "documento": "Documento",
+        "nombre": "Nombre",
+        "empty": "No hay jurados asignados a este puesto"
+      },
+      "testigos": {
+        "title": "Testigos Electorales",
+        "documento": "Documento",
+        "nombre": "Nombre",
+        "telefono": "Teléfono",
+        "asignadoPor": "Asignado por",
+        "fechaAsignacion": "Fecha",
+        "acciones": "Acciones",
+        "asignar": "Asignar Testigo",
+        "desasignar": "Desasignar",
+        "empty": "No hay testigos asignados a este puesto"
+      }
+    },
+    "asignarTestigo": {
+      "title": "Asignar Testigo Electoral",
+      "buscar": "Buscar testigo",
+      "hint": "Ingrese al menos 2 caracteres para buscar",
+      "noResults": "No se encontraron testigos disponibles para asignar",
+      "seleccionado": "Testigo seleccionado:",
+      "confirmar": "Confirmar Asignación",
+      "asignando": "Asignando..."
     },
     "export": {
       "download": "Descargar Reporte",

@@ -1,0 +1,49 @@
+@import '../../../color-variables';
+
+.asignar-testigo-modal {
+  .testigos-list {
+    max-height: 250px;
+    overflow-y: auto;
+
+    .list-group-item {
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover:not(.active) {
+        background-color: $color-gray-lighter;
+      }
+
+      &.active {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+      }
+    }
+  }
+
+  .selected-testigo {
+    background-color: $color-gray-lighter;
+  }
+}
+
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
+@include dark-theme {
+  .asignar-testigo-modal {
+    .testigos-list {
+      .list-group-item {
+        &:hover:not(.active) {
+          background-color: $color-dark-background;
+        }
+      }
+    }
+
+    .selected-testigo {
+      background-color: $color-dark-background;
+    }
+  }
+}
