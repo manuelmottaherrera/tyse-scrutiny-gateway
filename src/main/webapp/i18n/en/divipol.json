@@ -38,39 +38,43 @@
     "puestoDetail": {
       "title": "Voting Station Detail",
       "error": "Error loading voting station detail",
+      "ubicacion": "Location",
+      "datosElectorales": "Electoral Data",
+      "infoAdicional": "Additional Information",
+      "verMapa": "View on map",
+      "mapa": {
+        "titulo": "Location on Map",
+        "abrirGoogleMaps": "Open in Google Maps"
+      },
       "tabs": {
         "info": "Information",
         "jurados": "Jury Members",
         "testigos": "Witnesses"
       },
-      "info": {
-        "location": "Location",
+      "fields": {
+        "codigoDivipol": "Divipol Code",
         "departamento": "Department",
         "municipio": "Municipality",
         "zona": "Zone",
         "puesto": "Voting Station",
         "direccion": "Address",
         "coordenadas": "Coordinates",
-        "verMapa": "View on map",
-        "sinDireccion": "Not available",
-        "sinCoordenadas": "Not available",
-        "electoral": "Electoral Data",
-        "women": "Women",
-        "men": "Men",
-        "total": "Total Potential",
         "mesas": "Tables",
-        "additional": "Additional Information",
-        "jal": "JAL",
+        "potencialTotal": "Total Potential",
+        "potencialFemenino": "Female Potential",
+        "potencialMasculino": "Male Potential",
+        "jal": "JAL Code",
+        "nomjal": "JAL Name",
         "indicador": "Indicator",
-        "expandida": "Expanded",
-        "si": "Yes",
-        "no": "No"
+        "expandida": "Expanded"
       },
       "jurados": {
         "title": "Voting Jury Members",
         "documento": "ID Document",
-        "nombre": "Name",
-        "empty": "No jury members assigned to this voting station"
+        "nombres": "First Names",
+        "apellidos": "Last Names",
+        "empty": "No jury members assigned to this voting station",
+        "readOnly": "Jury members are assigned by the electoral system"
       },
       "testigos": {
         "title": "Electoral Witnesses",

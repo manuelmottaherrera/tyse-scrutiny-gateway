@@ -38,39 +38,43 @@
     "puestoDetail": {
       "title": "Detalle del Puesto",
       "error": "Error al cargar el detalle del puesto",
+      "ubicacion": "Ubicación",
+      "datosElectorales": "Datos Electorales",
+      "infoAdicional": "Información Adicional",
+      "verMapa": "Ver en mapa",
+      "mapa": {
+        "titulo": "Ubicación en el Mapa",
+        "abrirGoogleMaps": "Abrir en Google Maps"
+      },
       "tabs": {
         "info": "Información",
         "jurados": "Jurados",
         "testigos": "Testigos"
       },
-      "info": {
-        "location": "Ubicación",
+      "fields": {
+        "codigoDivipol": "Código Divipol",
         "departamento": "Departamento",
         "municipio": "Municipio",
         "zona": "Zona",
         "puesto": "Puesto",
         "direccion": "Dirección",
         "coordenadas": "Coordenadas",
-        "verMapa": "Ver en mapa",
-        "sinDireccion": "No disponible",
-        "sinCoordenadas": "No disponibles",
-        "electoral": "Datos Electorales",
-        "women": "Mujeres",
-        "men": "Hombres",
-        "total": "Total Potencial",
         "mesas": "Mesas",
-        "additional": "Información Adicional",
-        "jal": "JAL",
+        "potencialTotal": "Potencial Total",
+        "potencialFemenino": "Pot. Femenino",
+        "potencialMasculino": "Pot. Masculino",
+        "jal": "Código JAL",
+        "nomjal": "Nombre JAL",
         "indicador": "Indicador",
-        "expandida": "Expandida",
-        "si": "Sí",
-        "no": "No"
+        "expandida": "Expandida"
       },
       "jurados": {
         "title": "Jurados de Votación",
         "documento": "Documento",
-        "nombre": "Nombre",
-        "empty": "No hay jurados asignados a este puesto"
+        "nombres": "Nombres",
+        "apellidos": "Apellidos",
+        "empty": "No hay jurados asignados a este puesto",
+        "readOnly": "Los jurados son asignados por el sistema electoral"
       },
       "testigos": {
         "title": "Testigos Electorales",

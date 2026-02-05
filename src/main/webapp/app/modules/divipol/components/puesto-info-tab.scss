@@ -1,5 +1,12 @@
 @import '../../../color-variables';
 
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
 .puesto-info-tab {
   .info-item {
     display: flex;
@@ -12,11 +19,19 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 0.25rem;
+
+      @include dark-theme {
+        color: $color-gray-medium-dark;
+      }
     }
 
     .value {
       font-size: 0.95rem;
       color: $color-text-primary;
+
+      @include dark-theme {
+        color: $color-white;
+      }
     }
   }
 
@@ -26,50 +41,49 @@
     border-radius: 8px;
     background: $color-gray-lighter;
 
+    @include dark-theme {
+      background: $color-dark-background;
+    }
+
     .stat-value {
       display: block;
       font-size: 1.5rem;
       font-weight: 700;
       color: $color-text-primary;
+
+      @include dark-theme {
+        color: $color-white;
+      }
     }
 
     .stat-label {
+      display: block;
       font-size: 0.75rem;
       color: $color-text-secondary;
       text-transform: uppercase;
+      margin-top: 0.25rem;
+
+      @include dark-theme {
+        color: $color-gray-medium-dark;
+      }
     }
   }
-}
 
-@mixin dark-theme {
-  html[data-theme='dark'] &,
-  .theme-dark & {
-    @content;
+  .map-container {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid $color-gray-dark;
+
+    @include dark-theme {
+      border-color: $color-dark-overlay-border;
+    }
   }
-}
 
-@include dark-theme {
-  .puesto-info-tab {
-    .info-item {
-      .label {
-        color: $color-gray;
-      }
-
-      .value {
-        color: $color-white;
-      }
-    }
-
-    .stat-item {
-      background: $color-dark-background;
-
-      .stat-value {
-        color: $color-white;
-      }
-
-      .stat-label {
-        color: $color-gray;
-      }
-    }
+  .map-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
   }
 }
