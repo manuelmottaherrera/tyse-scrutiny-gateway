@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
 import { PuestoDetailModal } from './puesto-detail-modal';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
@@ -61,7 +62,7 @@ export const DivipolTable: React.FC = () => {
           {canViewDetail && (
             <td className="text-center">
               <Button color="info" size="sm" outline onClick={() => handleShowDetail(puesto.iddivipol)} title="Ver detalle">
-                <i className="bi bi-eye"></i>
+                <FontAwesomeIcon icon="eye" />
               </Button>
             </td>
           )}

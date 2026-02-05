@@ -1,8 +1,19 @@
 @import '../../../color-variables';
 
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
 .puesto-detail-modal {
   .modal-header {
     border-bottom-color: $color-border;
+
+    @include dark-theme {
+      border-bottom-color: $color-dark-background;
+    }
 
     .modal-title {
       display: flex;
@@ -13,15 +24,27 @@
   .nav-tabs {
     border-bottom-color: $color-border;
 
+    @include dark-theme {
+      border-bottom-color: $color-dark-background;
+    }
+
     .nav-link {
       cursor: pointer;
       color: $color-text-secondary;
       border: none;
       padding: 0.75rem 1rem;
 
+      @include dark-theme {
+        color: $color-gray-light;
+      }
+
       &:hover {
         color: $color-text-primary;
         border-bottom: 2px solid $color-gray-light;
+
+        @include dark-theme {
+          color: $color-white;
+        }
       }
 
       &.active {
@@ -29,6 +52,10 @@
         font-weight: 600;
         border-bottom: 2px solid var(--bs-primary);
         background: transparent;
+
+        @include dark-theme {
+          color: $color-white;
+        }
       }
 
       .badge {
@@ -40,36 +67,5 @@
 
   .tab-content {
     min-height: 300px;
-  }
-}
-
-@mixin dark-theme {
-  html[data-theme='dark'] &,
-  .theme-dark & {
-    @content;
-  }
-}
-
-@include dark-theme {
-  .puesto-detail-modal {
-    .modal-header {
-      border-bottom-color: $color-dark-background;
-    }
-
-    .nav-tabs {
-      border-bottom-color: $color-dark-background;
-
-      .nav-link {
-        color: $color-gray-light;
-
-        &:hover {
-          color: $color-white;
-        }
-
-        &.active {
-          color: $color-white;
-        }
-      }
-    }
   }
 }

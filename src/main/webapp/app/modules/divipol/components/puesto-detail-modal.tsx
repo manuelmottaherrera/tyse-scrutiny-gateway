@@ -171,7 +171,7 @@ export const PuestoDetailModal: React.FC<PuestoDetailModalProps> = ({ isOpen, on
                 <PuestoTestigosTab
                   testigos={testigos}
                   loading={loadingTestigos}
-                  puestoId={puestoId!}
+                  puestoId={puestoId}
                   onTestigoAsignado={handleTestigoAsignado}
                   onTestigoDesasignado={handleTestigoDesasignado}
                 />

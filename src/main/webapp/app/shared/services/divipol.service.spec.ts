@@ -4,13 +4,22 @@ import divipolService from './divipol.service';
 
 describe('Divipol service tests', () => {
   let axiosGetStub: sinon.SinonStub;
+  let axiosPostStub: sinon.SinonStub;
+  let axiosPutStub: sinon.SinonStub;
+  let axiosDeleteStub: sinon.SinonStub;
 
   beforeEach(() => {
     axiosGetStub = sinon.stub(axios, 'get');
+    axiosPostStub = sinon.stub(axios, 'post');
+    axiosPutStub = sinon.stub(axios, 'put');
+    axiosDeleteStub = sinon.stub(axios, 'delete');
   });
 
   afterEach(() => {
     axiosGetStub.restore();
+    axiosPostStub.restore();
+    axiosPutStub.restore();
+    axiosDeleteStub.restore();
   });
 
   describe('getDepartamentos', () => {
@@ -346,6 +355,351 @@ describe('Divipol service tests', () => {
           exportAll: false,
         }),
       ).rejects.toThrow('Search export failed');
+    });
+  });
+
+  // =====================================================
+  // Tests para Detalle de Puesto
+  // =====================================================
+
+  describe('getPuestoDetalle', () => {
+    it('should call correct API endpoint with puestoId', async () => {
+      const mockData = {
+        iddivipol: 100,
+        coddepto: 5,
+        codmipio: 1,
+        codzona: 1,
+        codpuesto: '01',
+        nomdepto: 'Antioquia',
+        nommipio: 'Medellín',
+        nompuesto: 'IE La Paz',
+        direccion: 'Calle 10 #20-30',
+        latitud: 6.2442,
+        longitud: -75.5812,
+        nummesas: 10,
+        potfemenino: 5000,
+        potmasculino: 4500,
+        pottotal: 9500,
+        totalJurados: 30,
+        totalTestigos: 2,
+      };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getPuestoDetalle(100);
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/puestos/100/detalle')).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should handle errors', async () => {
+      axiosGetStub.rejects(new Error('Puesto not found'));
+
+      await expect(divipolService.getPuestoDetalle(999)).rejects.toThrow('Puesto not found');
+    });
+  });
+
+  describe('getJuradosByPuesto', () => {
+    it('should call correct API endpoint with puestoId', async () => {
+      const mockData = [
+        { id: 1, tipoDocumento: 'CC', numeroDocumento: '12345678', nombres: 'Juan', apellidos: 'Pérez' },
+        { id: 2, tipoDocumento: 'CC', numeroDocumento: '87654321', nombres: 'María', apellidos: 'López' },
+      ];
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getJuradosByPuesto(100);
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/puestos/100/jurados')).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  describe('getTestigosByPuesto', () => {
+    it('should call correct API endpoint with puestoId', async () => {
+      const mockData = [
+        {
+          testigoId: 1,
+          tipoDocumento: 'CC',
+          numeroDocumento: '11111111',
+          nombreCompleto: 'Carlos García',
+          telefono: '3001234567',
+          assignedDate: '2025-01-15T10:00:00Z',
+          assignedBy: 'admin',
+        },
+      ];
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getTestigosByPuesto(100);
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/puestos/100/testigos')).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  // =====================================================
+  // Tests para Asignación/Desasignación de Testigos
+  // =====================================================
+
+  describe('asignarTestigoAPuesto', () => {
+    it('should call correct API endpoint with puestoId and testigoId', async () => {
+      const mockData = {
+        testigoId: 5,
+        tipoDocumento: 'CC',
+        numeroDocumento: '11111111',
+        nombreCompleto: 'Carlos García',
+        telefono: '3001234567',
+        assignedDate: '2025-01-15T10:00:00Z',
+        assignedBy: 'admin',
+      };
+      axiosPostStub.resolves({ data: mockData });
+
+      const result = await divipolService.asignarTestigoAPuesto(100, 5);
+
+      expect(axiosPostStub.calledOnce).toBe(true);
+      expect(axiosPostStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/puestos/100/testigos/5')).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should handle conflict errors', async () => {
+      axiosPostStub.rejects(new Error('Testigo already assigned'));
+
+      await expect(divipolService.asignarTestigoAPuesto(100, 5)).rejects.toThrow('Testigo already assigned');
+    });
+  });
+
+  describe('desasignarTestigoDePuesto', () => {
+    it('should call correct API endpoint with puestoId and testigoId', async () => {
+      axiosDeleteStub.resolves({ data: undefined });
+
+      await divipolService.desasignarTestigoDePuesto(100, 5);
+
+      expect(axiosDeleteStub.calledOnce).toBe(true);
+      expect(axiosDeleteStub.calledWith('/services/tysescrutinymicrodivipol/api/divipol/puestos/100/testigos/5')).toBe(true);
+    });
+
+    it('should handle errors', async () => {
+      axiosDeleteStub.rejects(new Error('Assignment not found'));
+
+      await expect(divipolService.desasignarTestigoDePuesto(100, 5)).rejects.toThrow('Assignment not found');
+    });
+  });
+
+  // =====================================================
+  // Tests para CRUD de Testigos Electorales
+  // =====================================================
+
+  describe('getAllTestigos', () => {
+    it('should call correct API endpoint with default pagination', async () => {
+      const mockData = {
+        content: [
+          {
+            id: 1,
+            tipoDocumento: 'CC',
+            numeroDocumento: '12345678',
+            nombres: 'Juan',
+            apellidos: 'Pérez',
+            activo: true,
+            puestosAsignados: 2,
+          },
+        ],
+        page: 0,
+        size: 20,
+        totalElements: 1,
+        totalPages: 1,
+      };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getAllTestigos();
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos', {
+          params: { page: 0, size: 20 },
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should call with custom pagination parameters', async () => {
+      const mockData = { content: [], page: 2, size: 10, totalElements: 0, totalPages: 0 };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getAllTestigos(2, 10);
+
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos', {
+          params: { page: 2, size: 10 },
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  describe('getTestigoById', () => {
+    it('should call correct API endpoint with testigo ID', async () => {
+      const mockData = {
+        id: 1,
+        tipoDocumento: 'CC',
+        numeroDocumento: '12345678',
+        nombres: 'Juan',
+        apellidos: 'Pérez',
+        telefono: '3001234567',
+        email: 'juan@test.com',
+        activo: true,
+        puestosAsignados: 2,
+      };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.getTestigoById(1);
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos/1')).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should handle not found errors', async () => {
+      axiosGetStub.rejects(new Error('Testigo not found'));
+
+      await expect(divipolService.getTestigoById(999)).rejects.toThrow('Testigo not found');
+    });
+  });
+
+  describe('createTestigo', () => {
+    it('should call correct API endpoint with testigo data', async () => {
+      const inputData = {
+        tipoDocumento: 'CC',
+        numeroDocumento: '12345678',
+        nombres: 'Juan',
+        apellidos: 'Pérez',
+        telefono: '3001234567',
+        email: 'juan@test.com',
+      };
+      const mockResponse = {
+        id: 1,
+        ...inputData,
+        activo: true,
+        puestosAsignados: 0,
+      };
+      axiosPostStub.resolves({ data: mockResponse });
+
+      const result = await divipolService.createTestigo(inputData);
+
+      expect(axiosPostStub.calledOnce).toBe(true);
+      expect(axiosPostStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos', inputData)).toBe(true);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should handle conflict errors for duplicate document', async () => {
+      axiosPostStub.rejects(new Error('Duplicate document'));
+
+      await expect(
+        divipolService.createTestigo({
+          tipoDocumento: 'CC',
+          numeroDocumento: '12345678',
+          nombres: 'Juan',
+          apellidos: 'Pérez',
+        }),
+      ).rejects.toThrow('Duplicate document');
+    });
+  });
+
+  describe('updateTestigo', () => {
+    it('should call correct API endpoint with testigo ID and update data', async () => {
+      const updateData = { nombres: 'Juan Carlos', apellidos: 'Pérez López' };
+      const mockResponse = {
+        id: 1,
+        tipoDocumento: 'CC',
+        numeroDocumento: '12345678',
+        nombres: 'Juan Carlos',
+        apellidos: 'Pérez López',
+        activo: true,
+        puestosAsignados: 2,
+      };
+      axiosPutStub.resolves({ data: mockResponse });
+
+      const result = await divipolService.updateTestigo(1, updateData);
+
+      expect(axiosPutStub.calledOnce).toBe(true);
+      expect(axiosPutStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos/1', updateData)).toBe(true);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should handle not found errors', async () => {
+      axiosPutStub.rejects(new Error('Testigo not found'));
+
+      await expect(divipolService.updateTestigo(999, { nombres: 'Test' })).rejects.toThrow('Testigo not found');
+    });
+  });
+
+  describe('deleteTestigo', () => {
+    it('should call correct API endpoint with testigo ID', async () => {
+      axiosDeleteStub.resolves({ data: undefined });
+
+      await divipolService.deleteTestigo(1);
+
+      expect(axiosDeleteStub.calledOnce).toBe(true);
+      expect(axiosDeleteStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos/1')).toBe(true);
+    });
+
+    it('should handle not found errors', async () => {
+      axiosDeleteStub.rejects(new Error('Testigo not found'));
+
+      await expect(divipolService.deleteTestigo(999)).rejects.toThrow('Testigo not found');
+    });
+  });
+
+  describe('searchTestigos', () => {
+    it('should call correct API endpoint with search params', async () => {
+      const mockData = {
+        content: [
+          {
+            id: 1,
+            tipoDocumento: 'CC',
+            numeroDocumento: '12345678',
+            nombres: 'Juan',
+            apellidos: 'Pérez',
+            activo: true,
+            puestosAsignados: 0,
+          },
+        ],
+        page: 0,
+        size: 10,
+        totalElements: 1,
+        totalPages: 1,
+      };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.searchTestigos('Juan');
+
+      expect(axiosGetStub.calledOnce).toBe(true);
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos/search', {
+          params: { q: 'Juan', page: 0, size: 10 },
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should call with custom pagination', async () => {
+      const mockData = { content: [], page: 1, size: 5, totalElements: 0, totalPages: 0 };
+      axiosGetStub.resolves({ data: mockData });
+
+      const result = await divipolService.searchTestigos('test', 1, 5);
+
+      expect(
+        axiosGetStub.calledWith('/services/tysescrutinymicrodivipol/api/testigos/search', {
+          params: { q: 'test', page: 1, size: 5 },
+        }),
+      ).toBe(true);
+      expect(result).toEqual(mockData);
+    });
+
+    it('should handle search errors', async () => {
+      axiosGetStub.rejects(new Error('Search failed'));
+
+      await expect(divipolService.searchTestigos('test')).rejects.toThrow('Search failed');
     });
   });
 });

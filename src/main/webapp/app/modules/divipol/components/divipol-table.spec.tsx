@@ -111,7 +111,7 @@ describe('divipol-table', () => {
   });
 
   describe('DivipolTable component', () => {
-    const createInitialState = (overrides: Partial<DivipolState> = {}): { divipol: DivipolState } => ({
+    const createInitialState = (overrides: Partial<DivipolState> = {}) => ({
       divipol: {
         departamentos: [],
         municipios: [],
@@ -127,6 +127,11 @@ describe('divipol-table', () => {
         loading: false,
         error: null,
         ...overrides,
+      },
+      authentication: {
+        account: {
+          authorities: [] as string[],
+        },
       },
     });
 

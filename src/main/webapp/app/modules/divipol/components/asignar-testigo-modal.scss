@@ -1,5 +1,12 @@
 @import '../../../color-variables';
 
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
 .asignar-testigo-modal {
   .testigos-list {
     max-height: 250px;
@@ -11,6 +18,10 @@
 
       &:hover:not(.active) {
         background-color: $color-gray-lighter;
+
+        @include dark-theme {
+          background-color: $color-dark-background;
+        }
       }
 
       &.active {
@@ -22,27 +33,8 @@
 
   .selected-testigo {
     background-color: $color-gray-lighter;
-  }
-}
 
-@mixin dark-theme {
-  html[data-theme='dark'] &,
-  .theme-dark & {
-    @content;
-  }
-}
-
-@include dark-theme {
-  .asignar-testigo-modal {
-    .testigos-list {
-      .list-group-item {
-        &:hover:not(.active) {
-          background-color: $color-dark-background;
-        }
-      }
-    }
-
-    .selected-testigo {
+    @include dark-theme {
       background-color: $color-dark-background;
     }
   }

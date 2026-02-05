@@ -1,5 +1,12 @@
 @import '../../../color-variables';
 
+@mixin dark-theme {
+  html[data-theme='dark'] &,
+  .theme-dark & {
+    @content;
+  }
+}
+
 .puesto-jurados-tab {
   .jurados-table {
     font-size: 0.9rem;
@@ -8,6 +15,10 @@
       font-weight: 600;
       color: $color-text-secondary;
       border-bottom-width: 2px;
+
+      @include dark-theme {
+        color: $color-gray-medium-dark;
+      }
     }
 
     td {
@@ -22,21 +33,4 @@
   justify-content: center;
   min-height: 150px;
   margin: 0;
-}
-
-@mixin dark-theme {
-  html[data-theme='dark'] &,
-  .theme-dark & {
-    @content;
-  }
-}
-
-@include dark-theme {
-  .puesto-jurados-tab {
-    .jurados-table {
-      th {
-        color: $color-gray;
-      }
-    }
-  }
 }
