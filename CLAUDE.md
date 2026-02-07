@@ -92,14 +92,19 @@ docker compose -f src/main/docker/sonar.yml up -d
 
 ### Docker Services
 
-```bash
-# Start all required services
-docker compose -f src/main/docker/services.yml up -d
+**IMPORTANTE**: Los servicios compartidos (Consul, Kafka, MinIO, MailHog) se levantan desde `tyse-infrastructure/`:
 
-# Individual services
-npm run docker:db:up          # PostgreSQL
-npm run docker:consul:up      # Consul
-npm run docker:kafka:up       # Kafka
+```bash
+# 1. Levantar infraestructura compartida (una sola vez, desde la raíz)
+cd ../tyse-infrastructure
+docker compose up -d
+
+# 2. Levantar PostgreSQL del gateway
+cd ../tyse-scrutiny-gateway
+docker compose -f src/main/docker/postgresql.yml up -d
+
+# O usar services.yml que solo levanta PostgreSQL
+docker compose -f src/main/docker/services.yml up -d
 ```
 
 ## Architecture
@@ -130,6 +135,16 @@ React application with Redux Toolkit for state management:
   - `account/` - User account management (settings, password reset, registration)
   - `administration/` - Admin pages (user management, metrics, health, gateway routes)
   - `home/` - Dashboard with modular grid layout
+  - `divipol/` - **Módulo de División Política y Testigos Electorales**
+    - `divipol.tsx` - Página principal con explorador DIVIPOL
+    - `divipol.reducer.ts` - Redux slice del módulo
+    - `components/` - Componentes reutilizables (DivipolTable, PuestoInfoTab, etc.)
+    - `pages/` - **Páginas con rutas dedicadas (Full Page Routes)**
+      - `puesto-detail-page.tsx` - Detalle de puesto con tabs
+      - `organizaciones-page.tsx` - CRUD de organizaciones políticas
+      - `comisiones-page.tsx` - CRUD de comisiones escrutadoras
+      - `reclamaciones-page.tsx` - Listado de reclamaciones
+      - `configuracion-electoral-page.tsx` - Configuración del sistema
 - **`src/main/webapp/app/shared/`** - Shared utilities
   - `reducers/` - Redux slices (authentication, locale, application-profile)
   - `components/` - Reusable components (dashboard, theme-toggle, brand-logo)
@@ -138,10 +153,29 @@ React application with Redux Toolkit for state management:
   - `layout/` - Header, footer, menus
   - `auth/` - PrivateRoute component for protected routes
   - `error/` - Error boundaries and 404 page
+  - `services/divipol.service.ts` - **API client para micro-divipol**
 - **`src/main/webapp/app/config/`** - Redux store configuration
   - Injectable reducer pattern for lazy loading
   - Middleware: error handling, notifications, loading bar, logger
 - **`src/main/webapp/app/entities/`** - Entity CRUD routes
+
+### Rutas del Módulo DIVIPOL
+
+El módulo divipol usa **Full Page Routes** (no modales) para mejor UX mobile y URL-driven state:
+
+```
+/divipol                        → DivipolPage (explorador jerárquico)
+/divipol/puestos/:puestoId      → PuestoDetailPage (tabs: info, jurados, testigos)
+/divipol/organizaciones         → OrganizacionesPage (CRUD)
+/divipol/comisiones             → ComisionesPage (CRUD)
+/divipol/reclamaciones          → ReclamacionesPage (listado con filtros)
+/divipol/configuracion          → ConfiguracionElectoralPage (admin)
+```
+
+**Patrón URL-driven:** El estado de navegación se refleja en la URL. Al refrescar, la app restaura el estado exacto:
+
+- Tabs activos via query param: `/divipol/puestos/123?tab=testigos`
+- Filtros via query params: `/divipol/reclamaciones?estado=PRESENTADA`
 
 ### State Management
 
