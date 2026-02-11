@@ -58,11 +58,6 @@ spring:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
     url: jdbc:postgresql://localhost:5432/tyseScrutinyGateway
-  mail:
-    host: localhost
-    port: 1025
-    username:
-    password:
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   r2dbc:
@@ -130,3 +125,11 @@ jhipster:
 google:
   recaptcha:
     secret-key: 6LdZumAsAAAAAOeymXilrbCsUBRCzxw2ToGlIDn4
+
+# MinIO object storage configuration
+minio:
+  endpoint: http://localhost:9000
+  access-key: tyseadmin
+  secret-key: tyseadmin123
+  bucket: e14-pdfs
+  presigned-url-expiry: 3600 # 1 hora en segundos
