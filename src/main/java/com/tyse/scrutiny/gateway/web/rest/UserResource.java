@@ -1,10 +1,10 @@
 package com.tyse.scrutiny.gateway.web.rest;
 
+import com.tyse.scrutiny.gateway.broker.NotificationProducer;
 import com.tyse.scrutiny.gateway.config.Constants;
 import com.tyse.scrutiny.gateway.domain.User;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
 import com.tyse.scrutiny.gateway.security.AuthoritiesConstants;
-import com.tyse.scrutiny.gateway.service.MailService;
 import com.tyse.scrutiny.gateway.service.UserService;
 import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
 import com.tyse.scrutiny.gateway.web.rest.errors.BadRequestAlertException;
@@ -98,12 +98,12 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
-    private final MailService mailService;
+    private final NotificationProducer notificationProducer;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    public UserResource(UserService userService, UserRepository userRepository, NotificationProducer notificationProducer) {
         this.userService = userService;
         this.userRepository = userRepository;
-        this.mailService = mailService;
+        this.notificationProducer = notificationProducer;
     }
 
     /**
@@ -160,7 +160,7 @@ public class UserResource {
                 }
                 return userService.createUser(userDTO);
             })
-            .doOnSuccess(mailService::sendCreationEmail)
+            .doOnSuccess(notificationProducer::sendCreationEmail)
             .map(user -> {
                 try {
                     return ResponseEntity.created(new URI("/api/admin/users/" + user.getLogin()))

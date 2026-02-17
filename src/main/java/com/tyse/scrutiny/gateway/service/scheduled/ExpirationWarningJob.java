@@ -48,19 +48,9 @@ public class ExpirationWarningJob {
             .doOnError(error -> LOG.error("Error checking expiring authority assignments", error))
             .onErrorResume(error -> Mono.empty())
             .subscribe();
-        // TODO: Integrate with MailService to send email notifications
-        // Example implementation:
-        // userAuthorityRepository.findExpiringWithinDays(WARNING_DAYS)
-        //     .flatMap(assignment -> userRepository.findById(assignment.getUserId())
-        //         .flatMap(user -> authorityRepository.findById(assignment.getAuthorityId())
-        //             .flatMap(authority -> mailService.sendExpirationWarningEmail(
-        //                 user.getEmail(),
-        //                 authority.getName(),
-        //                 assignment.getExpiresAt()
-        //             ))
-        //         )
-        //     )
-        //     .subscribe();
+        // TODO: Integrate with NotificationProducer to send email notifications via Kafka
+        // NotificationProducer publishes to 'notification-request' topic,
+        // which is consumed by tyse-scrutiny-micro-notification
     }
 
     /**
@@ -81,6 +71,6 @@ public class ExpirationWarningJob {
             .doOnError(error -> LOG.error("Error checking expiring permission grants", error))
             .onErrorResume(error -> Mono.empty())
             .subscribe();
-        // TODO: Integrate with MailService to send email notifications
+        // TODO: Integrate with NotificationProducer to send email notifications via Kafka
     }
 }

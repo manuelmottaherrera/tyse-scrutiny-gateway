@@ -8,7 +8,6 @@ public class JHipsterBlockHoundIntegration implements BlockHoundIntegration {
     @Override
     public void applyTo(BlockHound.Builder builder) {
         builder.allowBlockingCallsInside("org.springframework.validation.beanvalidation.SpringValidatorAdapter", "validate");
-        builder.allowBlockingCallsInside("com.tyse.scrutiny.gateway.service.MailService", "sendEmailFromTemplate");
         builder.allowBlockingCallsInside("com.tyse.scrutiny.gateway.security.DomainUserDetailsService", "createSpringSecurityUser");
         builder.allowBlockingCallsInside("org.springframework.web.reactive.result.method.InvocableHandlerMethod", "invoke");
         builder.allowBlockingCallsInside("org.springdoc.core.service.OpenAPIService", "build");

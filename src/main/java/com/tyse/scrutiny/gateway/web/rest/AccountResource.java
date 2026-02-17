@@ -1,9 +1,9 @@
 package com.tyse.scrutiny.gateway.web.rest;
 
+import com.tyse.scrutiny.gateway.broker.NotificationProducer;
 import com.tyse.scrutiny.gateway.domain.authorization.Permission;
 import com.tyse.scrutiny.gateway.repository.UserRepository;
 import com.tyse.scrutiny.gateway.security.SecurityUtils;
-import com.tyse.scrutiny.gateway.service.MailService;
 import com.tyse.scrutiny.gateway.service.UserService;
 import com.tyse.scrutiny.gateway.service.authorization.UserPermissionService;
 import com.tyse.scrutiny.gateway.service.dto.AdminUserDTO;
@@ -55,19 +55,19 @@ public class AccountResource {
 
     private final UserService userService;
 
-    private final MailService mailService;
+    private final NotificationProducer notificationProducer;
 
     private final UserPermissionService userPermissionService;
 
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
-        MailService mailService,
+        NotificationProducer notificationProducer,
         UserPermissionService userPermissionService
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.mailService = mailService;
+        this.notificationProducer = notificationProducer;
         this.userPermissionService = userPermissionService;
     }
 
@@ -96,7 +96,7 @@ public class AccountResource {
         }
         return userService
             .registerUser(managedUserVM, managedUserVM.getPassword())
-            .doOnSuccess(mailService::sendActivationEmail)
+            .doOnSuccess(notificationProducer::sendActivationEmail)
             .then(
                 Mono.just(
                     ResponseEntity.status(HttpStatus.CREATED)
@@ -311,7 +311,7 @@ public class AccountResource {
             .requestPasswordReset(mail)
             .doOnSuccess(user -> {
                 if (Objects.nonNull(user)) {
-                    mailService.sendPasswordResetMail(user);
+                    notificationProducer.sendPasswordResetMail(user);
                 } else {
                     // Pretend the request has been successful to prevent checking which emails really exist
                     // but log that an invalid attempt has been made

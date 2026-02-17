@@ -131,7 +131,7 @@ spring:
         pool:
           max-connections: 1000
     function:
-      definition: kafkaConsumer;kafkaProducer
+      definition: kafkaConsumer;kafkaProducer;notificationProducer;e14UploadProducer
     stream:
       kafka:
         binder:
@@ -148,6 +148,14 @@ spring:
           group: tyse-scrutiny-gateway
         kafkaProducer-out-0:
           content-type: text/plain
+          group: tyse-scrutiny-gateway
+        notificationProducer-out-0:
+          destination: notification-request
+          content-type: application/json
+          group: tyse-scrutiny-gateway
+        e14UploadProducer-out-0:
+          destination: e14-pdf-uploaded
+          content-type: application/json
           group: tyse-scrutiny-gateway
   docker:
     compose:
