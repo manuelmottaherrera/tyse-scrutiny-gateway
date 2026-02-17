@@ -1,0 +1,86 @@
+@import '../../color-variables';
+
+.e14-upload-page {
+  padding: 2rem 0;
+
+  .drop-zone {
+    border: 2px dashed $color-gray-light;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-color: $color-primary;
+      background-color: rgba($color-primary, 0.05);
+    }
+
+    &.drag-active {
+      border-color: $color-primary;
+      background-color: rgba($color-primary, 0.1);
+      border-style: solid;
+    }
+
+    &.has-file {
+      border-style: solid;
+      border-color: $color-success;
+      background-color: rgba($color-success, 0.05);
+    }
+
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop-zone-content {
+      pointer-events: none;
+    }
+
+    .file-preview {
+      .file-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        word-break: break-all;
+      }
+
+      .file-size {
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .e14-upload-page {
+    .drop-zone {
+      border-color: $color-gray-darker;
+      background-color: $color-dark-background;
+
+      &:hover {
+        border-color: $color-primary;
+        background-color: rgba($color-primary, 0.1);
+      }
+
+      &.drag-active {
+        background-color: rgba($color-primary, 0.15);
+      }
+
+      &.has-file {
+        border-color: $color-success;
+        background-color: rgba($color-success, 0.1);
+      }
+    }
+  }
+}

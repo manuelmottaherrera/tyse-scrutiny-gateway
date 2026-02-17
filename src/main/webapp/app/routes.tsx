@@ -21,6 +21,8 @@ const Account = React.lazy(() => import(/* webpackChunkName: "account" */ 'app/m
 const Admin = React.lazy(() => import(/* webpackChunkName: "administration" */ 'app/modules/administration'));
 
 const Divipol = React.lazy(() => import(/* webpackChunkName: "divipol" */ 'app/modules/divipol'));
+
+const E14 = React.lazy(() => import(/* webpackChunkName: "e14" */ 'app/modules/e14'));
 const AppRoutes = () => {
   return (
     <div className="view-routes">
@@ -62,6 +64,16 @@ const AppRoutes = () => {
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
               <Suspense fallback={loading}>
                 <Divipol />
+              </Suspense>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="e14/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+              <Suspense fallback={loading}>
+                <E14 />
               </Suspense>
             </PrivateRoute>
           }

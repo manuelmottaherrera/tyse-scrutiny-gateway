@@ -1,0 +1,21 @@
+{
+  "e14": {
+    "title": "Formularios E14",
+    "upload": {
+      "title": "Subir Formulario E14",
+      "description": "Sube el formulario E14 escaneado en formato PDF para procesarlo.",
+      "dropHere": "Arrastra el archivo PDF aquí",
+      "orClick": "o haz clic para seleccionar",
+      "changeFile": "Cambiar archivo",
+      "divipolKey": "Código DIVIPOL",
+      "tableNumber": "Número de Mesa",
+      "electionProcess": "Proceso Electoral",
+      "uploadButton": "Subir Formulario E14",
+      "uploading": "Subiendo archivo...",
+      "success": "El formulario E14 se ha subido correctamente y está siendo procesado.",
+      "storageKey": "Clave de almacenamiento",
+      "errorNotPdf": "Solo se permiten archivos PDF.",
+      "errorGeneric": "Error al subir el archivo. Por favor, intenta nuevamente."
+    }
+  }
+}

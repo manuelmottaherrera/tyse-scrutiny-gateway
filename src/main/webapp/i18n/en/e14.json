@@ -1,0 +1,21 @@
+{
+  "e14": {
+    "title": "E14 Forms",
+    "upload": {
+      "title": "Upload E14 Form",
+      "description": "Upload the scanned E14 form in PDF format for processing.",
+      "dropHere": "Drag the PDF file here",
+      "orClick": "or click to select",
+      "changeFile": "Change file",
+      "divipolKey": "DIVIPOL Code",
+      "tableNumber": "Table Number",
+      "electionProcess": "Election Process",
+      "uploadButton": "Upload E14 Form",
+      "uploading": "Uploading file...",
+      "success": "The E14 form has been uploaded successfully and is being processed.",
+      "storageKey": "Storage key",
+      "errorNotPdf": "Only PDF files are allowed.",
+      "errorGeneric": "Error uploading the file. Please try again."
+    }
+  }
+}
