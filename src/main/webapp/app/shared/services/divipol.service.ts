@@ -183,9 +183,253 @@ export interface SearchParams {
   size?: number;
 }
 
-// Base URL del microservicio divipol (a través del gateway)
+// =====================================================
+// Tipos para Mesa de Votación
+// =====================================================
+
+export interface MesaVotacion {
+  id: number;
+  puestoId: number;
+  numeroMesa: number;
+  activo: boolean;
+}
+
+// =====================================================
+// Tipos para Organización Política
+// =====================================================
+
+export type TipoOrganizacion = 'PARTIDO' | 'MOVIMIENTO' | 'COALICION' | 'GRUPO_SIGNIFICATIVO' | 'COMITE_VOTO_BLANCO';
+
+export interface OrganizacionPolitica {
+  id: number;
+  nombre: string;
+  sigla?: string;
+  tipo: TipoOrganizacion;
+  activo: boolean;
+}
+
+export interface OrganizacionPoliticaCreate {
+  nombre: string;
+  sigla?: string;
+  tipo: TipoOrganizacion;
+}
+
+export interface OrganizacionPoliticaPage {
+  content: OrganizacionPolitica[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+// =====================================================
+// Tipos para Comisión Escrutadora
+// =====================================================
+
+export type TipoComision = 'AUXILIAR' | 'MUNICIPAL' | 'DISTRITAL' | 'GENERAL';
+
+export interface ComisionEscrutadora {
+  id: number;
+  tipo: TipoComision;
+  nombre: string;
+  ubicacion?: string;
+  departamentoId?: number;
+  municipioId?: number;
+  fechaInicio?: string;
+  activo: boolean;
+}
+
+export interface ComisionEscrutadoraCreate {
+  tipo: TipoComision;
+  nombre: string;
+  ubicacion?: string;
+  departamentoId?: number;
+  municipioId?: number;
+  fechaInicio?: string;
+}
+
+export interface ComisionEscrutadoraPage {
+  content: ComisionEscrutadora[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+// =====================================================
+// Tipos para Testigo Mesa y Testigo Comisión
+// =====================================================
+
+export type TipoTestigo = 'PRINCIPAL' | 'REMANENTE';
+
+export interface TestigoMesa {
+  id: number;
+  testigoId: number;
+  testigoNombreCompleto: string;
+  testigoNumeroDocumento: string;
+  mesaId: number;
+  mesaNumero: number;
+  puestoId: number;
+  organizacionId?: number;
+  organizacionNombre?: string;
+  tipoTestigo: TipoTestigo;
+  assignedDate: string;
+  assignedBy: string;
+  activo: boolean;
+}
+
+export interface TestigoMesaAsignacion {
+  testigoId: number;
+  organizacionId?: number;
+  tipoTestigo: TipoTestigo;
+}
+
+export interface TestigoComision {
+  id: number;
+  testigoId: number;
+  testigoNombreCompleto: string;
+  testigoNumeroDocumento: string;
+  comisionId: number;
+  comisionNombre: string;
+  organizacionId?: number;
+  organizacionNombre?: string;
+  tipoTestigo: TipoTestigo;
+  assignedDate: string;
+  assignedBy: string;
+  activo: boolean;
+}
+
+export interface TestigoComisionAsignacion {
+  testigoId: number;
+  organizacionId?: number;
+  tipoTestigo: TipoTestigo;
+}
+
+// =====================================================
+// Tipos para Credencial
+// =====================================================
+
+export type TipoCredencial = 'E15' | 'E16';
+export type EstadoCredencial = 'PENDIENTE' | 'EMITIDA' | 'ENTREGADA' | 'ANULADA';
+
+export interface Credencial {
+  id: number;
+  testigoId: number;
+  testigoNombreCompleto: string;
+  testigoNumeroDocumento: string;
+  tipo: TipoCredencial;
+  estado: EstadoCredencial;
+  codigoVerificacion?: string;
+  testigoMesaId?: number;
+  testigoComisionId?: number;
+  asignacionDescripcion?: string;
+  fechaEmision?: string;
+  fechaEntrega?: string;
+  emitidoPor?: string;
+  activo: boolean;
+}
+
+export interface CredencialCreate {
+  testigoId: number;
+  tipo: TipoCredencial;
+  testigoMesaId?: number;
+  testigoComisionId?: number;
+}
+
+export interface CredencialEstado {
+  estado: EstadoCredencial;
+}
+
+export interface CredencialPage {
+  content: Credencial[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+// =====================================================
+// Tipos para Reclamación
+// =====================================================
+
+export type TipoReclamacion =
+  | 'IRREGULARIDAD_MESA'
+  | 'EXCESO_VOTANTES'
+  | 'ERROR_ARITMETICO'
+  | 'ERROR_NOMBRES'
+  | 'FIRMAS_INSUFICIENTES'
+  | 'DISCREPANCIA_ACTAS'
+  | 'OTRO';
+
+export type EstadoReclamacion = 'PRESENTADA' | 'EN_REVISION' | 'ACEPTADA' | 'RECHAZADA';
+
+export interface Reclamacion {
+  id: number;
+  testigoId: number;
+  testigoNombreCompleto: string;
+  testigoNumeroDocumento: string;
+  tipoReclamacion: TipoReclamacion;
+  descripcion: string;
+  estado: EstadoReclamacion;
+  mesaId?: number;
+  mesaDescripcion?: string;
+  comisionId?: number;
+  comisionNombre?: string;
+  fechaPresentacion: string;
+  resolucion?: string;
+  fechaResolucion?: string;
+  resueltaPor?: string;
+  activo: boolean;
+}
+
+export interface ReclamacionCreate {
+  testigoId: number;
+  tipoReclamacion: TipoReclamacion;
+  descripcion: string;
+  mesaId?: number;
+  comisionId?: number;
+}
+
+export interface ReclamacionResolucion {
+  estado: 'ACEPTADA' | 'RECHAZADA';
+  resolucion: string;
+}
+
+export interface ReclamacionPage {
+  content: Reclamacion[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+// =====================================================
+// Tipos para Configuración Electoral
+// =====================================================
+
+export interface ConfiguracionElectoral {
+  id: number;
+  clave: string;
+  valor: string;
+  descripcion?: string;
+  activo: boolean;
+}
+
+export interface ConfiguracionInscripcion {
+  inscripcionAbierta: boolean;
+  fechaInicio?: string;
+  fechaFin?: string;
+  fechaElecciones?: string;
+}
+
+// Base URLs del microservicio divipol (a través del gateway)
 const API_BASE_URL = '/services/tysescrutinymicrodivipol/api/divipol';
 const TESTIGOS_API_URL = '/services/tysescrutinymicrodivipol/api/testigos';
+const ORGANIZACIONES_API_URL = '/services/tysescrutinymicrodivipol/api/organizaciones';
+const COMISIONES_API_URL = '/services/tysescrutinymicrodivipol/api/comisiones';
+const CREDENCIALES_API_URL = '/services/tysescrutinymicrodivipol/api/credenciales';
+const RECLAMACIONES_API_URL = '/services/tysescrutinymicrodivipol/api/reclamaciones';
+const CONFIGURACION_API_URL = '/services/tysescrutinymicrodivipol/api/configuracion';
 
 /**
  * Servicio para interactuar con el microservicio DIVIPOL
@@ -423,6 +667,312 @@ class DivipolService {
     const response = await axios.get<TestigoPage>(`${TESTIGOS_API_URL}/search`, {
       params: { q: query, page, size },
     });
+    return response.data;
+  }
+
+  // =====================================================
+  // Métodos de Mesas de Votación
+  // =====================================================
+
+  /**
+   * Obtiene las mesas de un puesto
+   */
+  async getMesasByPuesto(puestoId: number): Promise<MesaVotacion[]> {
+    const response = await axios.get<MesaVotacion[]>(`${API_BASE_URL}/puestos/${puestoId}/mesas`);
+    return response.data;
+  }
+
+  /**
+   * Obtiene los testigos asignados a una mesa
+   */
+  async getTestigosByMesa(puestoId: number, mesaId: number): Promise<TestigoMesa[]> {
+    const response = await axios.get<TestigoMesa[]>(`${API_BASE_URL}/puestos/${puestoId}/mesas/${mesaId}/testigos`);
+    return response.data;
+  }
+
+  /**
+   * Asigna un testigo a una mesa
+   */
+  async asignarTestigoAMesa(puestoId: number, mesaId: number, asignacion: TestigoMesaAsignacion): Promise<TestigoMesa> {
+    const response = await axios.post<TestigoMesa>(`${API_BASE_URL}/puestos/${puestoId}/mesas/${mesaId}/testigos`, asignacion);
+    return response.data;
+  }
+
+  /**
+   * Desasigna un testigo de una mesa
+   */
+  async desasignarTestigoDeMesa(puestoId: number, mesaId: number, testigoId: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/puestos/${puestoId}/mesas/${mesaId}/testigos/${testigoId}`);
+  }
+
+  // =====================================================
+  // Métodos de Organizaciones Políticas
+  // =====================================================
+
+  /**
+   * Obtiene todas las organizaciones paginadas
+   */
+  async getAllOrganizaciones(page = 0, size = 20, tipo?: TipoOrganizacion): Promise<OrganizacionPoliticaPage> {
+    const response = await axios.get<OrganizacionPoliticaPage>(ORGANIZACIONES_API_URL, {
+      params: { page, size, tipo },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene una organización por ID
+   */
+  async getOrganizacionById(id: number): Promise<OrganizacionPolitica> {
+    const response = await axios.get<OrganizacionPolitica>(`${ORGANIZACIONES_API_URL}/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Crea una nueva organización
+   */
+  async createOrganizacion(org: OrganizacionPoliticaCreate): Promise<OrganizacionPolitica> {
+    const response = await axios.post<OrganizacionPolitica>(ORGANIZACIONES_API_URL, org);
+    return response.data;
+  }
+
+  /**
+   * Actualiza una organización
+   */
+  async updateOrganizacion(id: number, org: Partial<OrganizacionPoliticaCreate>): Promise<OrganizacionPolitica> {
+    const response = await axios.put<OrganizacionPolitica>(`${ORGANIZACIONES_API_URL}/${id}`, org);
+    return response.data;
+  }
+
+  /**
+   * Elimina una organización (soft delete)
+   */
+  async deleteOrganizacion(id: number): Promise<void> {
+    await axios.delete(`${ORGANIZACIONES_API_URL}/${id}`);
+  }
+
+  // =====================================================
+  // Métodos de Comisiones Escrutadoras
+  // =====================================================
+
+  /**
+   * Obtiene todas las comisiones paginadas
+   */
+  async getAllComisiones(page = 0, size = 20, tipo?: TipoComision): Promise<ComisionEscrutadoraPage> {
+    const response = await axios.get<ComisionEscrutadoraPage>(COMISIONES_API_URL, {
+      params: { page, size, tipo },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene una comisión por ID
+   */
+  async getComisionById(id: number): Promise<ComisionEscrutadora> {
+    const response = await axios.get<ComisionEscrutadora>(`${COMISIONES_API_URL}/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Crea una nueva comisión
+   */
+  async createComision(comision: ComisionEscrutadoraCreate): Promise<ComisionEscrutadora> {
+    const response = await axios.post<ComisionEscrutadora>(COMISIONES_API_URL, comision);
+    return response.data;
+  }
+
+  /**
+   * Actualiza una comisión
+   */
+  async updateComision(id: number, comision: Partial<ComisionEscrutadoraCreate>): Promise<ComisionEscrutadora> {
+    const response = await axios.put<ComisionEscrutadora>(`${COMISIONES_API_URL}/${id}`, comision);
+    return response.data;
+  }
+
+  /**
+   * Elimina una comisión (soft delete)
+   */
+  async deleteComision(id: number): Promise<void> {
+    await axios.delete(`${COMISIONES_API_URL}/${id}`);
+  }
+
+  /**
+   * Obtiene los testigos asignados a una comisión
+   */
+  async getTestigosByComision(comisionId: number): Promise<TestigoComision[]> {
+    const response = await axios.get<TestigoComision[]>(`${COMISIONES_API_URL}/${comisionId}/testigos`);
+    return response.data;
+  }
+
+  /**
+   * Asigna un testigo a una comisión
+   */
+  async asignarTestigoAComision(comisionId: number, asignacion: TestigoComisionAsignacion): Promise<TestigoComision> {
+    const response = await axios.post<TestigoComision>(`${COMISIONES_API_URL}/${comisionId}/testigos`, asignacion);
+    return response.data;
+  }
+
+  /**
+   * Desasigna un testigo de una comisión
+   */
+  async desasignarTestigoDeComision(comisionId: number, testigoId: number): Promise<void> {
+    await axios.delete(`${COMISIONES_API_URL}/${comisionId}/testigos/${testigoId}`);
+  }
+
+  // =====================================================
+  // Métodos de Credenciales
+  // =====================================================
+
+  /**
+   * Obtiene todas las credenciales paginadas
+   */
+  async getAllCredenciales(page = 0, size = 20, estado?: EstadoCredencial, tipo?: TipoCredencial): Promise<CredencialPage> {
+    const response = await axios.get<CredencialPage>(CREDENCIALES_API_URL, {
+      params: { page, size, estado, tipo },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene una credencial por ID
+   */
+  async getCredencialById(id: number): Promise<Credencial> {
+    const response = await axios.get<Credencial>(`${CREDENCIALES_API_URL}/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Crea una nueva credencial
+   */
+  async createCredencial(credencial: CredencialCreate): Promise<Credencial> {
+    const response = await axios.post<Credencial>(CREDENCIALES_API_URL, credencial);
+    return response.data;
+  }
+
+  /**
+   * Actualiza el estado de una credencial
+   */
+  async updateCredencialEstado(id: number, estado: CredencialEstado): Promise<Credencial> {
+    const response = await axios.put<Credencial>(`${CREDENCIALES_API_URL}/${id}/estado`, estado);
+    return response.data;
+  }
+
+  /**
+   * Anula una credencial
+   */
+  async anularCredencial(id: number): Promise<void> {
+    await axios.delete(`${CREDENCIALES_API_URL}/${id}`);
+  }
+
+  /**
+   * Obtiene las credenciales de un testigo
+   */
+  async getCredencialesByTestigo(testigoId: number): Promise<Credencial[]> {
+    const response = await axios.get<Credencial[]>(`${CREDENCIALES_API_URL}/testigo/${testigoId}`);
+    return response.data;
+  }
+
+  /**
+   * Verifica una credencial por código
+   */
+  async verificarCredencial(codigo: string): Promise<Credencial> {
+    const response = await axios.get<Credencial>(`${CREDENCIALES_API_URL}/verificar/${codigo}`);
+    return response.data;
+  }
+
+  // =====================================================
+  // Métodos de Reclamaciones
+  // =====================================================
+
+  /**
+   * Obtiene todas las reclamaciones paginadas
+   */
+  async getAllReclamaciones(page = 0, size = 20, estado?: EstadoReclamacion, tipo?: TipoReclamacion): Promise<ReclamacionPage> {
+    const response = await axios.get<ReclamacionPage>(RECLAMACIONES_API_URL, {
+      params: { page, size, estado, tipo },
+    });
+    return response.data;
+  }
+
+  /**
+   * Obtiene una reclamación por ID
+   */
+  async getReclamacionById(id: number): Promise<Reclamacion> {
+    const response = await axios.get<Reclamacion>(`${RECLAMACIONES_API_URL}/${id}`);
+    return response.data;
+  }
+
+  /**
+   * Crea una nueva reclamación
+   */
+  async createReclamacion(reclamacion: ReclamacionCreate): Promise<Reclamacion> {
+    const response = await axios.post<Reclamacion>(RECLAMACIONES_API_URL, reclamacion);
+    return response.data;
+  }
+
+  /**
+   * Resuelve una reclamación
+   */
+  async resolverReclamacion(id: number, resolucion: ReclamacionResolucion): Promise<Reclamacion> {
+    const response = await axios.put<Reclamacion>(`${RECLAMACIONES_API_URL}/${id}/resolver`, resolucion);
+    return response.data;
+  }
+
+  /**
+   * Elimina una reclamación (soft delete)
+   */
+  async deleteReclamacion(id: number): Promise<void> {
+    await axios.delete(`${RECLAMACIONES_API_URL}/${id}`);
+  }
+
+  /**
+   * Obtiene las reclamaciones de un testigo
+   */
+  async getReclamacionesByTestigo(testigoId: number): Promise<Reclamacion[]> {
+    const response = await axios.get<Reclamacion[]>(`${RECLAMACIONES_API_URL}/testigo/${testigoId}`);
+    return response.data;
+  }
+
+  /**
+   * Obtiene las reclamaciones de una mesa
+   */
+  async getReclamacionesByMesa(mesaId: number): Promise<Reclamacion[]> {
+    const response = await axios.get<Reclamacion[]>(`${RECLAMACIONES_API_URL}/mesa/${mesaId}`);
+    return response.data;
+  }
+
+  /**
+   * Obtiene las reclamaciones de una comisión
+   */
+  async getReclamacionesByComision(comisionId: number): Promise<Reclamacion[]> {
+    const response = await axios.get<Reclamacion[]>(`${RECLAMACIONES_API_URL}/comision/${comisionId}`);
+    return response.data;
+  }
+
+  // =====================================================
+  // Métodos de Configuración Electoral
+  // =====================================================
+
+  /**
+   * Obtiene toda la configuración electoral
+   */
+  async getAllConfiguracion(): Promise<ConfiguracionElectoral[]> {
+    const response = await axios.get<ConfiguracionElectoral[]>(CONFIGURACION_API_URL);
+    return response.data;
+  }
+
+  /**
+   * Obtiene el estado de la inscripción de testigos
+   */
+  async getConfiguracionInscripcion(): Promise<ConfiguracionInscripcion> {
+    const response = await axios.get<ConfiguracionInscripcion>(`${CONFIGURACION_API_URL}/inscripcion`);
+    return response.data;
+  }
+
+  /**
+   * Actualiza una configuración
+   */
+  async updateConfiguracion(clave: string, valor: string): Promise<ConfiguracionElectoral> {
+    const response = await axios.put<ConfiguracionElectoral>(`${CONFIGURACION_API_URL}/${clave}`, { valor });
     return response.data;
   }
 }

@@ -1,0 +1,40 @@
+@import '../../../color-variables';
+
+.reclamaciones-page {
+  .card {
+    border: 1px solid $color-gray-light;
+    box-shadow: 0 2px 4px $color-shadow-primary;
+  }
+
+  .table {
+    th {
+      font-weight: 600;
+      border-bottom: 2px solid $color-gray-light;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.35em 0.65em;
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .reclamaciones-page {
+    .card {
+      border-color: $color-gray-darker;
+      background: $color-dark-background;
+    }
+
+    .table {
+      th {
+        border-bottom-color: $color-gray-darker;
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
-import { PuestoDetailModal } from './puesto-detail-modal';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 
 /**
@@ -30,21 +30,13 @@ export const generateDivipolCode = (
 };
 
 export const DivipolTable: React.FC = () => {
+  const navigate = useNavigate();
   const { departamentos, municipios, zonas, puestos, filters } = useAppSelector(state => state.divipol);
   const authorities = useAppSelector(state => state.authentication.account.authorities);
   const canViewDetail = hasAnyAuthority(authorities, ['puesto.detail.read', 'ROLE_ADMIN']);
 
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedPuestoId, setSelectedPuestoId] = useState<number | null>(null);
-
   const handleShowDetail = (puestoId: number) => {
-    setSelectedPuestoId(puestoId);
-    setShowDetailModal(true);
-  };
-
-  const handleCloseDetail = () => {
-    setShowDetailModal(false);
-    setSelectedPuestoId(null);
+    navigate(`/divipol/puestos/${puestoId}`);
   };
 
   const showingPuestos = filters.zona && puestos.length > 0;
@@ -147,8 +139,6 @@ export const DivipolTable: React.FC = () => {
         </thead>
         <tbody>{renderTableData()}</tbody>
       </Table>
-
-      {selectedPuestoId && <PuestoDetailModal isOpen={showDetailModal} onClose={handleCloseDetail} puestoId={selectedPuestoId} />}
     </div>
   );
 };

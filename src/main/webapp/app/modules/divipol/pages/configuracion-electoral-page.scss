@@ -1,0 +1,34 @@
+@import '../../../color-variables';
+
+.configuracion-electoral-page {
+  .card {
+    border: 1px solid $color-gray-light;
+    box-shadow: 0 2px 4px $color-shadow-primary;
+
+    .card-header {
+      background: $color-gray-lighter;
+      font-weight: 600;
+      border-bottom: 1px solid $color-gray-light;
+    }
+  }
+
+  .badge {
+    font-size: 0.85rem;
+    padding: 0.5em 0.75em;
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .configuracion-electoral-page {
+    .card {
+      border-color: $color-gray-darker;
+      background: $color-dark-background;
+
+      .card-header {
+        background: $color-gray-darker;
+        border-bottom-color: $color-gray-dark;
+      }
+    }
+  }
+}

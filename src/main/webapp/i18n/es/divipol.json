@@ -49,6 +49,7 @@
       "tabs": {
         "info": "Información",
         "jurados": "Jurados",
+        "mesas": "Mesas",
         "testigos": "Testigos"
       },
       "fields": {
@@ -133,6 +134,161 @@
         "potential": "Potencial",
         "tables": "Mesas"
       }
+    },
+    "mesas": {
+      "title": "Mesas de Votación",
+      "numero": "Mesa #{{numero}}",
+      "testigos": "Testigos asignados",
+      "sinTestigos": "Sin testigos asignados",
+      "asignarTestigo": "Asignar testigo a esta mesa"
+    },
+    "organizaciones": {
+      "title": "Organizaciones Políticas",
+      "nuevo": "Nueva Organización",
+      "editar": "Editar Organización",
+      "nombre": "Nombre",
+      "sigla": "Sigla",
+      "tipo": "Tipo",
+      "tipos": {
+        "PARTIDO": "Partido Político",
+        "MOVIMIENTO": "Movimiento Político",
+        "COALICION": "Coalición",
+        "GRUPO_SIGNIFICATIVO": "Grupo Significativo de Ciudadanos",
+        "COMITE_VOTO_BLANCO": "Comité Promotor del Voto en Blanco"
+      },
+      "confirmarEliminar": "¿Está seguro que desea eliminar esta organización?",
+      "empty": "No hay organizaciones políticas registradas"
+    },
+    "comisiones": {
+      "title": "Comisiones Escrutadoras",
+      "nuevo": "Nueva Comisión",
+      "editar": "Editar Comisión",
+      "nombre": "Nombre",
+      "tipo": "Tipo",
+      "ubicacion": "Ubicación",
+      "fechaInicio": "Fecha de Inicio",
+      "tipos": {
+        "AUXILIAR": "Comisión Auxiliar",
+        "MUNICIPAL": "Comisión Municipal",
+        "DISTRITAL": "Comisión Distrital",
+        "GENERAL": "Comisión General"
+      },
+      "testigos": {
+        "title": "Testigos de la Comisión",
+        "asignar": "Asignar Testigo"
+      },
+      "empty": "No hay comisiones escrutadoras registradas"
+    },
+    "testigoAsignacion": {
+      "tipoTestigo": "Tipo de Testigo",
+      "tipos": {
+        "PRINCIPAL": "Principal",
+        "REMANENTE": "Remanente"
+      },
+      "organizacion": "Organización Política",
+      "seleccioneOrganizacion": "Seleccione una organización",
+      "validacion": {
+        "maximoPrincipal": "Ya existe un testigo principal de esta organización para esta mesa",
+        "maximoRemanentes": "Se ha alcanzado el límite de testigos remanentes para este puesto",
+        "inscripcionCerrada": "El período de inscripción de testigos está cerrado"
+      }
+    },
+    "credenciales": {
+      "title": "Credenciales Electorales",
+      "nuevo": "Nueva Credencial",
+      "tipo": "Tipo",
+      "tipos": {
+        "E15": "E-15 (Testigo de Mesa)",
+        "E16": "E-16 (Testigo de Comisión)"
+      },
+      "estado": "Estado",
+      "estados": {
+        "PENDIENTE": "Pendiente",
+        "EMITIDA": "Emitida",
+        "ENTREGADA": "Entregada",
+        "ANULADA": "Anulada"
+      },
+      "codigoVerificacion": "Código de Verificación",
+      "fechaEmision": "Fecha de Emisión",
+      "fechaEntrega": "Fecha de Entrega",
+      "emitidoPor": "Emitida por",
+      "asignacion": "Asignación",
+      "emitir": "Emitir Credencial",
+      "entregar": "Marcar como Entregada",
+      "anular": "Anular Credencial",
+      "verificar": "Verificar Credencial",
+      "empty": "No hay credenciales registradas"
+    },
+    "reclamaciones": {
+      "title": "Reclamaciones Electorales",
+      "nueva": "Nueva Reclamación",
+      "tipo": "Tipo de Reclamación",
+      "tipos": {
+        "IRREGULARIDAD_MESA": "Irregularidad en Mesa",
+        "EXCESO_VOTANTES": "Exceso de Votantes",
+        "ERROR_ARITMETICO": "Error Aritmético",
+        "ERROR_NOMBRES": "Error en Nombres",
+        "FIRMAS_INSUFICIENTES": "Firmas Insuficientes",
+        "DISCREPANCIA_ACTAS": "Discrepancia en Actas",
+        "OTRO": "Otra Causal"
+      },
+      "estado": "Estado",
+      "estados": {
+        "PRESENTADA": "Presentada",
+        "EN_REVISION": "En Revisión",
+        "ACEPTADA": "Aceptada",
+        "RECHAZADA": "Rechazada"
+      },
+      "descripcion": "Descripción",
+      "fechaPresentacion": "Fecha de Presentación",
+      "resolucion": "Resolución",
+      "fechaResolucion": "Fecha de Resolución",
+      "resueltaPor": "Resuelta por",
+      "resolver": "Resolver Reclamación",
+      "aceptar": "Aceptar",
+      "rechazar": "Rechazar",
+      "empty": "No hay reclamaciones registradas"
+    },
+    "configuracion": {
+      "title": "Configuración Electoral",
+      "inscripcion": {
+        "titulo": "Período de Inscripción de Testigos",
+        "fechaInicio": "Fecha de Inicio",
+        "fechaFin": "Fecha de Fin",
+        "estado": "Estado",
+        "abierta": "Inscripciones Abiertas",
+        "cerrada": "Inscripciones Cerradas"
+      },
+      "fechaElecciones": "Fecha de Elecciones",
+      "limiteRemanentes": {
+        "titulo": "Límite de Testigos Remanentes",
+        "menos10Mesas": "Puestos con menos de 10 mesas",
+        "porcentaje": "Porcentaje máximo del total de mesas"
+      },
+      "guardar": "Guardar Configuración"
+    },
+    "breadcrumb": {
+      "inicio": "DIVIPOL",
+      "puestos": "Puestos",
+      "mesas": "Mesas",
+      "testigos": "Testigos",
+      "organizaciones": "Organizaciones",
+      "comisiones": "Comisiones",
+      "reclamaciones": "Reclamaciones",
+      "configuracion": "Configuración"
+    },
+    "common": {
+      "volver": "Volver",
+      "guardar": "Guardar",
+      "cancelar": "Cancelar",
+      "eliminar": "Eliminar",
+      "editar": "Editar",
+      "ver": "Ver Detalle",
+      "confirmar": "Confirmar",
+      "cargando": "Cargando...",
+      "sinDatos": "Sin datos disponibles",
+      "activo": "Activo",
+      "inactivo": "Inactivo"
     }
   }
 }

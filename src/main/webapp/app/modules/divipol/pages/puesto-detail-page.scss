@@ -1,0 +1,87 @@
+@import '../../../color-variables';
+
+.puesto-detail-page {
+  .breadcrumb {
+    background: transparent;
+    padding: 0;
+    font-size: 0.875rem;
+
+    .breadcrumb-item {
+      + .breadcrumb-item::before {
+        content: '/';
+        color: $color-gray;
+      }
+
+      &.active {
+        color: $color-text-primary;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .nav-tabs {
+    border-bottom: 2px solid $color-gray-light;
+
+    .nav-link {
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      color: $color-text-secondary;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: $color-gray;
+        color: $color-text-primary;
+      }
+
+      &.active {
+        border-color: $color-primary;
+        color: $color-primary;
+        background: transparent;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  .card {
+    border: 1px solid $color-gray-light;
+    box-shadow: 0 2px 4px $color-shadow-primary;
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .puesto-detail-page {
+    .breadcrumb-item {
+      color: $color-gray-light;
+
+      &.active {
+        color: $color-white;
+      }
+    }
+
+    .nav-tabs {
+      border-bottom-color: $color-gray-darker;
+
+      .nav-link {
+        color: $color-gray-light;
+
+        &:hover {
+          color: $color-white;
+        }
+
+        &.active {
+          color: $color-primary;
+        }
+      }
+    }
+
+    .card {
+      border-color: $color-gray-darker;
+      background: $color-dark-background;
+    }
+  }
+}
