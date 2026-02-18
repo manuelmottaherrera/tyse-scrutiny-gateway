@@ -10,14 +10,17 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
  * Service for generating presigned URLs for MinIO object storage.
+ * Only loaded when MinioClient bean is available.
  */
 @Service
+@ConditionalOnBean(MinioClient.class)
 public class StorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StorageService.class);

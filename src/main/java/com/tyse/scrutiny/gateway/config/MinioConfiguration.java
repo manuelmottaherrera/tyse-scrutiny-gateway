@@ -2,13 +2,16 @@ package com.tyse.scrutiny.gateway.config;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration for MinIO object storage client.
+ * Only loaded when minio.endpoint property is defined.
  */
 @Configuration
+@ConditionalOnProperty(name = "minio.endpoint")
 public class MinioConfiguration {
 
     @Value("${minio.endpoint}")

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,11 @@ import reactor.core.publisher.Mono;
 /**
  * REST controller for managing storage operations.
  * Provides endpoints for generating presigned URLs for direct uploads to MinIO.
+ * Only loaded when StorageService bean is available.
  */
 @RestController
 @RequestMapping("/api/storage")
+@ConditionalOnBean(StorageService.class)
 public class StorageResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StorageResource.class);
