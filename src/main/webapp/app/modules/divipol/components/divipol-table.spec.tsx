@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
 import { TranslatorContext } from 'react-jhipster';
 import configureStore from 'redux-mock-store';
 
@@ -139,9 +140,11 @@ describe('divipol-table', () => {
       const store = mockStore(createInitialState());
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const alert = container.querySelector('.alert-info');
@@ -160,9 +163,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       // Get all table cells
@@ -206,9 +211,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const cells = container.querySelectorAll('tbody td');
@@ -235,9 +242,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const cells = container.querySelectorAll('tbody td');
@@ -280,9 +289,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const cells = container.querySelectorAll('tbody td');
@@ -305,9 +316,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const headers = container.querySelectorAll('thead th');
@@ -329,9 +342,11 @@ describe('divipol-table', () => {
       );
 
       const { container } = render(
-        <Provider store={store}>
-          <DivipolTable />
-        </Provider>,
+        <MemoryRouter>
+          <Provider store={store}>
+            <DivipolTable />
+          </Provider>
+        </MemoryRouter>,
       );
 
       const cells = container.querySelectorAll('tbody td');
