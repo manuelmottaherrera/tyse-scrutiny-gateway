@@ -1,0 +1,89 @@
+{
+  "anomalies": {
+    "title": "Anomalías Electorales",
+    "subtitle": "Gestión y seguimiento de anomalías detectadas en el escrutinio",
+    "error": "Error al cargar anomalías",
+    "stats": {
+      "total": "Total Anomalías",
+      "new": "Por Revisar",
+      "highSeverity": "Alta Severidad",
+      "claimed": "Reclamaciones"
+    },
+    "filters": {
+      "status": "Estado",
+      "type": "Tipo",
+      "severity": "Severidad",
+      "allStatuses": "Todos los estados",
+      "allTypes": "Todos los tipos",
+      "allSeverities": "Todas las severidades",
+      "reset": "Limpiar"
+    },
+    "status": {
+      "NEW": "Nueva",
+      "REVIEWED": "Revisada",
+      "CLAIMED": "Reclamada",
+      "DISMISSED": "Descartada"
+    },
+    "type": {
+      "PRECOUNT_DIFFERENCE": "Diferencia Preconteo",
+      "VOTES_EXCEED_VOTERS": "Votos > Votantes",
+      "SUM_MISMATCH": "Suma Inconsistente"
+    },
+    "severity": {
+      "CRITICAL": "Crítica",
+      "HIGH": "Alta",
+      "MEDIUM": "Media",
+      "LOW": "Baja"
+    },
+    "table": {
+      "case": "Caso",
+      "date": "Fecha",
+      "type": "Tipo",
+      "severity": "Severidad",
+      "status": "Estado",
+      "mesa": "Mesa",
+      "candidate": "Candidato",
+      "difference": "Diferencia",
+      "actions": "Acciones",
+      "noData": "No hay anomalías para mostrar"
+    },
+    "detail": {
+      "title": "Detalle de Anomalía",
+      "loading": "Cargando anomalía...",
+      "error": "Error al cargar la anomalía",
+      "notFound": "Anomalía no encontrada",
+      "back": "Volver",
+      "backToList": "Volver a la lista",
+      "anomalyInfo": "Información de la Anomalía",
+      "type": "Tipo",
+      "description": "Descripción",
+      "detectedAt": "Detectada el",
+      "precountVotes": "Votos Preconteo",
+      "scrutinyVotes": "Votos Escrutinio",
+      "difference": "Diferencia",
+      "locationInfo": "Ubicación",
+      "divipolKey": "Código DIVIPOL",
+      "department": "Departamento",
+      "municipality": "Municipio",
+      "zone": "Zona",
+      "votingTable": "Mesa de Votación",
+      "candidateInfo": "Candidato",
+      "candidateName": "Nombre",
+      "candidateId": "ID Candidato",
+      "partyNumber": "Número de Partido",
+      "actions": "Acciones",
+      "changeStatus": "Cambiar Estado",
+      "markReviewed": "Marcar como Revisada",
+      "fileClaim": "Presentar Reclamación",
+      "reviewInfo": "Revisión",
+      "reviewedBy": "Revisado por",
+      "reviewDate": "Fecha de revisión",
+      "notes": "Notas"
+    },
+    "modal": {
+      "changeStatus": "Cambiar Estado",
+      "notes": "Notas (opcional)",
+      "notesPlaceholder": "Agregar notas o comentarios sobre este cambio de estado..."
+    }
+  }
+}

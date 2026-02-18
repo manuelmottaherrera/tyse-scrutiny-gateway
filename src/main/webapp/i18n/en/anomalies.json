@@ -1,0 +1,89 @@
+{
+  "anomalies": {
+    "title": "Electoral Anomalies",
+    "subtitle": "Management and tracking of anomalies detected during scrutiny",
+    "error": "Error loading anomalies",
+    "stats": {
+      "total": "Total Anomalies",
+      "new": "Pending Review",
+      "highSeverity": "High Severity",
+      "claimed": "Claims Filed"
+    },
+    "filters": {
+      "status": "Status",
+      "type": "Type",
+      "severity": "Severity",
+      "allStatuses": "All statuses",
+      "allTypes": "All types",
+      "allSeverities": "All severities",
+      "reset": "Clear"
+    },
+    "status": {
+      "NEW": "New",
+      "REVIEWED": "Reviewed",
+      "CLAIMED": "Claimed",
+      "DISMISSED": "Dismissed"
+    },
+    "type": {
+      "PRECOUNT_DIFFERENCE": "Precount Difference",
+      "VOTES_EXCEED_VOTERS": "Votes > Voters",
+      "SUM_MISMATCH": "Sum Mismatch"
+    },
+    "severity": {
+      "CRITICAL": "Critical",
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
+    },
+    "table": {
+      "case": "Case",
+      "date": "Date",
+      "type": "Type",
+      "severity": "Severity",
+      "status": "Status",
+      "mesa": "Table",
+      "candidate": "Candidate",
+      "difference": "Difference",
+      "actions": "Actions",
+      "noData": "No anomalies to display"
+    },
+    "detail": {
+      "title": "Anomaly Detail",
+      "loading": "Loading anomaly...",
+      "error": "Error loading anomaly",
+      "notFound": "Anomaly not found",
+      "back": "Back",
+      "backToList": "Back to list",
+      "anomalyInfo": "Anomaly Information",
+      "type": "Type",
+      "description": "Description",
+      "detectedAt": "Detected at",
+      "precountVotes": "Precount Votes",
+      "scrutinyVotes": "Scrutiny Votes",
+      "difference": "Difference",
+      "locationInfo": "Location",
+      "divipolKey": "DIVIPOL Code",
+      "department": "Department",
+      "municipality": "Municipality",
+      "zone": "Zone",
+      "votingTable": "Voting Table",
+      "candidateInfo": "Candidate",
+      "candidateName": "Name",
+      "candidateId": "Candidate ID",
+      "partyNumber": "Party Number",
+      "actions": "Actions",
+      "changeStatus": "Change Status",
+      "markReviewed": "Mark as Reviewed",
+      "fileClaim": "File Claim",
+      "reviewInfo": "Review",
+      "reviewedBy": "Reviewed by",
+      "reviewDate": "Review date",
+      "notes": "Notes"
+    },
+    "modal": {
+      "changeStatus": "Change Status",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Add notes or comments about this status change..."
+    }
+  }
+}

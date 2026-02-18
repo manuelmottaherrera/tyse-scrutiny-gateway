@@ -15,6 +15,7 @@
         "main": "Entidades",
         "divipol": "DIVIPOL",
         "e14": "Formularios E14",
+        "anomalies": "Anomalías",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {
@@ -115,6 +116,7 @@
       "edit": "Editar",
       "open": "Abrir",
       "save": "Guardar",
+      "saving": "Guardando...",
       "view": "Vista",
       "show": "Show {{otherEntity}}"
     },
