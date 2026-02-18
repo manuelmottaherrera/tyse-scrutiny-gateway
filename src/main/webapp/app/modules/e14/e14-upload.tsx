@@ -142,6 +142,10 @@ const E14UploadPage = () => {
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
               >
+                {/* Input oculto pero clickeable - fuera del contenedor con pointer-events: none */}
+                {!selectedFile && (
+                  <Input type="file" accept="application/pdf" onChange={handleFileSelect} className="file-input" id="e14-file-input" />
+                )}
                 {selectedFile ? (
                   <div className="file-preview">
                     <FontAwesomeIcon icon={faFilePdf} size="3x" className="text-danger mb-2" />
@@ -160,7 +164,6 @@ const E14UploadPage = () => {
                     <p className="text-muted">
                       <Translate contentKey="e14.upload.orClick">o haz clic para seleccionar</Translate>
                     </p>
-                    <Input type="file" accept="application/pdf" onChange={handleFileSelect} className="file-input" id="e14-file-input" />
                   </div>
                 )}
               </div>
