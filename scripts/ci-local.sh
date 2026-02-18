@@ -52,7 +52,7 @@ CLEAN_START=$(date +%s)
 
 # 1. Detener y limpiar contenedores Docker de ejecuciones anteriores
 echo "  → Stopping and removing Docker containers from previous runs..."
-docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
 docker compose -f src/main/docker/services-e2e.yml down -v 2>/dev/null || true
 
 # 2. Limpiar directorio target/ (artefactos de Maven)
@@ -101,23 +101,22 @@ echo -e "${GREEN}✓ Environment cleaned${NC} (${CLEAN_TIME}s)"
 echo ""
 
 ################################################################################
-# Start Docker Services (PostgreSQL, Consul, Kafka, MailHog)
+# Start Docker Services (PostgreSQL only)
+# Note: Consul, Kafka, MailHog are in tyse-infrastructure/ for development.
+# For CI tests, only PostgreSQL is required (Spring uses Testcontainers, mail is mocked).
 ################################################################################
 
 echo -e "${YELLOW}[Services] Starting Docker services...${NC}"
 SERVICES_START=$(date +%s)
 
 mkdir -p logs
-echo "  → Starting services (PostgreSQL, Consul, Kafka, MailHog)..."
-docker compose -f src/main/docker/services.yml up -d > logs/services-start.log 2>&1
+echo "  → Starting PostgreSQL (port 5432)..."
+docker compose -f src/main/docker/postgresql.yml up -d > logs/services-start.log 2>&1
 
-# Esperar a que los servicios críticos estén healthy
-echo "  → Waiting for services to be healthy..."
-
-# PostgreSQL
+# Esperar a que PostgreSQL esté healthy
 echo -n "    PostgreSQL: "
 RETRIES=30
-until docker compose -f src/main/docker/services.yml ps postgresql 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
+until docker compose -f src/main/docker/postgresql.yml ps postgresql 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
     echo -n "."
     sleep 2
     RETRIES=$((RETRIES - 1))
@@ -128,34 +127,6 @@ else
     echo -e " ${RED}timeout${NC}"
     echo "    Check logs/services-start.log for details"
     exit 1
-fi
-
-# MailHog
-echo -n "    MailHog: "
-RETRIES=15
-until docker compose -f src/main/docker/services.yml ps mailhog 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
-    echo -n "."
-    sleep 2
-    RETRIES=$((RETRIES - 1))
-done
-if [ $RETRIES -gt 0 ]; then
-    echo -e " ${GREEN}healthy${NC}"
-else
-    echo -e " ${YELLOW}timeout (non-critical)${NC}"
-fi
-
-# Consul
-echo -n "    Consul: "
-RETRIES=15
-until docker compose -f src/main/docker/services.yml ps consul 2>/dev/null | grep -q "healthy" || [ $RETRIES -eq 0 ]; do
-    echo -n "."
-    sleep 2
-    RETRIES=$((RETRIES - 1))
-done
-if [ $RETRIES -gt 0 ]; then
-    echo -e " ${GREEN}healthy${NC}"
-else
-    echo -e " ${YELLOW}timeout (non-critical)${NC}"
 fi
 
 SERVICES_END=$(date +%s)
@@ -377,7 +348,7 @@ if [ "$RUN_E2E" = true ]; then
 
     # Stop any existing services and start E2E services
     echo "  → Preparing E2E environment (Docker with microservice)..."
-    docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+    docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
 
     echo "    Starting E2E services..."
     if ! docker compose -f src/main/docker/services-e2e.yml up -d > logs/e2e-services-start.log 2>&1; then
@@ -511,9 +482,9 @@ echo ""
 # Post-flight: Cleanup Background Processes
 ################################################################################
 
-# Stop all Docker services (PostgreSQL, Consul, Kafka, MailHog)
+# Stop all Docker services (PostgreSQL)
 echo -e "${YELLOW}[Post-flight] Cleaning up Docker services...${NC}"
-docker compose -f src/main/docker/services.yml down -v 2>/dev/null || true
+docker compose -f src/main/docker/postgresql.yml down -v 2>/dev/null || true
 
 # Wait for any background jobs to finish
 wait
