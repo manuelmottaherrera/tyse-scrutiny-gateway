@@ -11,11 +11,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Kafka producer for notification-request topic.
  * Replaces direct email sending (MailService) with Kafka messages
  * that are consumed by tyse-scrutiny-micro-notification.
+ *
+ * All methods are reactive and execute on a bounded elastic scheduler
+ * to avoid blocking the reactor event loop.
  */
 @Component
 public class NotificationProducer {
@@ -36,11 +41,14 @@ public class NotificationProducer {
 
     /**
      * Send activation email via notification service.
+     *
+     * @param user the user to send activation email to
+     * @return Mono that completes when the notification is published
      */
-    public void sendActivationEmail(User user) {
+    public Mono<Void> sendActivationEmail(User user) {
         if (user == null || user.getEmail() == null) {
             LOG.warn("Cannot send activation email - user or email is null");
-            return;
+            return Mono.empty();
         }
 
         LOG.debug("Publishing activation notification for user '{}'", user.getEmail());
@@ -50,16 +58,19 @@ public class NotificationProducer {
         templateData.put("activationUrl", baseUrl + "/activate?key=" + user.getActivationKey());
         templateData.put("baseUrl", baseUrl);
 
-        publishNotification("ACCOUNT_ACTIVATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
+        return publishNotification("ACCOUNT_ACTIVATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
     }
 
     /**
      * Send creation email via notification service.
+     *
+     * @param user the user to send creation email to
+     * @return Mono that completes when the notification is published
      */
-    public void sendCreationEmail(User user) {
+    public Mono<Void> sendCreationEmail(User user) {
         if (user == null || user.getEmail() == null) {
             LOG.warn("Cannot send creation email - user or email is null");
-            return;
+            return Mono.empty();
         }
 
         LOG.debug("Publishing creation notification for user '{}'", user.getEmail());
@@ -69,16 +80,19 @@ public class NotificationProducer {
         templateData.put("activationUrl", baseUrl + "/activate?key=" + user.getActivationKey());
         templateData.put("baseUrl", baseUrl);
 
-        publishNotification("USER_CREATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
+        return publishNotification("USER_CREATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
     }
 
     /**
      * Send password reset email via notification service.
+     *
+     * @param user the user to send password reset email to
+     * @return Mono that completes when the notification is published
      */
-    public void sendPasswordResetMail(User user) {
+    public Mono<Void> sendPasswordResetMail(User user) {
         if (user == null || user.getEmail() == null) {
             LOG.warn("Cannot send password reset email - user or email is null");
-            return;
+            return Mono.empty();
         }
 
         LOG.debug("Publishing password reset notification for user '{}'", user.getEmail());
@@ -88,7 +102,7 @@ public class NotificationProducer {
         templateData.put("resetUrl", baseUrl + "/account/reset/finish?key=" + user.getResetKey());
         templateData.put("baseUrl", baseUrl);
 
-        publishNotification("PASSWORD_RESET", "EMAIL", user.getEmail(), templateData, user.getLangKey());
+        return publishNotification("PASSWORD_RESET", "EMAIL", user.getEmail(), templateData, user.getLangKey());
     }
 
     private Map<String, Object> mapUserToData(User user) {
@@ -102,22 +116,26 @@ public class NotificationProducer {
         return userData;
     }
 
-    private void publishNotification(String type, String channel, String recipient, Map<String, Object> templateData, String locale) {
-        try {
-            Map<String, Object> notification = new HashMap<>();
-            notification.put("type", type);
-            notification.put("channel", channel);
-            notification.put("recipient", recipient);
-            notification.put("templateData", templateData);
-            notification.put("locale", locale != null ? locale : "es");
-            notification.put("requestedAt", Instant.now().toString());
+    private Mono<Void> publishNotification(String type, String channel, String recipient, Map<String, Object> templateData, String locale) {
+        return Mono.fromRunnable(() -> {
+            try {
+                Map<String, Object> notification = new HashMap<>();
+                notification.put("type", type);
+                notification.put("channel", channel);
+                notification.put("recipient", recipient);
+                notification.put("templateData", templateData);
+                notification.put("locale", locale != null ? locale : "es");
+                notification.put("requestedAt", Instant.now().toString());
 
-            String json = objectMapper.writeValueAsString(notification);
-            LOG.info("Publishing notification to Kafka: type={}, recipient={}", type, recipient);
-            streamBridge.send(BINDING_NAME, json);
-            LOG.debug("Notification published: {}", json);
-        } catch (JsonProcessingException e) {
-            LOG.error("Failed to serialize notification: {}", e.getMessage(), e);
-        }
+                String json = objectMapper.writeValueAsString(notification);
+                LOG.info("Publishing notification to Kafka: type={}, recipient={}", type, recipient);
+                streamBridge.send(BINDING_NAME, json);
+                LOG.debug("Notification published: {}", json);
+            } catch (JsonProcessingException e) {
+                LOG.error("Failed to serialize notification: {}", e.getMessage(), e);
+            }
+        })
+            .subscribeOn(Schedulers.boundedElastic())
+            .then();
     }
 }

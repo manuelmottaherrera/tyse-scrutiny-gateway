@@ -160,7 +160,7 @@ public class UserResource {
                 }
                 return userService.createUser(userDTO);
             })
-            .doOnSuccess(notificationProducer::sendCreationEmail)
+            .delayUntil(notificationProducer::sendCreationEmail)
             .map(user -> {
                 try {
                     return ResponseEntity.created(new URI("/api/admin/users/" + user.getLogin()))

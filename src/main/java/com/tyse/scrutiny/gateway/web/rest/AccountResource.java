@@ -96,7 +96,7 @@ public class AccountResource {
         }
         return userService
             .registerUser(managedUserVM, managedUserVM.getPassword())
-            .doOnSuccess(notificationProducer::sendActivationEmail)
+            .delayUntil(notificationProducer::sendActivationEmail)
             .then(
                 Mono.just(
                     ResponseEntity.status(HttpStatus.CREATED)
@@ -309,13 +309,14 @@ public class AccountResource {
     ) {
         return userService
             .requestPasswordReset(mail)
-            .doOnSuccess(user -> {
+            .flatMap(user -> {
                 if (Objects.nonNull(user)) {
-                    notificationProducer.sendPasswordResetMail(user);
+                    return notificationProducer.sendPasswordResetMail(user).thenReturn(user);
                 } else {
                     // Pretend the request has been successful to prevent checking which emails really exist
                     // but log that an invalid attempt has been made
                     LOG.warn("Password reset requested for non existing mail");
+                    return Mono.empty();
                 }
             })
             .then(
