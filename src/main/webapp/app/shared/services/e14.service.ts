@@ -83,17 +83,25 @@ class E14Service {
    * Sube un archivo directamente a MinIO usando la URL presignada
    */
   async uploadFile(uploadUrl: string, file: File, onProgress?: (percent: number) => void): Promise<void> {
-    await axios.put(uploadUrl, file, {
+    // Usar fetch en lugar de axios para evitar headers adicionales
+    // que pueden interferir con la firma presignada de MinIO
+    const response = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: file,
       headers: {
         'Content-Type': file.type,
       },
-      onUploadProgress(progressEvent) {
-        if (onProgress && progressEvent.total) {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(percent);
-        }
-      },
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+    }
+
+    // Simular progreso al 100% ya que fetch no soporta progreso nativo
+    if (onProgress) {
+      onProgress(100);
+    }
   }
 
   /**
