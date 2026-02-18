@@ -92,11 +92,11 @@ docker compose -f src/main/docker/sonar.yml up -d
 
 ### Docker Services
 
-**IMPORTANTE**: Los servicios compartidos (Consul, Kafka, MinIO, MailHog) se levantan desde `tyse-infrastructure/`:
+**IMPORTANTE**: Los servicios compartidos (Consul, Kafka, MinIO, MailHog) se levantan desde `tyse-scrutiny-infrastructure/`:
 
 ```bash
 # 1. Levantar infraestructura compartida (una sola vez, desde la raíz)
-cd ../tyse-infrastructure
+cd ../tyse-scrutiny-infrastructure
 docker compose up -d
 
 # 2. Levantar PostgreSQL del gateway

@@ -3,7 +3,7 @@
 ## Resumen de Arquitectura
 
 ```
-tyse-infrastructure (Docker)
+tyse-scrutiny-infrastructure (Docker)
 ├── Consul (8500) - Service discovery
 ├── Kafka (9092) - Mensajería
 ├── MinIO (9000/9001) - Storage S3
@@ -18,17 +18,6 @@ tyse-scrutiny-micro-notification (8085)
 
 ---
 
-## Commits Pendientes de Push
-
-| Repo               | Commits | Comando                   |
-| ------------------ | ------- | ------------------------- |
-| gateway            | 8       | `git push origin develop` |
-| micro-divipol      | 6       | `git push origin develop` |
-| mock-pipeline      | 1       | `git push origin develop` |
-| micro-notification | 1       | `git push origin develop` |
-
----
-
 ## Pendientes por Prioridad
 
 ### Alta - Funcionalidad Core
@@ -36,7 +25,7 @@ tyse-scrutiny-micro-notification (8085)
 - [ ] **Probar E14 Upload en navegador**
 
   - Iniciar: `./mvnw` + `npm start`
-  - URL: http://localhost:9000/e14
+  - URL: http://localhost:9060/e14 (dev server) o http://localhost:8080/e14 (backend)
   - Verificar upload a MinIO y mensaje en Kafka `e14-pdf-uploaded`
 
 - [ ] **Página de Anomalías**
@@ -105,7 +94,7 @@ mock-pipeline (genera E14 con anomalía)
 
 ```bash
 # Levantar infraestructura
-cd ~/repos/tyse/tyse-infrastructure && docker compose up -d
+cd ~/repos/tyse/tyse-scrutiny-infrastructure && docker compose up -d
 
 # Levantar PostgreSQL de cada micro
 cd ~/repos/tyse/tyse-scrutiny-gateway && docker compose -f src/main/docker/postgresql.yml up -d
