@@ -12,6 +12,10 @@ on:
         description: 'Divipol image tag (default: develop)'
         required: false
         default: 'develop'
+      scrutiny_tag:
+        description: 'Scrutiny image tag (default: develop, leave empty to skip)'
+        required: false
+        default: ''
 
   # Auto-deploy when both images are ready (develop only)
   repository_dispatch:
@@ -21,6 +25,7 @@ env:
   REGISTRY: ghcr.io
   GATEWAY_IMAGE: ${{ github.repository }}
   DIVIPOL_IMAGE: manuelmottaherrera/tyse-scrutiny-micro-divipol
+  SCRUTINY_IMAGE: manuelmottaherrera/tyse-scrutiny-micro-scrutiny
 
 jobs:
   deploy:
@@ -40,17 +45,22 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             GATEWAY_TAG="${{ github.event.inputs.gateway_tag }}"
             DIVIPOL_TAG="${{ github.event.inputs.divipol_tag }}"
+            SCRUTINY_TAG="${{ github.event.inputs.scrutiny_tag }}"
           else
             # Auto-deploy uses develop tags
             GATEWAY_TAG="develop"
             DIVIPOL_TAG="develop"
+            SCRUTINY_TAG=""
           fi
 
           echo "gateway_tag=${GATEWAY_TAG}" >> $GITHUB_OUTPUT
           echo "divipol_tag=${DIVIPOL_TAG}" >> $GITHUB_OUTPUT
+          echo "scrutiny_tag=${SCRUTINY_TAG}" >> $GITHUB_OUTPUT
+          echo "deploy_scrutiny=$([[ -n "${SCRUTINY_TAG}" ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
 
           echo "📦 Gateway tag: ${GATEWAY_TAG}"
           echo "📦 Divipol tag: ${DIVIPOL_TAG}"
+          echo "📦 Scrutiny tag: ${SCRUTINY_TAG:-'(not deployed)'}"
 
       - name: Copy deployment files to deployment directory
         run: |
@@ -70,14 +80,25 @@ jobs:
           REGISTRY=${{ env.REGISTRY }}
           GATEWAY_IMAGE=${{ env.GATEWAY_IMAGE }}
           DIVIPOL_IMAGE=${{ env.DIVIPOL_IMAGE }}
+          SCRUTINY_IMAGE=${{ env.SCRUTINY_IMAGE }}
           IMAGE_TAG_GATEWAY=${{ steps.set-tags.outputs.gateway_tag }}
           IMAGE_TAG_DIVIPOL=${{ steps.set-tags.outputs.divipol_tag }}
+          IMAGE_TAG_SCRUTINY=${{ steps.set-tags.outputs.scrutiny_tag }}
+          DEPLOY_SCRUTINY=${{ steps.set-tags.outputs.deploy_scrutiny }}
 
           # Service Ports
           GATEWAY_PORT=8090
           DIVIPOL_PORT=8091
+          SCRUTINY_PORT=8094
           CONSUL_PORT=8510
           KAFKA_PORT=9102
+
+          # MinIO Configuration (Object Storage for PDFs)
+          MINIO_PORT=9010
+          MINIO_CONSOLE_PORT=9011
+          MINIO_ROOT_USER=${{ secrets.STAGING_MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD=${{ secrets.STAGING_MINIO_ROOT_PASSWORD }}
+          MINIO_BUCKET_NAME=tyse-scrutiny-documents
 
           # MailHog Configuration (Email Testing)
           MAILHOG_SMTP_PORT=1035
@@ -87,6 +108,7 @@ jobs:
           # Ports for external access (only accessible from localhost)
           DB_PORT=5432
           DB_PORT_DIVIPOL=5433
+          DB_PORT_SCRUTINY=5434
 
           # Gateway Database
           GATEWAY_DB_NAME=tysescrutinygateway
@@ -98,6 +120,11 @@ jobs:
           DIVIPOL_DB_USER=tysescrutinymicrodivipol
           DIVIPOL_DB_PASSWORD=${{ secrets.STAGING_DIVIPOL_DB_PASSWORD }}
 
+          # Scrutiny Database
+          SCRUTINY_DB_NAME=tysescrutinymicroscrutiny
+          SCRUTINY_DB_USER=tysescrutinymicroscrutiny
+          SCRUTINY_DB_PASSWORD=${{ secrets.STAGING_SCRUTINY_DB_PASSWORD }}
+
           # Security
           JWT_SECRET=${{ secrets.STAGING_JWT_SECRET }}
           CORS_ALLOWED_ORIGINS=${{ secrets.STAGING_CORS_ALLOWED_ORIGINS }}
@@ -105,6 +132,12 @@ jobs:
           # Google reCAPTCHA
           GOOGLE_RECAPTCHA_SITE_KEY=${{ secrets.STAGING_RECAPTCHA_SITE_KEY }}
           GOOGLE_RECAPTCHA_SECRET_KEY=${{ secrets.STAGING_RECAPTCHA_SECRET_KEY }}
+
+          # Kafka Topics
+          KAFKA_E14_PDF_UPLOADED_TOPIC=e14-pdf-uploaded
+          KAFKA_E14_DATA_CLEANED_TOPIC=e14-data-cleaned
+          KAFKA_E14_ANOMALY_DETECTED_TOPIC=e14-anomaly-detected
+          KAFKA_NOTIFICATION_REQUEST_TOPIC=notification-request
 
           # Advanced Configuration
           JHIPSTER_SLEEP=30
@@ -161,8 +194,19 @@ jobs:
           echo "🔍 Checking Divipol health..."
           DIVIPOL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8091/management/health || echo "000")
 
+          echo "🔍 Checking MinIO health..."
+          MINIO_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9010/minio/health/live || echo "000")
+
           echo "Gateway response: $GATEWAY_RESPONSE"
           echo "Divipol response: $DIVIPOL_RESPONSE"
+          echo "MinIO response: $MINIO_RESPONSE"
+
+          # Check Scrutiny if deployed
+          if [ "${{ steps.set-tags.outputs.deploy_scrutiny }}" == "true" ]; then
+            echo "🔍 Checking Scrutiny health..."
+            SCRUTINY_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8094/management/health || echo "000")
+            echo "Scrutiny response: $SCRUTINY_RESPONSE"
+          fi
 
           if [ "$GATEWAY_RESPONSE" != "200" ] && [ "$GATEWAY_RESPONSE" != "503" ]; then
             echo "❌ Gateway health check failed"
@@ -174,9 +218,17 @@ jobs:
             exit 1
           fi
 
+          if [ "$MINIO_RESPONSE" != "200" ]; then
+            echo "⚠️ MinIO health check failed (non-critical)"
+          fi
+
           echo "✅ Deployment verified successfully"
           echo ""
           echo "🌐 Gateway: http://192.168.0.58:8090"
           echo "🌐 Divipol API: http://192.168.0.58:8091"
+          if [ "${{ steps.set-tags.outputs.deploy_scrutiny }}" == "true" ]; then
+            echo "🌐 Scrutiny API: http://192.168.0.58:8094"
+          fi
           echo "🌐 Consul UI: http://192.168.0.58:8510"
+          echo "📦 MinIO Console: http://192.168.0.58:9011"
           echo "📧 MailHog UI: http://192.168.0.58:8035"

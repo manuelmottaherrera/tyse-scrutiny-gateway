@@ -111,19 +111,13 @@ jobs:
   # Job 3: Backend Tests
   # Ejecuta unit tests e integration tests con Testcontainers
   # Solo se ejecuta si Liquibase Verification pasa (fail fast)
+  # Nota: Kafka y PostgreSQL son provistos por Testcontainers automáticamente
   # ============================================================================
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
     needs: [liquibase-verification]
     timeout-minutes: 20
-
-    services:
-      mailhog:
-        image: mailhog/mailhog:v1.0.1
-        ports:
-          - 1025:1025
-          - 8025:8025
 
     steps:
       - name: Checkout code
@@ -219,6 +213,8 @@ jobs:
   # ============================================================================
   # Job 5: E2E Tests (optional - only on push to main/develop)
   # Ejecuta tests end-to-end con Cypress
+  # Ambiente: Gateway + Consul + Kafka + PostgreSQL + micro-divipol
+  # Futuro: Agregar micro-scrutiny cuando esté listo
   # ============================================================================
   e2e-tests:
     name: E2E Tests
@@ -237,6 +233,16 @@ jobs:
           repository: ${{ github.repository_owner }}/tyse-scrutiny-micro-divipol
           path: micro-divipol
           ref: ${{ github.ref_name }}
+        continue-on-error: true
+
+      # TODO: Descomentar cuando micro-scrutiny esté listo para E2E
+      # - name: Checkout microservice scrutiny
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: ${{ github.repository_owner }}/tyse-scrutiny-micro-scrutiny
+      #     path: micro-scrutiny
+      #     ref: ${{ github.ref_name }}
+      #   continue-on-error: true
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -251,13 +257,24 @@ jobs:
           cache: 'npm'
 
       - name: Build microservice divipol Docker image
+        if: hashFiles('micro-divipol/pom.xml') != ''
         working-directory: micro-divipol
         run: |
           chmod +x mvnw
           ./mvnw -ntp package -DskipTests jib:dockerBuild
 
-      - name: Verify divipol image exists
-        run: docker images tysescrutinymicrodivipol:latest
+      # TODO: Descomentar cuando micro-scrutiny esté listo
+      # - name: Build microservice scrutiny Docker image
+      #   if: hashFiles('micro-scrutiny/pom.xml') != ''
+      #   working-directory: micro-scrutiny
+      #   run: |
+      #     chmod +x mvnw
+      #     ./mvnw -ntp package -DskipTests jib:dockerBuild
+
+      - name: Verify Docker images
+        run: |
+          echo "=== Available Docker images ==="
+          docker images | grep -E "tysescrutiny|REPOSITORY" || true
 
       - name: Install gateway dependencies
         run: npm ci
@@ -277,6 +294,8 @@ jobs:
           docker logs tysescrutinygateway-e2e-micro-divipol-1 2>&1 | tail -200 || true
           echo "=== PostgreSQL divipol logs ==="
           docker logs tysescrutinygateway-e2e-postgresql-divipol-1 2>&1 | tail -50 || true
+          echo "=== Kafka logs ==="
+          docker logs tysescrutinygateway-e2e-kafka-1 2>&1 | tail -100 || true
 
       - name: Run E2E tests
         run: npm run ci:e2e:run

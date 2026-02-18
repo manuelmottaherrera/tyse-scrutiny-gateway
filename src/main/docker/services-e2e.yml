@@ -1,5 +1,7 @@
 # Docker Compose for E2E testing environment
-# Includes all services needed for full end-to-end testing including the divipol microservice
+# Includes all services needed for full end-to-end testing:
+# - Gateway infrastructure: PostgreSQL, Consul, Kafka, MailHog, MinIO
+# - Microservices: micro-divipol (future: micro-scrutiny)
 name: tysescrutinygateway-e2e
 services:
   # Gateway services
@@ -15,6 +17,7 @@ services:
     extends:
       file: ./consul.yml
       service: consul-config-loader
+
   # Kafka with listeners configured for both internal (docker) and external (localhost) access
   kafka:
     image: apache/kafka-native:4.0.0
@@ -33,6 +36,41 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     labels:
       org.springframework.boot.ignore: true
+
+  # MinIO - Object Storage for PDF documents (E14 forms)
+  minio:
+    image: minio/minio:latest
+    ports:
+      - 127.0.0.1:9000:9000
+      - 127.0.0.1:9001:9001
+    environment:
+      MINIO_ROOT_USER: tyseadmin
+      MINIO_ROOT_PASSWORD: tyseadmin123
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      org.springframework.boot.ignore: true
+
+  # MinIO bucket initialization
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 tyseadmin tyseadmin123;
+      mc mb --ignore-existing myminio/tyse-scrutiny-documents;
+      mc anonymous set download myminio/tyse-scrutiny-documents;
+      exit 0;
+      "
+    labels:
+      org.springframework.boot.ignore: true
+
   mailhog:
     extends:
       file: ./mailhog.yml
