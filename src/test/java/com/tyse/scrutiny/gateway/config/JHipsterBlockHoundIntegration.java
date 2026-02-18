@@ -13,6 +13,10 @@ public class JHipsterBlockHoundIntegration implements BlockHoundIntegration {
         builder.allowBlockingCallsInside("org.springdoc.core.service.OpenAPIService", "build");
         builder.allowBlockingCallsInside("org.springdoc.core.service.OpenAPIService", "getWebhooks");
         builder.allowBlockingCallsInside("org.springdoc.core.service.AbstractRequestService", "build");
+        // Allow springdoc to read files for OpenAPI generation
+        builder.allowBlockingCallsInside("org.springdoc.core.providers.SpringDocProviders", "jsonMapper");
+        builder.allowBlockingCallsInside("org.springdoc.webflux.api.OpenApiWebfluxResource", "openapiJson");
+        builder.allowBlockingCallsInside("com.fasterxml.jackson.databind.ObjectMapper", "writeValueAsString");
         // Allow MessageSource to read .properties files in ExceptionTranslator (i18n error messages)
         builder.allowBlockingCallsInside("org.springframework.context.support.MessageSourceSupport", "getMessage");
         builder.allowBlockingCallsInside("org.springframework.context.support.ResourceBundleMessageSource", "getMessage");
