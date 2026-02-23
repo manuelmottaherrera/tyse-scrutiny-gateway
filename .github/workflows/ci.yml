@@ -235,14 +235,13 @@ jobs:
           ref: ${{ github.ref_name }}
         continue-on-error: true
 
-      # TODO: Descomentar cuando micro-scrutiny esté listo para E2E
-      # - name: Checkout microservice scrutiny
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: ${{ github.repository_owner }}/tyse-scrutiny-micro-scrutiny
-      #     path: micro-scrutiny
-      #     ref: ${{ github.ref_name }}
-      #   continue-on-error: true
+      - name: Checkout microservice scrutiny
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/tyse-scrutiny-micro-scrutiny
+          path: micro-scrutiny
+          ref: ${{ github.ref_name }}
+        continue-on-error: true
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -263,13 +262,12 @@ jobs:
           chmod +x mvnw
           ./mvnw -ntp package -DskipTests jib:dockerBuild
 
-      # TODO: Descomentar cuando micro-scrutiny esté listo
-      # - name: Build microservice scrutiny Docker image
-      #   if: hashFiles('micro-scrutiny/pom.xml') != ''
-      #   working-directory: micro-scrutiny
-      #   run: |
-      #     chmod +x mvnw
-      #     ./mvnw -ntp package -DskipTests jib:dockerBuild
+      - name: Build microservice scrutiny Docker image
+        if: hashFiles('micro-scrutiny/pom.xml') != ''
+        working-directory: micro-scrutiny
+        run: |
+          chmod +x mvnw
+          ./mvnw -ntp package -DskipTests jib:dockerBuild
 
       - name: Verify Docker images
         run: |
@@ -283,7 +281,9 @@ jobs:
         run: npm run ci:e2e:package
 
       - name: Prepare E2E environment
-        run: npm run ci:e2e:prepare:docker
+        run: |
+          docker compose -f src/main/docker/services-e2e-ci.yml up -d
+          npm run services:e2e:await
 
       - name: Show container logs on failure
         if: failure()
@@ -292,8 +292,12 @@ jobs:
           docker ps -a
           echo "=== Microservice divipol logs ==="
           docker logs tysescrutinygateway-e2e-micro-divipol-1 2>&1 | tail -200 || true
+          echo "=== Microservice scrutiny logs ==="
+          docker logs tysescrutinygateway-e2e-micro-scrutiny-1 2>&1 | tail -200 || true
           echo "=== PostgreSQL divipol logs ==="
           docker logs tysescrutinygateway-e2e-postgresql-divipol-1 2>&1 | tail -50 || true
+          echo "=== PostgreSQL scrutiny logs ==="
+          docker logs tysescrutinygateway-e2e-postgresql-scrutiny-1 2>&1 | tail -50 || true
           echo "=== Kafka logs ==="
           docker logs tysescrutinygateway-e2e-kafka-1 2>&1 | tail -100 || true
 
@@ -302,7 +306,7 @@ jobs:
 
       - name: Teardown E2E environment
         if: always()
-        run: npm run ci:e2e:teardown:docker
+        run: docker compose -f src/main/docker/services-e2e-ci.yml down -v
 
       - name: Upload E2E Test Results
         if: always()
