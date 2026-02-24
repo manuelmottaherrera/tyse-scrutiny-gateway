@@ -52,6 +52,33 @@ describe('Creating account tests', () => {
     });
   });
 
+  it('should set loading to false on fulfilled', () => {
+    const pendingState = { ...initialState, loading: true };
+    expect(
+      register(pendingState, {
+        type: handleRegister.fulfilled.type,
+        payload: 'fake payload',
+      }),
+    ).toMatchObject({
+      loading: false,
+      registrationSuccess: true,
+    });
+  });
+
+  it('should set loading to false on rejected', () => {
+    const pendingState = { ...initialState, loading: true };
+    const error = { message: 'fake error' };
+    expect(
+      register(pendingState, {
+        type: handleRegister.rejected.type,
+        error,
+      }),
+    ).toMatchObject({
+      loading: false,
+      registrationFailure: true,
+    });
+  });
+
   it('should handle CREATE_ACCOUNT failure', () => {
     const error = { message: 'fake error' };
     expect(

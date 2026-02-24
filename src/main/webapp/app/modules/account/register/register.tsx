@@ -32,6 +32,7 @@ export const RegisterPage = () => {
 
   const updatePassword = event => setPassword(event.target.value);
 
+  const loading = useAppSelector(state => state.register.loading);
   const successMessage = useAppSelector(state => state.register.successMessage);
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export const RegisterPage = () => {
               }}
               data-cy="secondPassword"
             />
-            <Button id="register-submit" color="primary" type="submit" data-cy="submit">
+            <Button id="register-submit" color="primary" type="submit" disabled={loading || isLoadingRecaptcha} data-cy="submit">
               <Translate contentKey="register.form.button">Register</Translate>
             </Button>
           </ValidatedForm>
