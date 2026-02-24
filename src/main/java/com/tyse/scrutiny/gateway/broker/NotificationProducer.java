@@ -55,7 +55,7 @@ public class NotificationProducer {
 
         Map<String, Object> templateData = new HashMap<>();
         templateData.put("user", mapUserToData(user));
-        templateData.put("activationUrl", baseUrl + "/activate?key=" + user.getActivationKey());
+        templateData.put("activationUrl", baseUrl + "/account/activate?key=" + user.getActivationKey());
         templateData.put("baseUrl", baseUrl);
 
         return publishNotification("ACCOUNT_ACTIVATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
@@ -77,7 +77,7 @@ public class NotificationProducer {
 
         Map<String, Object> templateData = new HashMap<>();
         templateData.put("user", mapUserToData(user));
-        templateData.put("activationUrl", baseUrl + "/activate?key=" + user.getActivationKey());
+        templateData.put("activationUrl", baseUrl + "/account/activate?key=" + user.getActivationKey());
         templateData.put("baseUrl", baseUrl);
 
         return publishNotification("USER_CREATION", "EMAIL", user.getEmail(), templateData, user.getLangKey());
