@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        ROLE_USER Read Permissions for Business Modules
+
+        This changelog grants read-only access to business modules for ROLE_USER.
+        Previously ROLE_USER only had: user.read, authority.read, permission.read.
+
+        This adds 13 read permissions covering:
+        - divipol, statistics, heatmap, votecount, fileupload
+        - votingjuries, trainings, witnesses, analytics
+        - account.settings, puesto.detail, jurado, testigo
+
+        No write permissions (create, update, delete, assign, manage, export)
+        are included.
+
+        Author: Claude Code
+        Date: 2026-02-24
+    -->
+
+    <!-- ========================================================================= -->
+    <!-- CHANGESET 1: Assign Read Permissions to ROLE_USER                        -->
+    <!-- ========================================================================= -->
+    <changeSet id="20260224000001-assign-read-permissions-to-role-user" author="claude">
+        <comment>
+            Assign read-only permissions to ROLE_USER for business modules.
+
+            Creates 13 authority-permission mappings (IDs 59-71).
+            ROLE_USER (authority_id=2) gets read access to:
+            - divipol.read (14), statistics.read (18), heatmap.read (20)
+            - votecount.read (22), fileupload.read (24), votingjuries.read (27)
+            - trainings.read (29), witnesses.read (31), analytics.read (33)
+            - account.settings.read (45), puesto.detail.read (48)
+            - jurado.read (49), testigo.read (50)
+        </comment>
+
+        <loadData file="config/liquibase/data/authority_permission_role_user_read.csv"
+                  separator=";"
+                  tableName="scr_authority_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="authority_id" type="numeric"/>
+            <column name="permission_id" type="numeric"/>
+        </loadData>
+
+        <rollback>
+            <delete tableName="scr_authority_permission">
+                <where>id BETWEEN 59 AND 71</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
