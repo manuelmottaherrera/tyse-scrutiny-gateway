@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Badge, Spinner, Alert, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { DivipolSearchResult } from 'app/shared/services/divipol.service';
 import './divipol-search-results.scss';
 
@@ -66,12 +68,21 @@ interface DivipolSearchResultsProps {
 }
 
 export const DivipolSearchResults: React.FC<DivipolSearchResultsProps> = ({ onPageChange, onClear }) => {
+  const navigate = useNavigate();
   const { search } = useAppSelector(state => state.divipol);
+  const authorities = useAppSelector(state => state.authentication.account.authorities);
   const { active, results, loading, pagination, term, mode } = search;
+
+  const canViewDetail = hasAnyAuthority(authorities, ['puesto.detail.read', 'ROLE_ADMIN']);
+  const hasPuestoResults = results.some(r => r.tipo === 'PUESTO');
 
   if (!active) {
     return null;
   }
+
+  const handleShowDetail = (puestoId: number) => {
+    navigate(`/divipol/puestos/${puestoId}`);
+  };
 
   const getTipoBadgeColor = (tipo: string): string => {
     switch (tipo) {
@@ -185,6 +196,11 @@ export const DivipolSearchResults: React.FC<DivipolSearchResultsProps> = ({ onPa
                 <th className="text-end">
                   <Translate contentKey="divipol.search.results.tables">Mesas</Translate>
                 </th>
+                {hasPuestoResults && canViewDetail && (
+                  <th className="text-center">
+                    <Translate contentKey="divipol.table.actions">Acciones</Translate>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -200,6 +216,15 @@ export const DivipolSearchResults: React.FC<DivipolSearchResultsProps> = ({ onPa
                   <td className="location-cell text-muted">{formatLocation(result)}</td>
                   <td className="text-end">{result.potencialTotal?.toLocaleString() || '-'}</td>
                   <td className="text-end">{result.mesas?.toLocaleString() || '-'}</td>
+                  {hasPuestoResults && canViewDetail && (
+                    <td className="text-center">
+                      {result.tipo === 'PUESTO' && result.iddivipol != null && (
+                        <Button color="info" size="sm" outline onClick={() => handleShowDetail(result.iddivipol)} title="Ver detalle">
+                          <FontAwesomeIcon icon="eye" />
+                        </Button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

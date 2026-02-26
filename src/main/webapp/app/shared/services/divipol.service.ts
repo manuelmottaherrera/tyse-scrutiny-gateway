@@ -65,6 +65,7 @@ export type SearchMode = 'name' | 'code';
 export type DivipolTipo = 'PAIS' | 'DEPTO' | 'MPIO' | 'ZONA' | 'PUESTO';
 
 export interface DivipolSearchResult {
+  iddivipol?: number; // Solo presente para tipo PUESTO
   codigoDivipol: string;
   tipo: DivipolTipo;
   coddepto: number;

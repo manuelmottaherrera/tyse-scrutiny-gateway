@@ -163,12 +163,19 @@ export const PuestoDetailPage: React.FC = () => {
               </span>
             </Button>
             {puestoDetalle && (
-              <nav aria-label="breadcrumb">
+              <nav aria-label="breadcrumb" className="breadcrumb-nav">
                 <ol className="breadcrumb mb-0">
-                  <li className="breadcrumb-item text-muted">{puestoDetalle.nomdepto}</li>
-                  <li className="breadcrumb-item text-muted">{puestoDetalle.nommipio}</li>
+                  <li className="breadcrumb-item">
+                    <span className="breadcrumb-badge depto">{puestoDetalle.nomdepto}</span>
+                  </li>
+                  <li className="breadcrumb-item">
+                    <span className="breadcrumb-badge mpio">{puestoDetalle.nommipio}</span>
+                  </li>
+                  <li className="breadcrumb-item">
+                    <span className="breadcrumb-badge zona">Zona {puestoDetalle.codzona}</span>
+                  </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    {puestoDetalle.nompuesto}
+                    <span className="breadcrumb-badge puesto">{puestoDetalle.nompuesto}</span>
                   </li>
                 </ol>
               </nav>

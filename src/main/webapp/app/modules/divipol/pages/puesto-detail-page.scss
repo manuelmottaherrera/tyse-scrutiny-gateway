@@ -1,20 +1,68 @@
 @import '../../../color-variables';
 
 .puesto-detail-page {
+  .breadcrumb-nav {
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   .breadcrumb {
     background: transparent;
     padding: 0;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 
     .breadcrumb-item {
+      display: flex;
+      align-items: center;
+
       + .breadcrumb-item::before {
-        content: '/';
+        content: '›';
         color: $color-gray;
+        font-size: 1.1rem;
+        font-weight: 300;
+        padding: 0 0.4rem;
       }
 
-      &.active {
-        color: $color-text-primary;
+      .breadcrumb-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
         font-weight: 500;
+        letter-spacing: 0.02em;
+        transition: all 0.15s ease;
+
+        &.depto {
+          background: rgba($color-primary, 0.1);
+          color: $color-primary;
+        }
+
+        &.mpio {
+          background: rgba(40, 167, 69, 0.1); // Verde Bootstrap
+          color: #1e7e34;
+        }
+
+        &.zona {
+          background: rgba($color-warning, 0.15);
+          color: #856404;
+        }
+
+        &.puesto {
+          background: rgba($color-success, 0.12);
+          color: #007bbd;
+          font-weight: 600;
+        }
+      }
+
+      &.active .breadcrumb-badge {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
     }
   }
@@ -56,10 +104,34 @@
 [data-theme='dark'] {
   .puesto-detail-page {
     .breadcrumb-item {
-      color: $color-gray-light;
+      + .breadcrumb-item::before {
+        color: $color-gray-dark;
+      }
 
-      &.active {
-        color: $color-white;
+      .breadcrumb-badge {
+        &.depto {
+          background: rgba($color-primary, 0.2);
+          color: #6ea8fe;
+        }
+
+        &.mpio {
+          background: rgba(40, 167, 69, 0.2);
+          color: #75d89a;
+        }
+
+        &.zona {
+          background: rgba($color-warning, 0.2);
+          color: $color-warning;
+        }
+
+        &.puesto {
+          background: rgba($color-success, 0.2);
+          color: #3dbae8;
+        }
+      }
+
+      &.active .breadcrumb-badge {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
       }
     }
 
