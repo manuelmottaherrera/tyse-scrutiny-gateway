@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Presupuesto OCR E14 - Tyse Scrutiny</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #2980b9;
+        margin-top: 30px;
+      }
+      h3 {
+        color: #34495e;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #3498db;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #ecf0f1;
+      }
+      .highlight {
+        background-color: #d5f5e3;
+        font-weight: bold;
+      }
+      .warning {
+        background-color: #fdebd0;
+      }
+      .info-box {
+        background-color: #e8f6f3;
+        border-left: 4px solid #1abc9c;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .recommend-box {
+        background-color: #d4efdf;
+        border: 2px solid #27ae60;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      code {
+        background-color: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #bdc3c7;
+        color: #7f8c8d;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Presupuesto: Extracción OCR de Formularios E14</h1>
+
+    <p>
+      <strong>Fecha:</strong> 23 de Febrero de 2026<br />
+      <strong>Proyecto:</strong> Tyse Scrutiny<br />
+      <strong>Autor:</strong> Manuel Motta
+    </p>
+
+    <hr />
+
+    <h2>1. Resumen Ejecutivo</h2>
+
+    <p>
+      Este documento presenta el análisis de costos para la extracción de texto mediante OCR de los formularios E14 electorales, comparando
+      tres servicios cloud de inteligencia artificial documental.
+    </p>
+
+    <h3>Contexto del Proyecto</h3>
+
+    <table>
+      <tr>
+        <th>Parámetro</th>
+        <th>Valor</th>
+      </tr>
+      <tr>
+        <td>Volumen estimado</td>
+        <td>~100,000 formularios E14 por escrutinio</td>
+      </tr>
+      <tr>
+        <td>Páginas por E14</td>
+        <td>Variable (2-8 páginas según tipo de elección)</td>
+      </tr>
+      <tr>
+        <td>Procesamiento</td>
+        <td>Paralelo (tiempo crítico durante escrutinio)</td>
+      </tr>
+      <tr>
+        <td>Flujo</td>
+        <td><code>E14 (PDF) → MinIO → Servicio OCR → Datos estructurados</code></td>
+      </tr>
+    </table>
+
+    <div class="recommend-box">
+      <h3>Recomendación</h3>
+      <p>
+        <strong>AWS Textract</strong> es la opción recomendada por su capacidad superior de procesamiento paralelo (100-600 jobs
+        concurrentes), crítico para el tiempo de escrutinio.
+      </p>
+    </div>
+
+    <h2>2. Comparativa de Precios</h2>
+
+    <h3>2.1 Precios por Página - Extracción de Formularios</h3>
+
+    <table>
+      <tr>
+        <th>Servicio</th>
+        <th>OCR Básico</th>
+        <th>Extracción Formularios</th>
+        <th>Tablas + Formularios</th>
+      </tr>
+      <tr>
+        <td>AWS Textract</td>
+        <td>$0.0015/pág</td>
+        <td>$0.05/pág</td>
+        <td>$0.07/pág</td>
+      </tr>
+      <tr>
+        <td>Azure Document Intelligence</td>
+        <td>$0.0015/pág</td>
+        <td>$0.02/pág</td>
+        <td>$0.04/pág</td>
+      </tr>
+      <tr>
+        <td>Google Document AI</td>
+        <td>$0.0015/pág</td>
+        <td>$0.02/pág</td>
+        <td>$0.03/pág</td>
+      </tr>
+    </table>
+
+    <h2>3. Escenarios de Costo para 100,000 E14</h2>
+
+    <h3>Escenario A: 2 páginas promedio (200,000 páginas totales)</h3>
+
+    <table>
+      <tr>
+        <th>Servicio</th>
+        <th>Costo USD</th>
+        <th>Costo COP (TRM $4,200)</th>
+      </tr>
+      <tr class="highlight">
+        <td>AWS Textract</td>
+        <td>$10,000 USD</td>
+        <td>$42,000,000 COP</td>
+      </tr>
+      <tr>
+        <td>Azure Document Intelligence</td>
+        <td>$4,000 - $8,000 USD</td>
+        <td>$16,800,000 - $33,600,000 COP</td>
+      </tr>
+      <tr>
+        <td>Google Document AI</td>
+        <td>$4,000 - $6,000 USD</td>
+        <td>$16,800,000 - $25,200,000 COP</td>
+      </tr>
+    </table>
+
+    <h3>Escenario B: 4 páginas promedio (400,000 páginas totales)</h3>
+
+    <table>
+      <tr>
+        <th>Servicio</th>
+        <th>Costo USD</th>
+        <th>Costo COP (TRM $4,200)</th>
+      </tr>
+      <tr class="highlight">
+        <td>AWS Textract</td>
+        <td>$20,000 USD</td>
+        <td>$84,000,000 COP</td>
+      </tr>
+      <tr>
+        <td>Azure Document Intelligence</td>
+        <td>$8,000 - $16,000 USD</td>
+        <td>$33,600,000 - $67,200,000 COP</td>
+      </tr>
+      <tr>
+        <td>Google Document AI</td>
+        <td>$8,000 - $12,000 USD</td>
+        <td>$33,600,000 - $50,400,000 COP</td>
+      </tr>
+    </table>
+
+    <h3>Escenario C: 8 páginas promedio (800,000 páginas totales)</h3>
+
+    <table>
+      <tr>
+        <th>Servicio</th>
+        <th>Costo USD</th>
+        <th>Costo COP (TRM $4,200)</th>
+      </tr>
+      <tr class="highlight">
+        <td>AWS Textract</td>
+        <td>$40,000 USD</td>
+        <td>$168,000,000 COP</td>
+      </tr>
+      <tr>
+        <td>Azure Document Intelligence</td>
+        <td>$16,000 - $32,000 USD</td>
+        <td>$67,200,000 - $134,400,000 COP</td>
+      </tr>
+      <tr>
+        <td>Google Document AI</td>
+        <td>$16,000 - $24,000 USD</td>
+        <td>$67,200,000 - $100,800,000 COP</td>
+      </tr>
+    </table>
+
+    <h2>4. Procesamiento Paralelo</h2>
+
+    <div class="info-box">
+      <strong>Importante:</strong> El tiempo de procesamiento es crítico durante un escrutinio electoral. La capacidad de procesar
+      documentos en paralelo determina cuánto tiempo tomará extraer los datos de todos los E14.
+    </div>
+
+    <table>
+      <tr>
+        <th>Servicio</th>
+        <th>Concurrencia Default</th>
+        <th>Tiempo para 100K E14</th>
+        <th>Evaluación</th>
+      </tr>
+      <tr class="highlight">
+        <td>AWS Textract</td>
+        <td>100-600 jobs paralelos</td>
+        <td><strong>6-33 minutos</strong></td>
+        <td>✅ Excelente</td>
+      </tr>
+      <tr class="warning">
+        <td>Azure Document Intelligence</td>
+        <td>15 TPS (por región)</td>
+        <td>111 minutos (~2 horas)</td>
+        <td>⚠️ Requiere planificación</td>
+      </tr>
+      <tr class="warning">
+        <td>Google Document AI</td>
+        <td>120 requests/minuto</td>
+        <td>~139 minutos</td>
+        <td>⚠️ Requiere evaluación</td>
+      </tr>
+    </table>
+
+    <h2>5. Costos Adicionales</h2>
+
+    <table>
+      <tr>
+        <th>Concepto</th>
+        <th>Costo USD</th>
+        <th>Costo COP</th>
+        <th>Notas</th>
+      </tr>
+      <tr>
+        <td>Almacenamiento (50GB)</td>
+        <td>$1.50/mes</td>
+        <td>$6,300/mes</td>
+        <td>100K PDFs × 500KB</td>
+      </tr>
+      <tr>
+        <td>Transferencia de datos</td>
+        <td>~$0</td>
+        <td>~$0</td>
+        <td>Datos extraídos mínimos</td>
+      </tr>
+      <tr>
+        <td>Pruebas de desarrollo</td>
+        <td>$100 - $500</td>
+        <td>$420,000 - $2,100,000</td>
+        <td>1,000-5,000 E14 de prueba</td>
+      </tr>
+    </table>
+
+    <h2>6. Recomendación Final</h2>
+
+    <div class="recommend-box">
+      <h3>Servicio Recomendado: AWS Textract</h3>
+
+      <p><strong>Justificación:</strong></p>
+      <ol>
+        <li><strong>Capacidad de concurrencia superior:</strong> 100-600 jobs paralelos vs 15 TPS de Azure</li>
+        <li><strong>Tiempo de procesamiento:</strong> 6-33 minutos para 100K documentos (crítico para escrutinio)</li>
+        <li><strong>Sin costo adicional por async:</strong> El procesamiento paralelo no tiene sobrecosto</li>
+        <li><strong>Escalabilidad:</strong> Incremento de cuotas sin costo adicional</li>
+        <li><strong>API madura:</strong> SDKs bien documentados para Java/Spring</li>
+      </ol>
+
+      <h4>Presupuesto Estimado (Escenario 4 páginas/E14)</h4>
+      <table>
+        <tr>
+          <th>Concepto</th>
+          <th>USD</th>
+          <th>COP (TRM $4,200)</th>
+        </tr>
+        <tr>
+          <td>Extracción de formularios (400K págs)</td>
+          <td>$20,000</td>
+          <td>$84,000,000</td>
+        </tr>
+        <tr>
+          <td>Almacenamiento y adicionales</td>
+          <td>$100</td>
+          <td>$420,000</td>
+        </tr>
+        <tr style="background-color: #d4efdf; font-weight: bold">
+          <td>TOTAL POR ESCRUTINIO</td>
+          <td>$20,100 USD</td>
+          <td>$84,420,000 COP</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>7. Próximos Pasos</h2>
+
+    <ol>
+      <li>Definir número promedio de páginas por E14 según tipo de elección</li>
+      <li>Realizar prueba de concepto con 100-1,000 E14 reales</li>
+      <li>Crear cuenta AWS y configurar Textract</li>
+      <li>Evaluar precisión de extracción con formularios E14 reales</li>
+      <li>Diseñar arquitectura de integración: MinIO → AWS Textract → micro-scrutiny</li>
+    </ol>
+
+    <h2>8. Fuentes</h2>
+
+    <ul>
+      <li><a href="https://azure.microsoft.com/en-us/pricing/details/document-intelligence/">Azure Document Intelligence Pricing</a></li>
+      <li>
+        <a href="https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/service-limits"
+          >Azure Document Intelligence Limits</a
+        >
+      </li>
+      <li><a href="https://aws.amazon.com/textract/pricing/">AWS Textract Pricing</a></li>
+      <li><a href="https://docs.aws.amazon.com/textract/latest/dg/limits.html">AWS Textract Quotas</a></li>
+      <li><a href="https://cloud.google.com/document-ai/pricing">Google Document AI Pricing</a></li>
+    </ul>
+
+    <div class="footer">
+      <p>
+        Documento generado para Tyse Scrutiny - Sistema de Escrutinio Electoral<br />
+        © 2026 - Todos los precios son estimados y pueden variar según región y acuerdos comerciales.
+      </p>
+    </div>
+  </body>
+</html>

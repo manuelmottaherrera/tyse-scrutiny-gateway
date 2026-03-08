@@ -1,0 +1,62 @@
+PRESUPUESTO OCR E14 - TYSE SCRUTINY,,,
+Fecha:,2026-02-23,,
+Autor:,Manuel Motta,,
+,,,
+CONFIGURACIÓN DE MONEDA,,,
+Tasa USD a COP:,3700,<-- Editar este valor,
+,,,
+PARÁMETROS DEL ESCRUTINIO,,,
+Cantidad de E14:,100000,,
+Páginas promedio por E14:,4,<-- Editar según tipo de elección,
+Total de páginas:,=B9*B10,,
+,,,
+PRECIOS POR PÁGINA (USD),,,
+,OCR Básico,Formularios,Tablas + Forms
+AWS Textract,$0.0015,$0.05,$0.07
+Azure Document Intelligence,$0.0015,$0.02,$0.04
+Google Document AI,$0.0015,$0.02,$0.03
+,,,
+CÁLCULO DE COSTOS - ESCENARIO 2 PÁGINAS (200,000 páginas),,
+Servicio,Costo USD,Costo COP,
+AWS Textract (Forms),$10000,=B21*$B$6,
+Azure Document Intelligence,$4000,=B22*$B$6,
+Google Document AI,$4000,=B23*$B$6,
+,,,
+CÁLCULO DE COSTOS - ESCENARIO 4 PÁGINAS (400,000 páginas),,
+Servicio,Costo USD,Costo COP,
+AWS Textract (Forms),$20000,=B28*$B$6,
+Azure Document Intelligence,$8000,=B29*$B$6,
+Google Document AI,$8000,=B30*$B$6,
+,,,
+CÁLCULO DE COSTOS - ESCENARIO 8 PÁGINAS (800,000 páginas),,
+Servicio,Costo USD,Costo COP,
+AWS Textract (Forms),$40000,=B35*$B$6,
+Azure Document Intelligence,$16000,=B36*$B$6,
+Google Document AI,$16000,=B37*$B$6,
+,,,
+CÁLCULO PERSONALIZADO (usar parámetros de arriba),,,
+Servicio,Costo USD,Costo COP,Fórmula
+AWS Textract (Forms),=B11*0.05,=B41*$B$6,Total páginas × $0.05/pág
+Azure Document Intelligence,=B11*0.02,=B42*$B$6,Total páginas × $0.02/pág
+Google Document AI,=B11*0.02,=B43*$B$6,Total páginas × $0.02/pág
+,,,
+CAPACIDAD DE PROCESAMIENTO PARALELO,,,
+Servicio,Concurrencia Default,Tiempo Estimado (100K E14),Notas
+AWS Textract,100-600 jobs,6-33 minutos,Mejor para procesamiento masivo
+Azure Document Intelligence,15 TPS,111 minutos (~2h),Requiere solicitar aumento
+Google Document AI,120 req/min,139 minutos,Batch processing disponible
+,,,
+COSTOS ADICIONALES (USD),,,
+Concepto,Costo Mensual USD,Costo Mensual COP,Notas
+Almacenamiento S3/Azure (50GB),$1.50,=B53*$B$6,Estimado para 100K PDFs
+Transferencia de datos,$0.00,=B54*$B$6,Despreciable
+Pruebas de desarrollo,$100.00,=B55*$B$6,1000 E14 de prueba
+Total adicional,=SUM(B53:B55),=B56*$B$6,
+,,,
+RESUMEN EJECUTIVO,,,
+,Escenario Recomendado (4 págs/E14),,
+Servicio Recomendado:,AWS Textract,,
+Costo Total USD:,$20100,,
+Costo Total COP:,=B62*$B$6,,
+Tiempo de procesamiento:,6-33 minutos,,
+Justificación:,Mayor concurrencia para procesamiento paralelo crítico,,
