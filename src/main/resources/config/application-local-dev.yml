@@ -1,0 +1,48 @@
+# ===================================================================
+# Spring Boot configuration for the "local-dev" profile.
+#
+# Ejecuta la app localmente conectada al servidor de desarrollo (192.168.0.58).
+# No necesitas levantar Consul, Kafka, ni PostgreSQL localmente.
+#
+# Uso: ./mvnw -Dspring-boot.run.profiles=local-dev
+# ===================================================================
+
+logging:
+  level:
+    ROOT: INFO
+    tech.jhipster: INFO
+    com.tyse.scrutiny.gateway: DEBUG
+
+spring:
+  cloud:
+    consul:
+      host: 192.168.0.58
+      port: 8510
+      config:
+        fail-fast: true
+        format: yaml
+        profile-separator: '-'
+      discovery:
+        prefer-ip-address: true
+    stream:
+      kafka:
+        binder:
+          brokers: 192.168.0.58:9102
+  r2dbc:
+    url: r2dbc:postgresql://192.168.0.58:5432/tysescrutinygateway
+    username: tysescrutinygateway
+    password: ${GATEWAY_DB_PASSWORD:}
+  liquibase:
+    url: jdbc:postgresql://192.168.0.58:5432/tysescrutinygateway
+    user: tysescrutinygateway
+    password: ${GATEWAY_DB_PASSWORD:}
+  mail:
+    host: 192.168.0.58
+    port: 1035
+
+server:
+  port: 8080
+
+jhipster:
+  mail:
+    base-url: http://localhost:8080
