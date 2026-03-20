@@ -1,0 +1,65 @@
+# ===================================================================
+# Spring Boot configuration for the "docker-dev" profile.
+#
+# Ejecuta dentro de Docker Compose (docker-dev/).
+# Todos los servicios se resuelven por hostname de contenedor.
+# NO necesitas instalar Java, Maven ni Node en tu máquina.
+#
+# Uso: se activa automáticamente desde docker-compose.docker-dev.yml
+# ===================================================================
+
+spring:
+  docker:
+    compose:
+      enabled: false
+  devtools:
+    restart:
+      enabled: true
+      additional-exclude: static/**
+      poll-interval: 2s
+      quiet-period: 1s
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      config:
+        fail-fast: false
+        format: yaml
+        profile-separator: '-'
+      discovery:
+        prefer-ip-address: true
+    stream:
+      kafka:
+        binder:
+          brokers: kafka:29092
+  r2dbc:
+    url: r2dbc:postgresql://postgres-gateway:5432/tyseScrutinyGateway
+    username: tyseScrutinyGateway
+    password:
+  liquibase:
+    contexts: dev, faker
+    url: jdbc:postgresql://postgres-gateway:5432/tyseScrutinyGateway
+    user: tyseScrutinyGateway
+    password:
+  mail:
+    host: mailhog
+    port: 1025
+    username:
+    password:
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+logging:
+  level:
+    ROOT: INFO
+    tech.jhipster: INFO
+    com.tyse.scrutiny.gateway: DEBUG
+
+jhipster:
+  mail:
+    base-url: http://localhost:9000

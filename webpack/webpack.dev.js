@@ -65,7 +65,7 @@ module.exports = async options =>
       proxy: [
         {
           context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console'],
-          target: `http${options.tls ? 's' : ''}://localhost:8080`,
+          target: process.env.BACKEND_URL || `http${options.tls ? 's' : ''}://localhost:8080`,
           secure: false,
           changeOrigin: options.tls,
         },
