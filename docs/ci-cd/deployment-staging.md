@@ -59,9 +59,9 @@ Ribbon: "Desarrollo" (marcador visual en el header)
 java --version
 # openjdk version "17" o superior
 
-# 2. Node.js 22.15.0+
+# 2. Node.js 22.22.2+
 node --version
-# v22.15.0 o superior
+# v22.22.2 o superior
 
 # 3. Maven (via wrapper)
 ./mvnw --version

@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Requirements
 
 - **Java 17** - Required for Spring Boot backend (`JAVA_HOME` must be set)
-- **Node 22.15.0** - Enforced in `package.json` engines (use nvm or volta)
+- **Node 22.22.2** - Enforced in `package.json` engines (use nvm or volta)
 - **Docker** - For Testcontainers, PostgreSQL, and infrastructure services
   - Docker API version 1.45+ required (see `TROUBLESHOOTING.md` for Docker 29+ issues)
 

@@ -116,7 +116,7 @@ Esto ejecuta el pipeline completo incluyendo tests E2E.
 ### Requisitos
 
 - **Java 17** - Verificar con `java -version`
-- **Node.js 22.15.0+** - Verificar con `node -v`
+- **Node.js 22.22.2+** - Verificar con `node -v`
 - **Docker** (solo para E2E) - Verificar con `docker --version`
 
 ### Pre-push Hook (Desactivado)
