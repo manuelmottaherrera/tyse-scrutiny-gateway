@@ -123,6 +123,5 @@ npm run java:docker         # Build imagen
 
 ## 📅 Información
 
-- **Última Actualización:** 2025-11-21
-- **Versión:** v1.0.0
+- **Última Actualización:** 2026-03-24
 - **Autor:** Manuel A. Motta H.

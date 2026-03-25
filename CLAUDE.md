@@ -5,9 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Rules
 
 - Hablame en español
-- Una tarea compleja debe planearse correctamente. El plan debe almacenarse en `claude/actual/` mientras se trabaja en él.
 - NO generar reportes de completación de tareas a menos que se solicite explícitamente.
-- Mantener planes activos en `claude/actual/` y archivar en `claude/hitos/` solo cuando se complete una fase completa del proyecto.
 
 ## Requirements
 

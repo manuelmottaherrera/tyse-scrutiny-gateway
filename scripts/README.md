@@ -119,30 +119,20 @@ Esto ejecuta el pipeline completo incluyendo tests E2E.
 - **Node.js 22.15.0+** - Verificar con `node -v`
 - **Docker** (solo para E2E) - Verificar con `docker --version`
 
-### Pre-push Hook Automático
+### Pre-push Hook (Desactivado)
 
-**Importante:** Este proyecto tiene configurado un pre-push hook de Git que ejecuta automáticamente el CI completo (con E2E) antes de permitir push a las ramas `main` o `develop`.
-
-**Comportamiento:**
-
-- Al hacer `git push` a `main` o `develop`, se ejecuta automáticamente `./scripts/ci-local.sh --with-e2e`
-- El push solo se completa si todos los tests pasan exitosamente
-- Para otras ramas, el push se ejecuta sin validación
-
-**Omitir el hook (no recomendado):**
+El pre-push hook (`.husky/pre-push`) está **desactivado** porque causaba timeouts de SSH al ejecutar CI completo. En su lugar, usa `push.sh` para validar antes de hacer push:
 
 ```bash
-git push --no-verify
+./scripts/push.sh                # Push con CI completa (recomendado)
+./scripts/push.sh --skip-ci      # Push sin CI (no recomendado)
 ```
-
-**Configuración:** El hook está en `.husky/pre-push`
 
 ### Notas
 
 - El script sale con código de error si algún test falla
 - Los reportes de cobertura y tests se guardan en `target/`
 - El script usa los mismos flags y configuraciones que GitHub Actions
-- Con el pre-push hook activo, no necesitas ejecutar manualmente antes de push a main/develop
 
 ---
 
