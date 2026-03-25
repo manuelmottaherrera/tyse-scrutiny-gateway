@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Card, CardBody } from 'reactstrap';
 import { Translate } from 'react-jhipster';
-import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { useTheme } from 'app/shared/context/theme-contex/theme-context';
 import type { PuestoDetalle } from 'app/shared/services/divipol.service';
 import './puesto-info-tab.scss';
@@ -110,9 +110,10 @@ export const PuestoInfoTab: React.FC<PuestoInfoTabProps> = ({ puesto }) => {
                   defaultZoom={16}
                   gestureHandling="cooperative"
                   disableDefaultUI={false}
+                  mapId="DEMO_MAP_ID"
                   colorScheme={currentResolvedTheme === 'dark' ? 'DARK' : 'LIGHT'}
                 >
-                  <Marker position={{ lat: puesto.latitud, lng: puesto.longitud }} title={puesto.nompuesto} />
+                  <AdvancedMarker position={{ lat: puesto.latitud, lng: puesto.longitud }} title={puesto.nompuesto} />
                 </Map>
               </APIProvider>
             </div>
