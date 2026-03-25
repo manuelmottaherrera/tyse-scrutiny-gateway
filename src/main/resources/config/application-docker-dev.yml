@@ -62,4 +62,4 @@ logging:
 
 jhipster:
   mail:
-    base-url: http://localhost:9000
+    base-url: http://localhost:9060
