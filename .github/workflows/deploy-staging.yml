@@ -130,8 +130,8 @@ jobs:
           CORS_ALLOWED_ORIGINS=${{ secrets.STAGING_CORS_ALLOWED_ORIGINS }}
 
           # Google reCAPTCHA
-          GOOGLE_RECAPTCHA_SITE_KEY=${{ secrets.STAGING_RECAPTCHA_SITE_KEY }}
-          GOOGLE_RECAPTCHA_SECRET_KEY=${{ secrets.STAGING_RECAPTCHA_SECRET_KEY }}
+          GOOGLE_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}
+          GOOGLE_RECAPTCHA_SECRET_KEY=${{ secrets.RECAPTCHA_SECRET_KEY }}
 
           # Kafka Topics
           KAFKA_E14_PDF_UPLOADED_TOPIC=e14-pdf-uploaded

@@ -46,7 +46,7 @@ jobs:
 
       - name: Build production JAR
         env:
-          REACT_APP_RECAPTCHA_SITE_KEY: ${{ secrets.STAGING_RECAPTCHA_SITE_KEY }}
+          REACT_APP_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
         run: |
           chmod +x mvnw
           ./mvnw -Pprod clean verify -DskipTests
@@ -72,7 +72,7 @@ jobs:
       - name: Build and push Docker image with Jib
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REACT_APP_RECAPTCHA_SITE_KEY: ${{ secrets.STAGING_RECAPTCHA_SITE_KEY }}
+          REACT_APP_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
         run: |
           IMAGE_TAG=${{ steps.meta.outputs.IMAGE_TAG }}
           SHORT_SHA=${{ steps.meta.outputs.SHORT_SHA }}
